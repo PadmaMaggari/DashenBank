@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://Integration_Dashen" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://Integration_Dashen" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:element ibmSchExtn:docRoot="true" name="AccountBalanceEnquiry">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="CustomerName" nillable="true" type="xsd:string"/>
+                <xsd:element name="AccountNumber" nillable="true" type="xsd:string"/>
+                <xsd:element name="MobileNumber" nillable="true" type="xsd:string"/>
+            </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element ibmSchExtn:docRoot="true" name="AccountBalanceEnquiryResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="CustomerName" nillable="true" type="xsd:string"/>
+                <xsd:element name="CustomerID" nillable="true" type="xsd:string"/>
+                <xsd:element name="AccountNumber" nillable="true" type="xsd:string"/>
+                <xsd:element name="AccountType" nillable="true" type="xsd:string"/>
+                <xsd:element name="AccountStatus" nillable="true" type="xsd:string"/>
+                <xsd:element name="LedgerBalance" nillable="true" type="xsd:string"/>
+                <xsd:element name="AvailableBalance" nillable="true" type="xsd:string"/>
+                <xsd:element name="ResponseCode" nillable="true" type="xsd:string"/>
+                <xsd:element name="ResponseReason" nillable="true" type="xsd:string"/>
+            </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    <xsd:element ibmSchExtn:docRoot="true" name="FundTransfer">
+    <xsd:complexType>
+      <xsd:sequence>
+      	<xsd:element name="RemitterDetails" nillable="true" type="tns:RemType"/>
+      	<xsd:element name="BenificiaryDetails" type="tns:BenType"/>
+      	<xsd:element name="Amount" type="xsd:string"/>
+      	<xsd:element name="Currency" type="xsd:string"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+    <xsd:element ibmSchExtn:docRoot="true" name="FundTransferResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+      	<xsd:element name="Amount" nillable="true" type="xsd:string"/>
+      	<xsd:element name="ResponseCode" type="xsd:string"/>
+      	<xsd:element name="ResponseReason" type="xsd:string"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+    <xsd:element ibmSchExtn:docRoot="true" name="NewOperaion">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="in" type="xsd:string"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+    <xsd:element ibmSchExtn:docRoot="true" name="NewOperaionResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="out" type="xsd:string"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+    <xsd:complexType name="RemType">
+    	<xsd:sequence>
+    		<xsd:element name="AccountNumber" type="xsd:string"/>
+    		<xsd:element name="CustomerID" type="xsd:string"/>
+    		<xsd:element name="Mobile" type="xsd:string"/>
+    	</xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="BenType">
+    	<xsd:sequence>
+    		<xsd:element name="AccountNumber" type="xsd:string"/>
+    		<xsd:element name="CustomerNumber" type="xsd:string"/>
+    		<xsd:element name="Mobile" type="xsd:string"/>
+    	</xsd:sequence>
+    </xsd:complexType>
+    <xsd:element ibmSchExtn:docRoot="true" name="BankToWallet">
+    <xsd:complexType>
+      <xsd:sequence>
+      	<xsd:element name="CustomerName" nillable="true"
+      		type="xsd:string" />
+      	<xsd:element name="CustomerID" type="xsd:string"></xsd:element>
+      	<xsd:element name="WalletID" type="xsd:string"></xsd:element>
+      	<xsd:element name="AccoutNumber" type="xsd:string"></xsd:element>
+      	<xsd:element name="MobileNumber" type="xsd:string"></xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+    <xsd:element ibmSchExtn:docRoot="true" name="BankToWalletResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+      	<xsd:element name="CustomerID" nillable="true"
+      		type="xsd:string" />
+      	<xsd:element name="MobileNumber" type="xsd:string"></xsd:element>
+      	<xsd:element name="ResponseCode" type="xsd:string"></xsd:element>
+      	<xsd:element name="ResponseReason" type="xsd:string"></xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

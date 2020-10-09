@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="Integration_Dashen" targetNamespace="http://Integration_Dashen" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://Integration_Dashen" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:documentation>
+    <wsdl:appinfo source="WMQI_APPINFO">
+      <MRWSDLAppInfo imported="true">
+        <binding hasEncoding="false" imported="true" name="Integration_DashenHttpBinding" originalBindingStyle="document"/>
+        <generatedXSD location="Integration_Dashen_InlineSchema1.xsd"/>
+      </MRWSDLAppInfo>
+    </wsdl:appinfo>
+  </wsdl:documentation>
+  
+  
+  
+  
+  <wsdl:types>
+    
+        <xsd:schema targetNamespace="http://Integration_Dashen" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions">
+      <xsd:include schemaLocation="Integration_Dashen_InlineSchema1.xsd"/>
+    </xsd:schema>
+    </wsdl:types>
+  <wsdl:message name="AccountBalanceEnquiryRequestMsg">
+    <wsdl:part element="tns:AccountBalanceEnquiry" name="AccountBalanceEnquiryParameters"/>
+  </wsdl:message>
+  <wsdl:message name="AccountBalanceEnquiryResponseMsg">
+    <wsdl:part element="tns:AccountBalanceEnquiryResponse" name="AccountBalanceEnquiryResult"/>
+  </wsdl:message>
+  <wsdl:message name="FundTransferRequestMsg">
+  	<wsdl:part element="tns:FundTransfer" name="FundTransferParameters"/>
+  </wsdl:message>
+  <wsdl:message name="FundTransferResponseMsg">
+    <wsdl:part element="tns:FundTransferResponse" name="FundTransferResult"/>
+  </wsdl:message>
+  <wsdl:message name="FundTransferRequest">
+  	<wsdl:part element="tns:FundTransfer" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="FundTransferResponse">
+  	<wsdl:part element="tns:FundTransferResponse" name="parameters"/>
+  </wsdl:message>
+    <wsdl:message name="BankToWalletRequestMsg">
+    <wsdl:part element="tns:BankToWallet" name="BankToWalletParameters"/>
+  </wsdl:message>
+    <wsdl:message name="BankToWalletResponseMsg">
+    <wsdl:part element="tns:BankToWalletResponse" name="BankToWalletResult"/>
+  </wsdl:message>
+    <wsdl:portType name="Integration_Dashen">
+    <wsdl:operation name="AccountBalanceEnquiry">
+            <wsdl:input message="tns:AccountBalanceEnquiryRequestMsg" name="AccountBalanceEnquiryRequest"/>
+            <wsdl:output message="tns:AccountBalanceEnquiryResponseMsg" name="AccountBalanceEnquiryResponse"/>
+        </wsdl:operation>
+
+    <wsdl:operation name="FundTransfer">
+    	<wsdl:input message="tns:FundTransferRequest"/>
+    	<wsdl:output message="tns:FundTransferResponse"/>
+    </wsdl:operation>
+        <wsdl:operation name="BankToWallet">
+      <wsdl:input message="tns:BankToWalletRequestMsg" name="BankToWalletRequest"/>
+      <wsdl:output message="tns:BankToWalletResponseMsg" name="BankToWalletResponse"/>
+    </wsdl:operation>
+    </wsdl:portType>
+  <wsdl:binding name="Integration_DashenHttpBinding" type="tns:Integration_Dashen">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="AccountBalanceEnquiry">
+            <soap:operation soapAction="http://Integration_Dashen/AccountBalanceEnquiry"/>
+            <wsdl:input name="AccountBalanceEnquiryRequest">
+                <soap:body use="literal"/>
+            </wsdl:input>
+      <wsdl:output name="AccountBalanceEnquiryResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+    </wsdl:operation>
+        <wsdl:operation name="FundTransfer">
+            <soap:operation soapAction="http://Integration_Dashen/FundTransfer"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+      <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+    </wsdl:operation>
+        <wsdl:operation name="BankToWallet">
+      <soap:operation soapAction="http://Integration_Dashen/BankToWallet"/>
+      <wsdl:input name="BankToWalletRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="BankToWalletResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    </wsdl:binding>
+  <wsdl:service name="Integration_DashenHttpService">
+    <wsdl:port binding="tns:Integration_DashenHttpBinding" name="Integration_DashenHttpPort">
+      <soap:address location="http://localhost:7800/Integration_Dashen"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

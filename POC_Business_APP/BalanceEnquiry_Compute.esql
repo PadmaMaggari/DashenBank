@@ -1,0 +1,71 @@
+PATH Eidiko.Dashen.CommanEsql;
+
+DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER;
+CREATE COMPUTE MODULE BalanceEnquiry_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN FALSE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		DECLARE rc BOOLEAN FALSE;
+		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
+		IF ( rc = FALSE ) THEN
+			DECLARE msg CHARACTER ;
+			--SET Environment.Variables.Log4j.ErrorMsg = LOG4J_INIT_ERROR_MSG;		
+		END IF;
+		CALL writeToLogFile(MessageFlowLabel, 'ACE-LOG', 'DEGUB','..............Initializing logging...........') INTO rc;
+		DECLARE EnRef REFERENCE TO Environment.Variables;
+		CREATE LASTCHILD OF Environment AS EnRef NAME 'Variables';
+		CALL LoadEnvironemnt();
+		DECLARE refId CHARACTER EnRef.localEnv.Destination.SOAP.Reply.ReplyIdentifier;
+		SET EnRef.RefID = CAST(EnRef.localEnv.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
+		DECLARE BusinessIN CHARACTER  CAST(ASBITSTREAM(InputRoot.SOAP CCSID InputRoot.Properties.CodedCharSetId ENCODING InputRoot.Properties.Encoding)
+		AS CHARACTER CCSID InputRoot.Properties.CodedCharSetId ENCODING InputRoot.Properties.Encoding);
+		
+		CALL PayloadLogging(refId,BusinessIN,'BUSINESS-REQUEST');		
+		SET OutputRoot.XMLNSC.AccountBalanceEnquiry[] =InputRoot.SOAP[];
+		SET EnRef.FlexIN =  CAST(ASBITSTREAM(OutputRoot.XMLNSC CCSID InputRoot.Properties.CodedCharSetId ENCODING InputRoot.Properties.Encoding)
+		AS CHARACTER CCSID InputRoot.Properties.CodedCharSetId ENCODING InputRoot.Properties.Encoding);
+		CALL writeToLogFile(MessageFlowLabel, 'ACE-LOG', 'DEGUB','..............Request Sent to FlexCube...........') INTO rc;
+		CALL PayloadLogging(refId,EnRef.FlexIN,'FLEXCUBE-REQUEST');
+		SET OutputRoot.XMLNSC.AccountBalanceEnquiry[] =InputRoot.SOAP[];
+		PROPAGATE TO TERMINAL 'out';
+		
+		
+	END;
+	CREATE PROCEDURE LoadEnvironemnt ( )
+	BEGIN
+		DECLARE EnRef REFERENCE TO Environment.Variables;
+		SET EnRef.InProperties	 = InputProperties;
+		SET EnRef.InHeader		 = InputRoot.HTTPInputHeader;
+		SET EnRef.InBody 		 = InputRoot.SOAP;
+		SET EnRef.localEnv       = InputLocalEnvironment;
+		
+	END;
+	CREATE FUNCTION PayloadLogging(IN RefId CHARACTER,IN TRAN_PAYLOAD CHARACTER,IN PAYLOAD_TYPE CHARACTER)
+	BEGIN
+		
+		SET OutputRoot.HTTPRequestHeader.RefId = RefId;
+		SET OutputRoot.XMLNSC.Payload.RefId=RefId;
+		SET OutputRoot.XMLNSC.Payload.PayloadType = PAYLOAD_TYPE;
+		SET OutputRoot.XMLNSC.Payload.PayloadData =TRAN_PAYLOAD;
+		--SET OutputRoot.XMLNSC.Payload 			= ASBITSTREAM(InputRoot.JSON.Data CCSID InputRoot.Properties.CodedCharSetId ENCODING InputRoot.Properties.Encoding);	
+		PROPAGATE TO TERMINAL 'out1' ;
+		SET OutputRoot.XMLNSC = NULL;
+		
+		
+	END;
+END MODULE;
