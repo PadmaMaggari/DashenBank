@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://localhost:7800/RTSERVICE/" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://localhost:7800/RTSERVICE/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:element ibmSchExtn:docRoot="true" name="RTSERVICE">
+        <xsd:complexType>
+
+        	<xsd:sequence>
+        		<xsd:element name="RT_HEADER" type="tns:RT_HEADERTYPE">
+        		</xsd:element>
+        		<xsd:element name="RT_BODY" type="tns:RT_BODYTYPE"/>
+        	</xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element ibmSchExtn:docRoot="true" name="RTSERVICEResponse">
+        <xsd:complexType>
+
+        	<xsd:sequence>
+        		<xsd:element name="RT_HEADER" type="tns:RT_HEADERTYPE1">
+        		</xsd:element>
+        		<xsd:element name="RT_BODY" type="tns:RT_BODYTYPE"/>
+        		<xsd:element name="RT_WARNING_RESP" type="tns:RT_WARNING_RESPTYPE">
+        		</xsd:element>
+        	</xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    
+      <xsd:complexType name="RT_HEADERTYPE">
+      	<xsd:sequence>
+      		<xsd:element name="SOURCE" type="xsd:string"/>
+      		<xsd:element name="UBSCOMP" type="xsd:string"/>
+      		<xsd:element name="MSGID" type="xsd:string"/>
+      		<xsd:element name="CORRELID" type="xsd:string"/>
+      		<xsd:element name="USERID" type="xsd:string"/>
+      		<xsd:element name="BRANCH" type="xsd:string"/>
+      		<xsd:element name="MODULEID" type="xsd:string"/>
+      		<xsd:element name="SERVICE" type="xsd:string"/>
+      		<xsd:element name="OPERATION" type="xsd:string"/>
+      		<xsd:element name="SOURCE_USERID" type="xsd:string"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="RT_BODYTYPE">
+      	<xsd:sequence>
+      		<xsd:element name="Transaction-Details" type="tns:Transaction-DetailsTYPE1">
+      		</xsd:element>
+
+
+
+
+
+
+
+
+
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="Transaction-DetailsTYPE">
+      	<xsd:sequence>
+      		<xsd:element name="XREF" type="xsd:string"/>
+      		<xsd:element name="PRD" type="xsd:string"/>
+      		<xsd:element name="BRN" type="xsd:string"/>
+      		<xsd:element name="MODULE" type="xsd:string"/>
+      		<xsd:element name="TXNBRN" type="xsd:string"/>
+      		<xsd:element name="TXNACC" type="xsd:string"/>
+      		<xsd:element name="TXNCCY" type="xsd:string"/>
+      		<xsd:element name="TXNAMT" type="xsd:string"/>
+      		<xsd:element name="TXNTRN" type="xsd:string"/>
+      		<xsd:element name="OFFSETBRN" type="xsd:string"/>
+      		<xsd:element name="OFFSETACC" type="xsd:string"/>
+      		<xsd:element name="OFFSETCCY" type="xsd:string"/>
+      		<xsd:element name="OFFSETAMT" type="xsd:string"/>
+      		<xsd:element name="OFFSETTRN" type="xsd:string"/>
+      		<xsd:element name="TXNDATE" type="xsd:string"/>
+      		<xsd:element name="VALDATE" type="xsd:string"/>
+      		<xsd:element name="NARRATIVE" type="xsd:string"/>
+      		<xsd:element name="AUTHSTAT" type="xsd:string"/>
+
+
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="RT_HEADERTYPE1">
+      	<xsd:sequence>
+
+      		<xsd:element name="MSGSTAT" type="xsd:string"/>
+      		<xsd:element name="ACTION" type="xsd:string"/>
+      		<xsd:element name="FUNCTIONID" type="xsd:string"/>
+      		<xsd:element name="DESTINATION" type="xsd:string"/>
+      		<xsd:element name="SOURCE" type="xsd:string"/>
+      		<xsd:element name="UBSCOMP" type="xsd:string"/>
+      		<xsd:element name="CORRELID" type="xsd:string"/>
+      		<xsd:element name="USERID" type="xsd:string"/>
+      		<xsd:element name="BRANCH" type="xsd:string"/>
+      		<xsd:element name="MODULEID" type="xsd:string"/>
+      		<xsd:element name="SERVICE" type="xsd:string"/>
+      		<xsd:element name="OPERATION" type="xsd:string"/>
+      		<xsd:element name="SOURCE_USERID" type="xsd:string"/>
+
+
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="Transaction-DetailsTYPE1">
+      	<xsd:sequence>
+      		<xsd:element name="XREF" type="xsd:string"/>
+      		<xsd:element name="FCCREF" type="xsd:string"/>
+      		<xsd:element name="PRD" type="xsd:string"/>
+      		<xsd:element name="BRN" type="xsd:string"/>
+      		<xsd:element name="TXNBRN" type="xsd:string"/>
+      		<xsd:element name="TXNACC" type="xsd:string"/>
+      		<xsd:element name="TXNCCY" type="xsd:string"/>
+      		<xsd:element name="TXNAMT" type="xsd:string"/>
+      		<xsd:element name="TXNTRN" type="xsd:string"/>
+      		<xsd:element name="OFFSETBRN" type="xsd:string"/>
+      		<xsd:element name="OFFSETACC" type="xsd:string"/>
+      		<xsd:element name="OFFSETCCY" type="xsd:string"/>
+      		<xsd:element name="OFFSETAMT" type="xsd:string"/>
+      		<xsd:element name="OFFSETTRN" type="xsd:string"/>
+      		<xsd:element name="XRATE" type="xsd:string"/>
+      		<xsd:element name="LCYAMT" type="xsd:string"/>
+      		<xsd:element name="TXNDATE" type="xsd:string"/>
+      		<xsd:element name="VALDATE" type="xsd:string"/>
+      		<xsd:element name="RELCUST" type="xsd:string"/>
+      		<xsd:element name="TCYTOTCHGAMT" type="xsd:string"/>
+      		<xsd:element name="NARRATIVE" type="xsd:string"/>
+      		<xsd:element name="MAKERID" type="xsd:string"/>
+      		<xsd:element name="MAKERSTAMP" type="xsd:string"/>
+      		<xsd:element name="CHECKERID" type="xsd:string"/>
+      		<xsd:element name="CHECKERSTAMP" type="xsd:string"/>
+      		<xsd:element name="RECSTAT" type="xsd:string"/>
+      		<xsd:element name="AUTHSTAT" type="xsd:string"/>
+      		<xsd:element name="DRACC" type="xsd:string"/>
+      		<xsd:element name="TXNDRCR" type="xsd:string"/>
+      		<xsd:element name="BOOKDATE" type="xsd:string"/>
+      		<xsd:element name="FT" type="xsd:string"/>
+      		<xsd:element name="LCYTOTCHGAMT" type="xsd:string"/>
+      		<xsd:element name="DENMCCY1" type="xsd:string"/>
+      		<xsd:element name="DENMAMT1" type="xsd:string"/>
+      		<xsd:element name="DENMAMT2" type="xsd:string"/>
+      		<xsd:element name="ACCTITLE1" type="xsd:string"/>
+      		<xsd:element name="ACCTITLE2" type="xsd:string"/>
+      		<xsd:element name="ACTAMT" type="xsd:string"/>
+      		<xsd:element name="CUSTNAME" type="xsd:string"/>
+      		<xsd:element name="TXNDATEADV" type="xsd:string"/>
+      		<xsd:element name="ACTAMTADV" type="xsd:string"/>
+      		<xsd:element name="TCYCHGAMTADV" type="xsd:string"/>
+      		<xsd:element name="TCYCHGAMTADV1" type="xsd:string"/>
+      		<xsd:element name="TXNAMTINWORDS" type="xsd:string"/>
+      		<xsd:element name="OFFSETBRNADDR" type="xsd:string"/>
+      		<xsd:element name="TXNBRNADDR" type="xsd:string"/>
+      		<xsd:element name="NARRATIVE" type="xsd:string"/>
+      		<xsd:element name="TXNAMTADV" type="xsd:string"/>
+      		<xsd:element name="ACTAMTINWORDS" type="xsd:string"/>
+      		<xsd:element name="PHADVICENAME" type="xsd:string"/>
+      		<xsd:element name="CHGDESC" type="xsd:string"/>
+      		<xsd:element name="PHTXNAMOUNT" type="xsd:string"/>
+      		<xsd:element name="TXNAMOUNTADV" type="xsd:string"/>
+      		<xsd:element name="CHGAMTADV" type="xsd:string"/>
+      		<xsd:element name="OFFSETAMTADV" type="xsd:string"/>
+      		<xsd:element name="OFSAMTINWORDS" type="xsd:string"/>
+      		<xsd:element name="AMTDESC" type="xsd:string"/>
+      		<xsd:element name="ADVICEACC" type="xsd:string"/>
+      		<xsd:element name="ADVICEACCTITLE" type="xsd:string"/>
+      		<xsd:element name="PHADVICEACC" type="xsd:string"/>
+
+      	</xsd:sequence>
+      </xsd:complexType>
+        
+      <xsd:complexType name="RT_WARNING_RESPTYPE">
+      	<xsd:sequence>
+      		<xsd:element name="WARNING" type="tns:WARNINGTYPE"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="WARNINGTYPE">
+      	<xsd:sequence>
+      		<xsd:element name="WCODE" type="xsd:string"/>
+      		<xsd:element name="WDESC" type="xsd:string"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
