@@ -67,7 +67,7 @@ CREATE COMPUTE MODULE Businessflow_Compute1
 		CALL writeToLogFile(MessageFlowLabel,'Internalfundtransfer_Log','DEBUG','Response data is: '||payload) INTO rc;
 	            
 	--	SET OutputRoot.HTTPResponseHeader."Content-Type" = id1;
-        SET OutputRoot.SOAP.Body = InputRoot.SOAP.Body;
+        SET OutputRoot = InputRoot;
    --     SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = CAST(Environment.id1 AS BLOB);
 		
 --		DECLARE Qry1 CHARACTER 'SELECT * FROM DASHENBANK_SERVICE_CONFIG WHERE BUSINESSFLOW_NAME=?';
