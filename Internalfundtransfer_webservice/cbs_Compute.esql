@@ -37,17 +37,21 @@ CREATE COMPUTE MODULE cbs_Compute
         CALL writeToLogFile(MessageFlowLabel,'CBS_BACKEND_LOG','INFO','..........CBS_BACKEND Flow is Started...........') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,'CBS_BACKEND_LOG','INFO','Payload data is: '||LOG) INTO rc;
 		
+		DECLARE Service_Name CHARACTER;           
+	    SET Service_Name = FIELDNAME(InputRoot.SOAP.Body.[<]);
 		DECLARE FILENAME CHARACTER;
-		DECLARE OPERATION_NAME CHARACTER InputRoot.SOAP.Body.ns50:RTSERVICE.RT_HEADER.OPERATION;
-		DECLARE SERVICE_NAME CHARACTER InputRoot.SOAP.Body.ns50:RTSERVICE.RT_HEADER.SERVICE;
+--		DECLARE OPERATION_NAME CHARACTER InputRoot.SOAP.Body.ns50:RTSERVICE.RT_HEADER.OPERATION;
+--		DECLARE SERVICE_NAME CHARACTER InputRoot.SOAP.Body.ns50:RTSERVICE.RT_HEADER.SERVICE;
+
 		CASE
-		WHEN OPERATION_NAME='xxx' AND SERVICE_NAME='yyy' THEN
+		WHEN Service_Name='xxx_yyy' THEN
 		SET FILENAME = 'zzz.xml';
-		WHEN OPERATION_NAME='CreateTransaction' AND SERVICE_NAME='FCUBSRTService' THEN
+		WHEN Service_Name='RTSERVICE' THEN
 		SET FILENAME = 'RTRES.xml';
 		ELSE
 		SET FILENAME = NULL;	
 		END CASE;
+		
 		SET OutputRoot = InputRoot;
 		SET OutputLocalEnvironment.Destination.File.Name = FILENAME;
 		
