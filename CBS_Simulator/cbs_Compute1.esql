@@ -38,7 +38,15 @@ CREATE COMPUTE MODULE cbs_Compute1
         CALL writeToLogFile(MessageFlowLabel,'CBS_BACKEND_LOG','INFO','.....................') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,'CBS_BACKEND_LOG','INFO','Payload data is: '||LOG) INTO rc;
 		
+		DECLARE Service_Name CHARACTER;           
+	    SET Service_Name = FIELDNAME(InputRoot.XMLNSC.[<]);
+	    
+	    CASE
+		WHEN Service_Name='RTSERVICEResponse' THEN
 		SET OutputRoot.SOAP.Body.ns50:RTSERVICEResponse = InputRoot.XMLNSC.RTSERVICEResponse;
+		ELSE
+		SET OutputRoot.SOAP = NULL;
+		END CASE;
 		
 		CALL writeToLogFile(MessageFlowLabel,'CBS_BACKEND_LOG','INFO','..........CBS_BACKEND Flow is Ended...........') INTO rc;
 		

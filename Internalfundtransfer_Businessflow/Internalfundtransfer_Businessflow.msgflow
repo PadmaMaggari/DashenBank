@@ -9,12 +9,12 @@
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR" name="LOG4J_ERROR" defaultValueLiteral="Log4j is not Configured Properly.">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.CBS_URL" name="CBS_URL" defaultValueLiteral="http://localhost:7800/CBS_IFT_RTSERVICE">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.CBS_URL" name="CBS_URL" defaultValueLiteral="http://localhost:7800/CBS_BACKEND">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <translation xmi:type="utility:TranslatableString" key="Internalfundtransfer_Businessflow" bundleName="Internalfundtransfer_Businessflow" pluginId="Internalfundtransfer_Businessflow"/>
-    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/Internalfundtransfer_Businessflow/icons/full/obj16/Internalfundtransfer_Businessflow.gif"/>
-    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/Internalfundtransfer_Businessflow/icons/full/obj30/Internalfundtransfer_Businessflow.gif"/>
+    <translation xmi:type="utility:TranslatableString" key="Internalfundtransfer_Businessflow" bundleName="Internalfundtransfer_Businessflow" pluginId="ESB-DASHENBANK_InternalFundTransfer"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/ESB-DASHENBANK_InternalFundTransfer/icons/full/obj16/Internalfundtransfer_Businessflow.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/ESB-DASHENBANK_InternalFundTransfer/icons/full/obj30/Internalfundtransfer_Businessflow.gif"/>
     <composition>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="434,38" dataSource="DBDSN" computeExpression="esql://routine/#Businessflow_Compute1.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="Compute"/>
@@ -25,7 +25,7 @@
       <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="636,194" targetApplication="Auditdblogging_Flow" targetEndpointName="auditlogging">
         <translation xmi:type="utility:ConstantString" string="payloadlogging"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="16,158" wsdlFileName="RTSERVICE.wsdl" selectedPortType="RTSERVICE" selectedBinding="RTSERVICESOAP" selectedPort="RTSERVICESOAP" targetNamespace="http://localhost:7800/RTSERVICE/" useHTTPTransport="true" urlSelector="/IFT_RTSERVICE" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="16,158" wsdlFileName="RTSERVICE.wsdl" selectedPortType="RTSERVICE" selectedBinding="RTSERVICESOAP" selectedPort="RTSERVICESOAP" targetNamespace="http://localhost:7800/RTSERVICE/" useHTTPTransport="true" urlSelector="/ESB-IFT_RTSERVICE" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Internalfundtransfer_businessflowInput"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="575,65">
@@ -54,11 +54,11 @@
     </composition>
     <propertyOrganizer>
       <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_PATH">
-        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_PATH" bundleName="Internalfundtransfer_Businessflow" pluginId="Internalfundtransfer_Businessflow"/>
+        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_PATH" bundleName="Internalfundtransfer_Businessflow" pluginId="ESB-DASHENBANK_InternalFundTransfer"/>
         <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_ERROR">
-          <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR" bundleName="Internalfundtransfer_Businessflow" pluginId="Internalfundtransfer_Businessflow"/>
+          <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR" bundleName="Internalfundtransfer_Businessflow" pluginId="ESB-DASHENBANK_InternalFundTransfer"/>
           <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.CBS_URL">
-            <propertyName xmi:type="utility:TranslatableString" key="Property.CBS_URL" bundleName="Internalfundtransfer_Businessflow" pluginId="Internalfundtransfer_Businessflow"/>
+            <propertyName xmi:type="utility:TranslatableString" key="Property.CBS_URL" bundleName="Internalfundtransfer_Businessflow" pluginId="ESB-DASHENBANK_InternalFundTransfer"/>
           </propertyDescriptor>
         </propertyDescriptor>
       </propertyDescriptor>
