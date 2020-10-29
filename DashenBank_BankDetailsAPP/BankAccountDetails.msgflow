@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ComIbmCallableFlowInvoke.msgnode="ComIbmCallableFlowInvoke.msgnode" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ComIbmSOAPInput.msgnode="ComIbmSOAPInput.msgnode" xmlns:ComIbmSOAPReply.msgnode="ComIbmSOAPReply.msgnode" xmlns:ComIbmSOAPRequest.msgnode="ComIbmSOAPRequest.msgnode" xmlns:com_dashenbank_co_zw_common_exceptionhandling_ExceptionHandling.subflow="com/dashenbank/co/zw/common/exceptionhandling/ExceptionHandling.subflow"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" nsURI="BankAccountDetails.msgflow" nsPrefix="BankAccountDetails.msgflow">
+  <eClassifiers xmi:type="eflow:FCMComposite" name="FCMComposite_1">
+    <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_PATH" name="LOG4J_PATH" defaultValueLiteral="E:\IBM_ACE\Projects\Dashen\LOG4J\Log4jConfigurationFile.xml">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR" name="LOG4J_ERROR" defaultValueLiteral="Log4j is not Configured Properly.">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.CBS_URL" name="CBS_URL" defaultValueLiteral="http://localhost:7800/AccountDetailsQuery_cbs">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.DSN_name" name="DSN_name" defaultValueLiteral="DBDSN">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" key="BankAccountDetails" bundleName="BankAccountDetails" pluginId="DashenBank_BankDetailsAPP"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_BankDetailsAPP/icons/full/obj16/BankAccountDetails.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_BankDetailsAPP/icons/full/obj30/BankAccountDetails.gif"/>
+    <composition>
+      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_27" location="829,121">
+        <translation xmi:type="utility:ConstantString" string="SOAP Reply"/>
+      </nodes>
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_28" location="216,184" wsdlFileName="bankDetails.wsdl" selectedPortType="bankDetails" selectedBinding="bankDetailsSOAP" selectedPort="bankDetailsSOAP" targetNamespace="http://fcubs.iflex.com/service/FCUBSAccService/QueryAccBal" useHTTPTransport="true" urlSelector="/AccountDetailsQuery" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+        <translation xmi:type="utility:ConstantString" string="SOAP Input"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_29" location="315,81" dataSource="DBDSN" transaction="commit" computeExpression="esql://routine/#AccountDetails_request.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="Request"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_30" location="664,73" dataSource="DBDSN" computeExpression="esql://routine/#AccountDetails_Compute1.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="Response"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_31" location="780,194" targetApplication="Auditdblogging_Flow" targetEndpointName="auditlogging">
+        <translation xmi:type="utility:ConstantString" string="CallableFlowInvoke"/>
+      </nodes>
+      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_32" location="454,72" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://dummy" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+        <translation xmi:type="utility:ConstantString" string="SOAP Request"/>
+      </nodes>
+      <nodes xmi:type="com_dashenbank_co_zw_common_exceptionhandling_ExceptionHandling.subflow:FCMComposite_1" xmi:id="FCMComposite_1_33" location="533,275">
+        <translation xmi:type="utility:ConstantString" string="ExceptionHandling"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_22" targetNode="FCMComposite_1_30" sourceNode="FCMComposite_1_32" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_23" targetNode="FCMComposite_1_32" sourceNode="FCMComposite_1_29" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_24" targetNode="FCMComposite_1_29" sourceNode="FCMComposite_1_28" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_25" targetNode="FCMComposite_1_31" sourceNode="FCMComposite_1_29" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_26" targetNode="FCMComposite_1_27" sourceNode="FCMComposite_1_30" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_27" targetNode="FCMComposite_1_31" sourceNode="FCMComposite_1_30" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_28" targetNode="FCMComposite_1_33" sourceNode="FCMComposite_1_28" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_29" targetNode="FCMComposite_1_33" sourceNode="FCMComposite_1_28" sourceTerminalName="OutTerminal.timeout" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_30" targetNode="FCMComposite_1_33" sourceNode="FCMComposite_1_28" sourceTerminalName="OutTerminal.catch" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_31" targetNode="FCMComposite_1_33" sourceNode="FCMComposite_1_29" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_32" targetNode="FCMComposite_1_27" sourceNode="FCMComposite_1_33" sourceTerminalName="OutTerminal.Output" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_33" targetNode="FCMComposite_1_33" sourceNode="FCMComposite_1_32" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_34" targetNode="FCMComposite_1_33" sourceNode="FCMComposite_1_32" sourceTerminalName="OutTerminal.fault" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_35" targetNode="FCMComposite_1_33" sourceNode="FCMComposite_1_30" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.Input"/>
+    </composition>
+    <propertyOrganizer>
+      <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_PATH">
+        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_PATH" bundleName="BankAccountDetails" pluginId="DashenBank_BankDetailsAPP"/>
+        <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_ERROR">
+          <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR" bundleName="BankAccountDetails" pluginId="DashenBank_BankDetailsAPP"/>
+          <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.CBS_URL">
+            <propertyName xmi:type="utility:TranslatableString" key="Property.CBS_URL" bundleName="BankAccountDetails" pluginId="DashenBank_BankDetailsAPP"/>
+            <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.DSN_name">
+              <propertyName xmi:type="utility:TranslatableString" key="Property.DSN_name" bundleName="BankAccountDetails" pluginId="DashenBank_BankDetailsAPP"/>
+            </propertyDescriptor>
+          </propertyDescriptor>
+        </propertyDescriptor>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <stickyBoard/>
+  </eClassifiers>
+</ecore:EPackage>
