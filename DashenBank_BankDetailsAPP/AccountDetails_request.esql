@@ -1,0 +1,110 @@
+
+PATH Dashen_log4jlib_1;
+CREATE COMPUTE MODULE AccountDetails_request
+	DECLARE rc BOOLEAN;
+	DECLARE LOG4J_PATH EXTERNAL CHARACTER;
+	DECLARE LOG4J_ERROR EXTERNAL CHARACTER;
+	DECLARE CBS_URL EXTERNAL CHARACTER;
+	DECLARE DSN_name EXTERNAL CHARACTER;
+	
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL initLog4j(LOG4J_PATH) INTO rc;
+		IF (rc = TRUE) THEN
+		       CALL AccountDetailsRequest();
+	      ELSE
+			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR;
+		END IF;
+		RETURN TRUE;
+	END;
+
+	
+	CREATE PROCEDURE AccountDetailsRequest() BEGIN
+
+        DECLARE id CHARACTER InputRoot.SOAP.Body.*:FCUBS_REQ_ENV.FCUBS_HEADER.MSGID;
+	    SET Environment.id = id;
+	    SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
+        SET Environment.encodeRef = InputRoot.Properties.Encoding;
+	    SET Environment.domainDataRef = InputRoot.XMLNSC;
+	    SET Environment.domainName = FIELDNAME(InputBody); 
+	    
+	   DECLARE id1 INTEGER;
+	   DECLARE TRANSACTION_STATUS1 CHARACTER 'Request Received from END USER';
+	   DECLARE CREATED_ON1 TIMESTAMP CURRENT_TIMESTAMP;
+	   DECLARE CREATED_BY1 CHARACTER 'ACE USER';
+	   DECLARE SERVICE_NAME CHARACTER InputRoot.SOAP.Body.*:FCUBS_REQ_ENV.FCUBS_HEADER.SERVICE;
+	   DECLARE OPERATIONNAME CHARACTER InputRoot.SOAP.Body.*:FCUBS_REQ_ENV.FCUBS_HEADER.OPERATION;
+	  
+	   INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(id1.NEXTVAL,id,SERVICE_NAME,OPERATIONNAME,TRANSACTION_STATUS1,CREATED_ON1,CREATED_BY1);
+	    
+      DECLARE ccidRef INTEGER Environment.ccidRef;
+      DECLARE encodeRef INTEGER Environment.encodeRef;
+	  DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
+	  DECLARE domainName CHARACTER Environment.domainName; 
+	  DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+	  CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	  DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+	  CALL PayloadLogging(id,payload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
+	    
+	   CALL writeToLogFile(MessageFlowLabel,'AQD_BUSINESSFLOW_LOG','DEBUG','..........Request Received from channel...........') INTO rc;
+	   CALL writeToLogFile(MessageFlowLabel,'AQD_BUSINESSFLOW_LOG','DEBUG','Request data is: '||payload) INTO rc;
+	     DECLARE ns NAMESPACE 'http://fcubs.iflex.com/service/FCUBSAccService/QueryAccBal'; 
+	     DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
+	     
+	    SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = CBS_URL;
+	      
+
+	DECLARE soapRef,headRef,bodyRef REFERENCE TO OutputRoot;
+	CREATE LASTCHILD OF soapRef AS soapRef DOMAIN 'SOAP';
+--   CREATE LASTCHILD OF soapRef AS soapRef NAMESPACE soapenv NAME 'Envelope';
+  
+--   CREATE LASTCHILD OF soapRef AS soapRef NAMESPACE ns NAME 'Body';
+--   CREATE LASTCHILD OF soapRef AS soapRef NAMESPACE ns NAME 'FCUBS_REQ_ENV';
+--   CREATE LASTCHILD OF soapRef AS headRef NAMESPACE ns NAME 'FCUBS_HEADER';
+--   CREATE LASTCHILD OF soapRef AS bodyRef NAMESPACE ns NAME 'FCUBS_BODY';
+--  	   DECLARE outRef REFERENCE TO OutputRoot.SOAP.soapenv:Envelope;
+--	   CREATE LASTCHILD OF OutputRoot.SOAP.soapenv:Envelope.soapenv:Header NAMESPACE 'ns:FCUBS_HEADER';
+ 
+--        SET headRef.ns:SOURCE = InputRoot.SOAP.Body.ns:FCUBS_REQ_ENV.FCUBS_HEADER.SOURCE;
+--       -- SET OutputRoot.XMLNSC.soapenv:Envelope.soapenv:Header.ns:FCUBS_HEADER.ns:SOURCE=InputRoot.SOAP.Body.ns:FCUBS_REQ_ENV.FCUBS_HEADER.SOURCE;
+--		SET headRef.ns:UBSCOMP=InputRoot.SOAP.Body.ns:FCUBS_REQ_ENV.FCUBS_HEADER.UBSCOMP;
+--        SET headRef.ns:BRANCH=InputRoot.SOAP.Body.ns:FCUBS_REQ_ENV.FCUBS_HEADER.BRANCH;
+--        SET headRef.ns:CORRELID=InputRoot.SOAP.Body.ns:FCUBS_REQ_ENV.FCUBS_HEADER.CORRELID;
+--        SET headRef.ns:OPERATION=InputRoot.SOAP.Body.ns:FCUBS_REQ_ENV.FCUBS_HEADER.OPERATION;
+--        SET headRef.ns:SERVICE=InputRoot.SOAP.Body.ns:FCUBS_REQ_ENV.FCUBS_HEADER.SERVICE;
+--        SET headRef.ns:SOURCE_USERID=InputRoot.SOAP.Body.ns:FCUBS_REQ_ENV.FCUBS_HEADER.SOURCE_USERID;
+--        SET headRef.ns:USERID=InputRoot.SOAP.Body.ns:FCUBS_REQ_ENV.FCUBS_HEADER.USERID;
+--		SET headRef.ns:MSGID=InputRoot.SOAP.Body.ns:FCUBS_REQ_ENV.FCUBS_HEADER.MSGID;
+--		
+--		SET bodyRef.ns:FCUBS_BODY.ns:"ACC-ACC-Balance".ns:BRANCH_CODE=InputRoot.SOAP.Body.ns:FCUBS_REQ_ENV.FCUBS_BODY."ACC-ACC-Balance".BRANCH_CODE;
+--	    SET bodyRef.ns:FCUBS_BODY.ns:"ACC-ACC-Balance".ns:CUST_AC_NO=InputRoot.SOAP.Body.ns:FCUBS_REQ_ENV.FCUBS_BODY."ACC-ACC-Balance".CUST_AC_NO;
+       SET OutputRoot.SOAP=InputRoot.SOAP;
+--       PROPAGATE TO TERMINAL 'out' DELETE NONE;
+       
+--		
+       DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP;
+       DECLARE domainName1 CHARACTER 'SOAP';
+       DECLARE payload_Backend CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
+       SET OutputRoot.SOAP = NULL;
+       CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+       DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
+       CALL PayloadLogging(Environment.id,payload_Backend,'FLEXCUBE_REQ',MessageFlowLabel,OutRef1);
+
+      
+       CALL writeToLogFile(MessageFlowLabel,'AQD_BUSINESSFLOW_LOG','DEBUG','..........Request For backend...........') INTO rc;
+	   CALL writeToLogFile(MessageFlowLabel,'AQD_BUSINESSFLOW_LOG','DEBUG','Request data is: '||payload_Backend) INTO rc;
+	   
+--		DECLARE TPrequest BLOB ASBITSTREAM(OutputRoot.XMLNSC CCSID 1208 ENCODING 1208);
+--		DECLARE TPrequestcahr CHARACTER CAST(TPrequest AS CHARACTER CCSID 1208);
+--		SET Environment.Payloadrequest = 'LOG_TIME:'||CAST(CURRENT_TIMESTAMP AS CHARACTER)||TPrequestcahr;
+		SET OutputRoot= InputRoot;
+       
+       
+       DECLARE TRANSACTION_STATUS2 CHARACTER 'Request Sent to Backend flow';
+	   DECLARE CREATED_ON2 TIMESTAMP CURRENT_TIMESTAMP;
+	   PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_name} VALUES(TRANSACTION_STATUS2,CREATED_ON2,id);
+       
+		CALL writeToLogFile(MessageFlowLabel,'AQD_BUSINESSFLOW_LOG','DEBUG','...............Request Sent to Backend flow..............') INTO rc;
+		
+	END;
+END MODULE;
