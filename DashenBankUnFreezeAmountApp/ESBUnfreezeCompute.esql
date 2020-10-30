@@ -1,0 +1,69 @@
+
+
+
+
+
+PATH Dashen_log4jlib_1 ;
+--PATH com.dashenbank.co.zw.common.esql;
+DECLARE ns NAMESPACE 'http://www.example.org/FCUBSCustomerService/';
+CREATE COMPUTE MODULE CloseAmtBlk_Compute
+	DECLARE rc BOOLEAN;
+	DECLARE LOG4J_PATH EXTERNAL CHARACTER;
+	DECLARE LOG4J_ERROR EXTERNAL CHARACTER;
+	DECLARE CBS_URL EXTERNAL CHARACTER;
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL initLog4j(LOG4J_PATH) INTO rc;
+		IF (rc = TRUE) THEN
+			CALL CloseAmtBlk();
+		ELSE
+			SET OutputRoot.SOAP.Body.Log.Message = LOG4J_ERROR;
+		END IF;
+
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CloseAmtBlk() BEGIN
+		-- DECLARE id CHARACTER InputRoot.HTTPInputHeader."Content-Type";
+		DECLARE id CHARACTER InputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS.Unblocking_HEADER.MSGID;
+		SET Environment.id = id;
+		SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
+		SET Environment.encodeRef = InputRoot.Properties.Encoding;
+		SET Environment.domainDataRef = InputRoot.SOAP.Body;
+		SET Environment.domainName = FIELDNAME(InputBody);
+		DECLARE ccidRef INTEGER Environment.ccidRef;
+		DECLARE encodeRef INTEGER Environment.encodeRef;
+		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
+		DECLARE domainName CHARACTER Environment.domainName;
+		DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+		CALL PayloadLogging(id,payload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
+		CALL writeToLogFile(MessageFlowLabel,'UnBlocking_Log','INFO','..........Request Received...........') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'UnBlocking_Log','INFO','CHANNEL_REQ data is: '||payload) INTO rc;
+		--SET OutputRoot.HTTPRequestHeader=InputRoot.HTTPInputHeader;
+		set OutputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS=InputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS;
+		DECLARE id1 INTEGER;
+		DECLARE TRANSACTION_STATUS CHARACTER 'Request Sent to CBS Flow';
+		DECLARE CREATED_ON TIMESTAMP CURRENT_TIMESTAMP;
+		DECLARE CREATED_BY CHARACTER 'ACE USER';
+		DECLARE SERVICE_NAME CHARACTER InputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS.Unblocking_HEADER.SERVICE;
+		DECLARE OPERATION_NAME CHARACTER InputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS.Unblocking_HEADER.OPERATION;
+		-- INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(id1.NEXTVAL,id,SERVICE_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY);
+		INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(id1.NEXTVAL,id,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY);
+		DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
+		DECLARE domainName1 CHARACTER 'SOAP';
+		DECLARE payload1 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
+		SET OutputRoot.SOAP = NULL;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
+		CALL PayloadLogging(id,payload1,'FLEXCUBE_REQ',MessageFlowLabel,OutRef1);
+
+		SET OutputRoot = InputRoot;
+		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = CBS_URL;
+
+		CALL writeToLogFile(MessageFlowLabel,'UnBlocking_Log','INFO','FLEXCUBE_REQ data is: '||payload1) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'UnBlocking_Log','INFO','..........Request Sent To CBS Flow...........') INTO rc;
+
+	END;
+END MODULE;

@@ -48,6 +48,8 @@ CREATE COMPUTE MODULE cbs_Compute
 		SET FILENAME = 'zzz.xml';
 		WHEN Service_Name='RTSERVICE' THEN
 		SET FILENAME = 'RTRES.xml';
+		WHEN Service_Name='CLOSEAMTBLK_FSFS' THEN
+		SET FILENAME = 'cbsresponse.xml';
 		ELSE
 		SET FILENAME = NULL;	
 		END CASE;

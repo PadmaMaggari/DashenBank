@@ -1,0 +1,21 @@
+
+
+Importing file: C:\Users\eidiko\IBM\ACET11\DashenDEV1\DashenBankUnFreezeAmountApp\ESBUnFreezeAmountService.wsdl
+
+The WSDL import will proceed with bindings FCUBSCustomerServiceSOAP.
+Creating wsdl schema document for file:///C:/Users/eidiko/IBM/ACET11/DashenDEV1/DashenBankUnFreezeAmountApp/ESBUnFreezeAmountService.wsdl.
+Parsing wsdl binding {http://www.example.org/FCUBSCustomerService/}FCUBSCustomerServiceSOAP.
+Parsing wsdl binding input CLOSEAMTBLK_FSFS.
+Parsing wsdl binding output CLOSEAMTBLK_FSFS.
+Processing doc style for operation CLOSEAMTBLK_FSFS.
+Populating WSDL schema ESBUnFreezeAmountService.xsd.
+Creating file ESBUnFreezeAmountService.xsd in the workspace.
+Copying source WSDL ESBUnFreezeAmountService.wsdl to ESBUnFreezeAmountService.wsdl.
+
+Elapsed time processing this message definition file: 0.201 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+

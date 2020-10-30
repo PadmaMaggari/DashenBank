@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ComIbmCallableFlowInvoke.msgnode="ComIbmCallableFlowInvoke.msgnode" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ComIbmSOAPInput.msgnode="ComIbmSOAPInput.msgnode" xmlns:ComIbmSOAPReply.msgnode="ComIbmSOAPReply.msgnode" xmlns:ComIbmSOAPRequest.msgnode="ComIbmSOAPRequest.msgnode" xmlns:com_dashenbank_co_zw_common_exceptionhandling_ExceptionHandling.subflow="com/dashenbank/co/zw/common/exceptionhandling/ExceptionHandling.subflow"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" nsURI="UnFreezeAmountFlow.msgflow" nsPrefix="UnFreezeAmountFlow.msgflow">
+  <eClassifiers xmi:type="eflow:FCMComposite" name="FCMComposite_1">
+    <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_PATH" name="LOG4J_PATH" defaultValueLiteral="E:\IBM_ACE\Projects\Dashen\LOG4J\Log4jConfigurationFile.xml">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR" name="LOG4J_ERROR" defaultValueLiteral="Log4j is not Configured Properly.">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.DSN" name="DSN" defaultValueLiteral="DBDSN">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.CBS_URL" name="CBS_URL" defaultValueLiteral="http://localhost:7800/CBS">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" key="UnFreezeAmountFlow" bundleName="UnFreezeAmountFlow" pluginId="DashenBankUnFreezeAmountApp"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBankUnFreezeAmountApp/icons/full/obj16/UnFreezeAmountFlow.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBankUnFreezeAmountApp/icons/full/obj30/UnFreezeAmountFlow.gif"/>
+    <composition>
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="22,46" wsdlFileName="ESBUnFreezeAmountService.wsdl" selectedPortType="FCUBSCustomerService" selectedBinding="FCUBSCustomerServiceSOAP" selectedPort="FCUBSCustomerServiceSOAP" targetNamespace="http://www.example.org/FCUBSCustomerService/" useHTTPTransport="true" urlSelector="/Unfreeze">
+        <translation xmi:type="utility:ConstantString" string="Unblocking Input"/>
+      </nodes>
+      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="441,42" validateMaster="none">
+        <translation xmi:type="utility:ConstantString" string="Unblocking Reply"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="131,39" dataSource="DBDSN" computeExpression="esql://routine/#CloseAmtBlk_Compute.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="CBS Header"/>
+      </nodes>
+      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="234,40" wsdlOperationMode="gateway" wsdlFileName="FCUBSCustomerService.wsdl" selectedPortType="FCUBSCustomerService" selectedBinding="FCUBSCustomerServiceSOAP" selectedOperation="CLOSEAMTBLK_FSFS" selectedPort="FCUBSCustomerServiceSOAP" useHTTPTransport="true" webServiceURL="http://localhost:7800/CBS1" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+        <translation xmi:type="utility:ConstantString" string="CBS Request"/>
+      </nodes>
+      <nodes xmi:type="com_dashenbank_co_zw_common_exceptionhandling_ExceptionHandling.subflow:FCMComposite_1" xmi:id="FCMComposite_1_3" location="175,-37">
+        <translation xmi:type="utility:ConstantString" string="ExceptionHandling"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="340,138" targetApplication="Auditdblogging_Flow" targetEndpointName="auditlogging">
+        <translation xmi:type="utility:ConstantString" string="PayLoadLogging"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="334,41" dataSource="DBDSN" computeExpression="esql://routine/#CloseAmtBlk_Compute1.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="CBS Response"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_1" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.catch" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.Output" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.timeout" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_8" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.fault" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_10" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_6" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_11" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_6" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_12" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_6" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
+    </composition>
+    <propertyOrganizer>
+      <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_PATH">
+        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_PATH" bundleName="UnFreezeAmountFlow" pluginId="DashenBankUnFreezeAmountApp"/>
+        <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_ERROR">
+          <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR" bundleName="UnFreezeAmountFlow" pluginId="DashenBankUnFreezeAmountApp"/>
+          <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.DSN">
+            <propertyName xmi:type="utility:TranslatableString" key="Property.DSN" bundleName="UnFreezeAmountFlow" pluginId="DashenBankUnFreezeAmountApp"/>
+            <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.CBS_URL">
+              <propertyName xmi:type="utility:TranslatableString" key="Property.CBS_URL" bundleName="UnFreezeAmountFlow" pluginId="DashenBankUnFreezeAmountApp"/>
+            </propertyDescriptor>
+          </propertyDescriptor>
+        </propertyDescriptor>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <stickyBoard/>
+  </eClassifiers>
+</ecore:EPackage>

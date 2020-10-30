@@ -1,5 +1,6 @@
 PATH Dashen_log4jlib_1;
 DECLARE ns50 NAMESPACE 'http://localhost:7800/RTSERVICE/';
+DECLARE ns5 NAMESPACE 'http://www.example.org/FCUBSCustomerService/';
 
 CREATE COMPUTE MODULE cbs_Compute1
 	DECLARE rc BOOLEAN;
@@ -44,6 +45,8 @@ CREATE COMPUTE MODULE cbs_Compute1
 	    CASE
 		WHEN Service_Name='RTSERVICEResponse' THEN
 		SET OutputRoot.SOAP.Body.ns50:RTSERVICEResponse = InputRoot.XMLNSC.RTSERVICEResponse;
+		WHEN Service_Name='CLOSEAMTBLK_FSFSResponse' THEN
+		SET OutputRoot.SOAP.Body.ns5:CLOSEAMTBLK_FSFSResponse  = InputRoot.XMLNSC.CLOSEAMTBLK_FSFSResponse;
 		ELSE
 		SET OutputRoot.SOAP = NULL;
 		END CASE;
