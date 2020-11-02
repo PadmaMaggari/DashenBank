@@ -2,7 +2,7 @@
 
 
 
-PATH Dashen_log4jlib_1;
+PATH com.dashenbank.co.eth.common.esql;
 CREATE COMPUTE MODULE CloseAmtBlk_Compute1
 	DECLARE rc BOOLEAN;
 	DECLARE LOG4J_PATH EXTERNAL CHARACTER;

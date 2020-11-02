@@ -3,7 +3,7 @@
 
 
 
-PATH Dashen_log4jlib_1 ;
+PATH com.dashenbank.co.eth.common.esql;
 --PATH com.dashenbank.co.zw.common.esql;
 DECLARE ns NAMESPACE 'http://www.example.org/FCUBSCustomerService/';
 CREATE COMPUTE MODULE CloseAmtBlk_Compute
@@ -25,7 +25,7 @@ CREATE COMPUTE MODULE CloseAmtBlk_Compute
 
 	CREATE PROCEDURE CloseAmtBlk() BEGIN
 		-- DECLARE id CHARACTER InputRoot.HTTPInputHeader."Content-Type";
-		DECLARE id CHARACTER InputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS.Unblocking_HEADER.MSGID;
+		DECLARE id CHARACTER InputRoot.Properties.ReplyIdentifier;
 		SET Environment.id = id;
 		SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
 		SET Environment.encodeRef = InputRoot.Properties.Encoding;

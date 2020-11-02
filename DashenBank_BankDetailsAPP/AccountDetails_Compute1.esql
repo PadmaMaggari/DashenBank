@@ -1,5 +1,5 @@
 
-PATH Dashen_log4jlib_1;
+PATH com.dashenbank.co.eth.common.esql;
 
 CREATE COMPUTE MODULE AccountDetails_Compute1
 	DECLARE rc BOOLEAN;
@@ -34,7 +34,7 @@ CREATE COMPUTE MODULE AccountDetails_Compute1
    
 	    SET Environment.ccidRef1 = InputRoot.Properties.CodedCharSetId;
         SET Environment.encodeRef1 = InputRoot.Properties.Encoding;
-	    SET Environment.domainDataRef1 = InputRoot.SOAP;
+	    SET Environment.domainDataRef1 = InputRoot.SOAP.Body;
 	    SET Environment.domainName1 = FIELDNAME(InputBody); 
 	    
 	    DECLARE TRANSACTION_STATUS3 CHARACTER 'Response Received from Backend flow';
@@ -45,7 +45,7 @@ CREATE COMPUTE MODULE AccountDetails_Compute1
 
       DECLARE ccidRef INTEGER Environment.ccidRef1;
       DECLARE encodeRef INTEGER Environment.encodeRef1;
-	  DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
+	  DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
 	  DECLARE domainName CHARACTER Environment.domainName1; 
 	  DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 	  CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -115,7 +115,7 @@ CREATE COMPUTE MODULE AccountDetails_Compute1
         SET OutputRoot.XMLNSC = NULL;
         CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
         DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-        CALL PayloadLogging(Environment.id,payload1,'CHANNEL_RES',MessageFlowLabel,OutRef1);
+        CALL PayloadLogging(Environment.id,payload1,'CHANNEL_RESP',MessageFlowLabel,OutRef1);
         CALL writeToLogFile(MessageFlowLabel,'AQD_BUSINESSFLOW_LOG','DEBUG','------------Response Received from Backend flow---------------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,'AQD_BUSINESSFLOW_LOG','DEBUG','Response data is: '||payload1) INTO rc;
 	    

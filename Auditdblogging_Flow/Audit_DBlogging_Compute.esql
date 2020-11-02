@@ -1,4 +1,4 @@
-PATH Dashen_log4jlib_1;
+PATH com.dashenbank.co.eth.common.esql;
 
 CREATE COMPUTE MODULE Audit_DBlogging_Compute
 	DECLARE rc BOOLEAN;
@@ -39,17 +39,17 @@ CREATE COMPUTE MODULE Audit_DBlogging_Compute
 		DECLARE MSG_ID CHARACTER InputRoot.XMLNSC.payload.Payload_Id;
 		DECLARE Payload_Flow CHARACTER InputRoot.XMLNSC.payload.Flow_Name;
 		DECLARE Payload_Type CHARACTER InputRoot.XMLNSC.payload.Payload_Type;
-	    DECLARE Payload_ID INTEGER 1;
+	    DECLARE Seq_ID INTEGER 1;
 	   ------ DECLARE ref REFERENCE TO InputRoot.XMLNSC.DBLOG;
 	    DECLARE Created_by CHARACTER 'ACE USER';
 	    DECLARE Created_on TIMESTAMP CURRENT_TIMESTAMP;
 ------	    DECLARE Payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 	    
 ---	    CALL AUDIT_PROCEDURE(Payload_ID,RequestIdentifier,Payload_Type,Payload,Payload_Flow,Created_on,Created_by);
-	    CALL AUDIT_PROCEDURE(Payload_ID,MSG_ID,Payload_Type,payload_data,Payload_Flow,Created_on,Created_by);
+	    CALL AUDIT_PROCEDURE(Seq_ID,MSG_ID,Payload_Type,payload_data,Payload_Flow,Created_on,Created_by);
 	    
 	    CALL writeToLogFile(MessageFlowLabel,'payloaddblogging_Log','INFO','..........Audit logging Flow is Started...........') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,'payloaddblogging_Log','INFO','Audit data is: '||payload_data) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'payloaddblogging_Log','INFO','Payload data is: '||payload_data) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,'payloaddblogging_Log','INFO','..........Audit logging Flow is Ended...........') INTO rc;
 	
 	END;

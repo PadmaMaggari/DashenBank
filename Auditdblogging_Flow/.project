@@ -5,7 +5,6 @@
 	<projects>
 		<project>log4jlib</project>
 		<project>Dashen_log4jlib_1</project>
-		<project>Dashen_commonESQL</project>
 		<project>DashenBankCommonEsql</project>
 		<project>DashenBankExceptionHandling</project>
 	</projects>

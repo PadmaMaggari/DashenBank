@@ -1,8 +1,7 @@
-BROKER SCHEMA com.dashenbank.co.zw.common.esql
+BROKER SCHEMA com.dashenbank.co.eth.common.esql
 
 
-
-CREATE FUNCTION getPayLoad(IN domainName CHARACTER,IN domainDataRef REFERENCE, IN encodeRef INTEGER,IN ccidRef INTEGER) RETURNS CHARACTER
+CREATE FUNCTION getPayLoad(IN domainName CHARACTER,IN domainDataRef REFERENCE,IN encodeRef INTEGER,IN ccidRef INTEGER) RETURNS CHARACTER
 BEGIN
 	DECLARE payload CHARACTER '';
 	CASE
@@ -23,6 +22,17 @@ BEGIN
 		SET payload=CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{MT103}' TYPE '{}:MT103') AS CHARACTER CCSID ccidRef);*/			
 	END CASE;
 	RETURN payload;
+END;
+
+CREATE FUNCTION PayloadLogging(IN Msg_Id CHARACTER,IN Payload_Data CHARACTER,IN Payload_Type CHARACTER,IN Flow_Name CHARACTER,INOUT OutRef REFERENCE)
+BEGIN
+	
+	SET OutRef.payload.Payload_Id = Msg_Id;
+	SET OutRef.payload.Payload_Data = Payload_Data;
+	SET OutRef.payload.Payload_Type = Payload_Type;
+	SET OutRef.payload.Flow_Name = Flow_Name;
+	        PROPAGATE TO TERMINAL 'out1' DELETE NONE;
+	SET OutRef = NULL;
 END;
 
 
@@ -151,21 +161,20 @@ CREATE PROCEDURE BuildExceptionDetails(IN excpRef REFERENCE,INOUT outRef REFEREN
 END;
 
 
-CREATE FUNCTION writeToLogFile( IN COMPONENT_NAME CHARACTER,
+CREATE FUNCTION writeToLogFile(IN COMPONENT_NAME CHARACTER,
 IN LOGGER_NAME CHARACTER,
 IN LEVEL CHARACTER,
-IN TEXT CHARACTER )
+IN TEXT CHARACTER)
 RETURNS BOOLEAN
 LANGUAGE JAVA
 EXTERNAL NAME "com.ibm.broker.IAM3.Log4jNode.log";
 
-CREATE FUNCTION initLog4j( IN CONFIG_FILE_NAME CHARACTER )
+CREATE FUNCTION initLog4j(IN CONFIG_FILE_NAME CHARACTER)
 RETURNS BOOLEAN
 LANGUAGE JAVA
 EXTERNAL NAME "com.ibm.broker.IAM3.Log4jNode.initLog4j";
 
-
-CREATE PROCEDURE exceptiondatalogging(IN excpType CHARACTER,IN excpNumber INTEGER ,IN excpLable CHARACTER,IN excpText CHARACTER ,IN actualExcpText CHARACTER)
+CREATE PROCEDURE exceptiondatalogging(IN excpType CHARACTER,IN excpNumber INTEGER,IN excpLable CHARACTER,IN excpText CHARACTER,IN actualExcpText CHARACTER)
 LANGUAGE DATABASE
 EXTERNAL NAME "exceptiondatalogging";
 

@@ -1,4 +1,4 @@
-PATH Dashen_log4jlib_1;
+PATH com.dashenbank.co.eth.common.esql;
 
 CREATE COMPUTE MODULE Businessflow_Compute1
 	DECLARE rc BOOLEAN;

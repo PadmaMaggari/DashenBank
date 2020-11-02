@@ -1,5 +1,4 @@
---PATH Dashen_log4jlib_1;
-  PATH com.dashenbank.co.zw.common.esql;
+PATH com.dashenbank.co.eth.common.esql;
 CREATE COMPUTE MODULE CBSFlow_Compute
 		DECLARE rc BOOLEAN;
 	CREATE FUNCTION Main() RETURNS BOOLEAN
@@ -11,6 +10,6 @@ CREATE COMPUTE MODULE CBSFlow_Compute
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
 		SET OutputRoot.SOAP.Body.CLOSEAMTBLK_FSFSResponse= InputRoot.XMLNSC.CBS_CLOSEAMTBLK_FSFS_RES;
-	---	 CALL writeToLogFile(MessageFlowLabel,'UnBlocking_Log','INFO','..........Request Sent  FROM CBS....') INTO rc;
+		 CALL writeToLogFile(MessageFlowLabel,'UnBlocking_Log','INFO','..........Request Sent  FROM CBS....') INTO rc;
 	END;
 END MODULE;

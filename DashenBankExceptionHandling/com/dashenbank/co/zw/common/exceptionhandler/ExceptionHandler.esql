@@ -1,10 +1,7 @@
-
-
 BROKER SCHEMA com.dashenbank.co.zw.common.exceptionhandler
 
 
-
-PATH com.dashenbank.co.zw.common.esql;
+PATH com.dashenbank.co.eth.common.esql;
 DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER '';
 --DECLARE IS_ERROR_RESPONSE_REQUIRED EXTERNAL CHARACTER '';
 DECLARE LOG4J_INIT_ERROR_MSG EXTERNAL CHARACTER '';

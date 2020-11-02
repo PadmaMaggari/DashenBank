@@ -1,5 +1,5 @@
 
-PATH Dashen_log4jlib_1;
+PATH com.dashenbank.co.eth.common.esql;
 CREATE COMPUTE MODULE AccountDetails_request
 	DECLARE rc BOOLEAN;
 	DECLARE LOG4J_PATH EXTERNAL CHARACTER;
@@ -25,7 +25,7 @@ CREATE COMPUTE MODULE AccountDetails_request
 	    SET Environment.id = id;
 	    SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
         SET Environment.encodeRef = InputRoot.Properties.Encoding;
-	    SET Environment.domainDataRef = InputRoot.XMLNSC;
+	    SET Environment.domainDataRef = InputRoot.SOAP.Body;
 	    SET Environment.domainName = FIELDNAME(InputBody); 
 	    
 	   DECLARE id1 INTEGER;
@@ -39,7 +39,7 @@ CREATE COMPUTE MODULE AccountDetails_request
 	    
       DECLARE ccidRef INTEGER Environment.ccidRef;
       DECLARE encodeRef INTEGER Environment.encodeRef;
-	  DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
+	  DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
 	  DECLARE domainName CHARACTER Environment.domainName; 
 	  DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 	  CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -82,7 +82,7 @@ CREATE COMPUTE MODULE AccountDetails_request
 --       PROPAGATE TO TERMINAL 'out' DELETE NONE;
        
 --		
-       DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP;
+       DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
        DECLARE domainName1 CHARACTER 'SOAP';
        DECLARE payload_Backend CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
        SET OutputRoot.SOAP = NULL;
