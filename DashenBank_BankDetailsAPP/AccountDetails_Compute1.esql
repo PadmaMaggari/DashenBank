@@ -1,0 +1,125 @@
+
+PATH com.dashenbank.co.eth.common.esql;
+
+CREATE COMPUTE MODULE AccountDetails_Compute1
+	DECLARE rc BOOLEAN;
+	DECLARE LOG4J_PATH EXTERNAL CHARACTER;
+	DECLARE LOG4J_ERROR EXTERNAL CHARACTER;
+	DECLARE DSN_name EXTERNAL CHARACTER;
+	
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL initLog4j(LOG4J_PATH) INTO rc;
+		IF (rc = TRUE) THEN
+		-- CALL CopyMessageHeaders();
+		  CALL CopyEntireMessage();
+		  ELSE
+			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR;
+		END IF;
+		RETURN FALSE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		DECLARE ns NAMESPACE 'http://fcubs.iflex.com/service/FCUBSAccService/QueryAccBal';
+   
+	    SET Environment.ccidRef1 = InputRoot.Properties.CodedCharSetId;
+        SET Environment.encodeRef1 = InputRoot.Properties.Encoding;
+	    SET Environment.domainDataRef1 = InputRoot.SOAP.Body;
+	    SET Environment.domainName1 = FIELDNAME(InputBody); 
+	    
+	    DECLARE TRANSACTION_STATUS3 CHARACTER 'Response Received from Backend flow';
+	    DECLARE CREATED_ON3 TIMESTAMP CURRENT_TIMESTAMP;
+
+	    PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_name} VALUES(TRANSACTION_STATUS3,CREATED_ON3,Environment.id);
+	    
+
+      DECLARE ccidRef INTEGER Environment.ccidRef1;
+      DECLARE encodeRef INTEGER Environment.encodeRef1;
+	  DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
+	  DECLARE domainName CHARACTER Environment.domainName1; 
+	  DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+	  CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	  DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+	  CALL PayloadLogging(Environment.id,payload,'FLEXCUBE_RESP',MessageFlowLabel,OutRef);
+		
+		CALL writeToLogFile(MessageFlowLabel,'AQD_BUSINESSFLOW_LOG','DEBUG','------------Response Received from Backend flow---------------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'AQD_BUSINESSFLOW_LOG','DEBUG','Response data is: '||payload) INTO rc;
+	            
+		
+		DECLARE Source1 CHARACTER InputRoot.SOAP.Body.*:FCUBS_RES_ENV.*:FCUBS_HEADER.*:SOURCE;
+		DECLARE Source2 CHARACTER InputRoot.SOAP.Body.*:FCUBS_RES_ENV.*:FCUBS_BODY.*:*.*:*.*:CUST_AC_NO;
+		DECLARE Inref REFERENCE TO InputRoot.SOAP.Body.*:FCUBS_RES_ENV.*:FCUBS_HEADER;
+		DECLARE InrefBody REFERENCE TO InputRoot.SOAP.Body.*:FCUBS_RES_ENV.*:FCUBS_BODY;
+		DECLARE soapRef,headRef,bodyRef REFERENCE TO OutputRoot;
+	    CREATE LASTCHILD OF soapRef AS soapRef DOMAIN 'XMLNSC';
+   CREATE LASTCHILD OF soapRef AS soapRef NAMESPACE ns NAME 'FCUBS_RES_ENV';
+   CREATE LASTCHILD OF soapRef AS headRef NAME 'FCUBS_HEADER';
+   CREATE LASTCHILD OF soapRef AS bodyRef NAME 'FCUBS_BODY';
+		
+		SET headRef.SOURCE=Inref.*:SOURCE;
+        SET headRef.UBSCOMP=Inref.*:UBSCOMP;
+        SET headRef.BRANCH=Inref.*:BRANCH;
+        SET headRef.CORRELID=Inref.*:CORRELID;
+        SET headRef.OPERATION=Inref.*:OPERATION;
+        SET headRef.SERVICE=Inref.*:SERVICE;
+        SET headRef.SOURCE_USERID=Inref.*:SOURCE_USERID;
+        SET headRef.USERID=Inref.*:USERID;
+        
+        SET bodyRef."ACC-Balance".CUST_AC_NO=InrefBody.*:*.*:*.*:CUST_AC_NO;
+        SET bodyRef."ACC-Balance".CCY=InrefBody.*:*.*:*.*:CCY;
+        SET bodyRef."ACC-Balance".TRNDT=InrefBody.*:*.*:*.*:TRNDT;
+        SET bodyRef."ACC-Balance".OPNBAL=InrefBody.*:*.*:*.*:OPNBAL;
+        SET bodyRef."ACC-Balance".CURBAL=InrefBody.*:*.*:*.*:CURBAL;
+        SET bodyRef."ACC-Balance".AVLBAL=InrefBody.*:*.*:*.*:AVLBAL;
+        SET bodyRef."ACC-Balance".UNCOLAMT=InrefBody.*:*.*:*.*:UNCOLAMT;
+        SET bodyRef."ACC-Balance".MTDTOVCR=InrefBody.*:*.*:*.*:MTDTOVCR;
+        SET bodyRef."ACC-Balance".MTDTOVDR=InrefBody.*:*.*:*.*:MTDTOVDR;
+        SET bodyRef."ACC-Balance".ACY_BKD_AMT=InrefBody.*:*.*:*.*:ACY_BKD_AMT;
+        SET bodyRef."ACC-Balance".ACCR_DR=InrefBody.*:*.*:*.*:ACCR_DR;
+        SET bodyRef."ACC-Balance".ACCR_CR=InrefBody.*:*.*:*.*:ACCR_CR;
+        SET bodyRef."ACC-Balance".ACY_TANK_CR=InrefBody.*:*.*:*.*:ACY_TANK_CR;
+        SET bodyRef."ACC-Balance".ACY_TANK_DR=InrefBody.*:*.*:*.*:ACY_TANK_DR;
+        SET bodyRef."ACC-Balance".ACY_TANK_UNCOL=InrefBody.*:*.*:*.*:ACY_TANK_UNCOL;
+        SET bodyRef."ACC-Balance".ACY_UNAUTH_DR=InrefBody.*:*.*:*.*:ACY_UNAUTH_DR;
+        SET bodyRef."ACC-Balance".ACY_TANK_UNCOL=InrefBody.*:*.*:*.*:ACY_TANK_UNCOL;
+        SET bodyRef."ACC-Balance".ACY_UNAUTH_TANK_DR=InrefBody.*:*.*:*.*:ACY_UNAUTH_TANK_DR;
+        SET bodyRef."ACC-Balance".ACY_UNAUTH_CR=InrefBody.*:*.*:*.*:ACY_UNAUTH_CR;
+        SET bodyRef."ACC-Balance".ACY_UNAUTH_TANK_CR=InrefBody.*:*.*:*.*:ACY_UNAUTH_TANK_CR;
+        SET bodyRef."ACC-Balance".ACY_UNAUTH_UNCOL=InrefBody.*:*.*:*.*:ACY_UNAUTH_UNCOL;
+        SET bodyRef."ACC-Balance".ACY_UNAUTH_TANK_UNCOL=InrefBody.*:*.*:*.*:ACY_UNAUTH_TANK_UNCOL;
+        PROPAGATE TO TERMINAL 'out' DELETE NONE;
+
+        DECLARE TRANSACTION_STATUS4 CHARACTER 'Response Sent to END USER';
+	    DECLARE CREATED_ON4 TIMESTAMP CURRENT_TIMESTAMP;
+	    
+	    PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_name} VALUES(TRANSACTION_STATUS4,CREATED_ON4,Environment.id);
+	    
+--	    DECLARE ChannelDataRef REFERENCE TO InputRoot.SOAP;
+--	   DECLARE Channel_response CHARACTER getPayLoad(domainName,ChannelDataRef,encodeRef,ccidRef);
+--	  
+--	  CALL PayloadLogging(Environment.id,Channel_response,'AccountQueryDetails_Response',MessageFlowLabel,OutRef);
+	    
+		DECLARE domainDataRef1 REFERENCE TO OutputRoot.XMLNSC;
+        DECLARE domainName1 CHARACTER 'XMLNSC';
+        DECLARE payload1 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
+        SET OutputRoot.XMLNSC = NULL;
+        CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+        DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
+        CALL PayloadLogging(Environment.id,payload1,'CHANNEL_RESP',MessageFlowLabel,OutRef1);
+        CALL writeToLogFile(MessageFlowLabel,'AQD_BUSINESSFLOW_LOG','DEBUG','------------Response Received from Backend flow---------------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'AQD_BUSINESSFLOW_LOG','DEBUG','Response data is: '||payload1) INTO rc;
+	    
+--		CALL writeToLogFile(MessageFlowLabel,'AQD_BUSINESSFLOW_LOG','DEBUG','------------Response Sent to Router flow------------') INTO rc;
+		
+	END;
+END MODULE;

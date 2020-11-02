@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://fcubs.iflex.com/service/FCUBSAccService/QueryAccBal" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://fcubs.iflex.com/service/FCUBSAccService/QueryAccBal" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:element ibmSchExtn:docRoot="true" name="FCUBS_REQ_ENV">
+        <xsd:complexType>
+          <xsd:sequence>
+          	<xsd:element name="FCUBS_HEADER" type="tns:Header_type"/>
+          	<xsd:element name="FCUBS_BODY" type="tns:Body_type"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element ibmSchExtn:docRoot="true" name="FCUBS_RES_ENV">
+        <xsd:complexType>
+          <xsd:sequence>
+          	<xsd:element name="FCUBS_HEADER" type="tns:Header_type" />
+          	<xsd:element name="FCUBS_BODY"
+          		type="tns:ACC-Balance_Type">
+          	</xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    
+      <xsd:complexType name="Header_type">
+      	<xsd:sequence>
+      		<xsd:element name="SOURCE" type="xsd:string"/>
+      		<xsd:element name="UBSCOMP" type="xsd:string"/>
+      		<xsd:element name="MSGID" type="xsd:string"/>
+      		<xsd:element name="CORRELID" type="xsd:string"/>
+      		<xsd:element name="USERID" type="xsd:string"/>
+      		<xsd:element name="BRANCH" type="xsd:string"/>
+      		<xsd:element name="SERVICE" type="xsd:string"/>
+      		<xsd:element name="OPERATION" type="xsd:string"/>
+      		<xsd:element name="SOURCE_USERID" type="xsd:string"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="Body_type">
+      	<xsd:sequence>
+      		<xsd:element name="ACC-ACC-Balance" type="tns:ACC-ACC-Balance_type"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+      
+            <xsd:complexType name="ACC-ACC-Balance_type">
+            	<xsd:sequence>
+            		<xsd:element name="BRANCH_CODE" type="xsd:string"/>
+            		<xsd:element name="CUST_AC_NO" type="xsd:string"/>
+            	</xsd:sequence>
+            </xsd:complexType>
+    
+            <xsd:complexType name="ACC_BAL_Response_Type">
+            	<xsd:sequence>
+            		<xsd:element name="BRANCH_CODE" type="xsd:string"></xsd:element>
+            		<xsd:element name="CUST_AC_NO" type="xsd:string"></xsd:element>
+            		<xsd:element name="CCY" type="xsd:string"></xsd:element>
+            		<xsd:element name="TRNDT" type="xsd:string"></xsd:element>
+            		<xsd:element name="OPNBAL" type="xsd:string"></xsd:element>
+            		<xsd:element name="CURBAL" type="xsd:string"></xsd:element>
+            		<xsd:element name="AVLBAL" type="xsd:string"></xsd:element>
+            		<xsd:element name="UNCOLAMT" type="xsd:string"></xsd:element>
+            		<xsd:element name="MTDTOVCR" type="xsd:string"></xsd:element>
+            		<xsd:element name="MTDTOVDR" type="xsd:string"></xsd:element>
+            		<xsd:element name="ACY_BKD_AMT" type="xsd:string"></xsd:element>
+            		<xsd:element name="ACCR_DR" type="xsd:string"></xsd:element>
+            		<xsd:element name="ACCR_CR" type="xsd:string"></xsd:element>
+            		<xsd:element name="ACY_TANK_CR" type="xsd:string"></xsd:element>
+            		<xsd:element name="ACY_TANK_DR" type="xsd:string"></xsd:element>
+            		<xsd:element name="ACY_TANK_UNCOL"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="ACY_UNAUTH_DR"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="ACY_UNAUTH_TANK_DR"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="ACY_UNAUTH_CR"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="ACY_UNAUTH_TANK_CR"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="ACY_UNAUTH_UNCOL"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="ACY_UNAUTH_TANK_UNCOL" type="xsd:string"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="ACC-Balance_Type">
+            	<xsd:sequence>
+            		<xsd:element name="ACC-Balance" type="tns:ACC_BAL_Response_Type"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+</xsd:schema>
