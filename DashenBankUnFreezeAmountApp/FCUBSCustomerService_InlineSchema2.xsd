@@ -9,8 +9,9 @@
                 	type="tns:UnBlockingHeaderType">
                 </xsd:element>
                 <xsd:element name="Unblocking_BODY"
-          		type="tns:Amount-Blocks-Full_REQ_Type">
-          	</xsd:element>
+                	type="tns:Amount-Blocks-Full">
+                </xsd:element>
+
           </xsd:sequence>
         </xsd:complexType>
       </xsd:element>
@@ -77,13 +78,15 @@
       		<xsd:element name="SERVICE" type="xsd:string"></xsd:element>
       		<xsd:element name="OPERATION" type="xsd:string"></xsd:element>
       		<xsd:element name="MSGSTAT" type="xsd:string"></xsd:element>
+
+      	</xsd:sequence>
+      </xsd:complexType>
 
-      		<xsd:element name="MSGID" type="xsd:string"></xsd:element>
-      		<xsd:element name="CORRELID" type="xsd:string"></xsd:element>
-      		<xsd:element name="ENTITY" type="xsd:string"></xsd:element>
-      		<xsd:element name="DESTINATION" type="xsd:string"></xsd:element>
-      		<xsd:element name="FUNCTIONID" type="xsd:string"></xsd:element>
-      		<xsd:element name="ACTION" type="xsd:string"></xsd:element>
+      <xsd:complexType name="Amount-Blocks-Full">
+      	<xsd:sequence>
+      		<xsd:element name="Amount-Blocks-Full"
+      			type="tns:Amount-Blocks-Full_REQ_Type">
+      		</xsd:element>
       	</xsd:sequence>
       </xsd:complexType>
 </xsd:schema>
