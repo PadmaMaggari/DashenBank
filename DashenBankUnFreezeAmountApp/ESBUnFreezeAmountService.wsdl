@@ -11,6 +11,7 @@
   
   
   
+  
   <wsdl:types>
     
           <xsd:schema targetNamespace="http://www.example.org/FCUBSCustomerService/" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions">

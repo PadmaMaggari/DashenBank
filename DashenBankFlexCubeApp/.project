@@ -3,7 +3,6 @@
 	<name>DashenBankFlexCubeApp</name>
 	<comment></comment>
 	<projects>
-		<project>Dashen_commonESQL</project>
 		<project>DashenBankCommonEsql</project>
 		<project>DashenBankExceptionHandling</project>
 	</projects>
