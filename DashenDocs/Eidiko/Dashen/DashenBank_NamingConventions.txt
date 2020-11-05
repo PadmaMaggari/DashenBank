@@ -1,0 +1,25 @@
+DashenBank Naming Conventions:
+
+Application Names : DashenBank_(ServiceName)_App
+Schema Name : com.dashenbank.(servicename)
+Flow Name : (ServiceName)_Flow
+Esql FileName : ServiceName_Esql(it should be only one file per application)
+URL : should be passed from compute node
+Variable Names : should follow Camlin case  (eg : isAvailable)
+Common libraries: com.dashenbank.genericesql
+Sub Flow : com.dashenbank.genericsubflow
+LOG_CONFIG_PATH : C:/DashenBank/Log4j/broker.xml
+Logs path : C:/DashenBank/Log4j/Logs/ServiceName/servicename.log
+LOG4J_ERROR_MSG : Log4j Initialization Error
+DSN_NAME : DBDSN
+LOGGER_NAME : (serverName)Logger
+LOG_TYPE : DEBUG
+Payload logging Node Name : PayloadLogging
+Exception Node Name: ExceptionHandler
+Soap Input/Http input : Service_Request
+Soap Request/Http Request : BackEndSystemCall
+Soap Reply/Http Reply : Service_Response
+Compute Node : RequestTo(ThirdPartyServiceName) (eg: RequestToFlexcube,RequestToTaxSystem) {if it is before request node}
+Compute Node : ResponseToChannel {if it is after request node}
+Compute Node : BuildBusinessError {if it is after exception Handling}
+
