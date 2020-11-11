@@ -1,0 +1,22 @@
+
+
+Importing file: C:\Users\Anumala Shankar\IBM\ACET11\dashen\IFT\RTSERVICE.wsdl
+
+The WSDL import will proceed with bindings RTSERVICESOAP.
+Creating wsdl schema document for file:///C:/Users/Anumala Shankar/IBM/ACET11/dashen/IFT/RTSERVICE.wsdl.
+Parsing wsdl binding {http://localhost:7800/RTSERVICE/}RTSERVICESOAP.
+Parsing wsdl binding input RTSERVICE.
+Parsing wsdl binding output RTSERVICE.
+Processing doc style for operation RTSERVICE.
+Populating WSDL schema RTSERVICE.xsd.
+Creating file RTSERVICE.xsd in the workspace.
+Creating file RTSERVICE_InlineSchema1.xsd in the workspace.
+Copying source WSDL RTSERVICE.wsdl to RTSERVICE.wsdl.
+
+Elapsed time processing this message definition file: 0.891 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+
