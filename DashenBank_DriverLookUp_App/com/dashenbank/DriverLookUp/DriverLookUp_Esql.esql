@@ -1,0 +1,216 @@
+BROKER SCHEMA com.dashenbank.DriverLookUp
+
+PATH com.dashenbank.genericfunctions;
+
+DECLARE rc BOOLEAN;
+DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER;
+DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER;
+DECLARE BACKEND_URL EXTERNAL CHARACTER;
+DECLARE DSN_NAME EXTERNAL CHARACTER;
+
+CREATE COMPUTE MODULE RequestToBackend
+	
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
+		IF (rc = TRUE) THEN
+		-- CALL CopyMessageHeaders();
+		  CALL CopyEntireMessage();
+		  ELSE
+			SET OutputRoot.SOAP.Body.Log.Message = LOG4J_ERROR_MSG;
+		END IF;
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+	--	DECLARE id CHARACTER InputRoot.HTTPInputHeader."Content-Type";
+	    DECLARE msg_Id CHARACTER CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
+	    SET Environment.id = msg_Id;
+	    SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
+        SET Environment.encodeRef = InputRoot.Properties.Encoding;
+	    SET Environment.domainDataRef = InputRoot.SOAP.Body;
+	    SET Environment.domainName = FIELDNAME(InputBody); 
+	    
+	   DECLARE seq_Id INTEGER;
+	   DECLARE transactionStatus1 CHARACTER 'Request Received from END USER';
+	   DECLARE createdOn1 TIMESTAMP CURRENT_TIMESTAMP;
+	   DECLARE createdBy1 CHARACTER 'ACE USER';
+	   DECLARE serviceName CHARACTER 'DriverLookUp';
+	   DECLARE operationName CHARACTER 'DriverLookUp';
+	   PASSTHRU 'INSERT INTO TRANSACTION_LOG VALUES(?,?,?,?,?,?,?)' TO Database.{DSN_NAME} VALUES(seq_Id.NEXTVAL,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,createdBy1);
+	 --  INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(seq_Id.NEXTVAL,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,createdBy1);
+	   PASSTHRU 'COMMIT' TO Database.{DSN_NAME}; 
+
+      DECLARE ccidRef INTEGER Environment.ccidRef;
+      DECLARE encodeRef INTEGER Environment.encodeRef;
+	  DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
+	  DECLARE domainName CHARACTER Environment.domainName; 
+	  DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+	  CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	  DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+	  CALL PayloadLogging(msg_Id,payload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
+	    
+	   CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','..........Request Received from END USER...........') INTO rc;
+	   CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','CHANNEL_REQ data is: '||payload) INTO rc;
+	   
+	   SET OutputRoot.SOAP = InputRoot.SOAP;
+       
+       DECLARE transactionStatus2 CHARACTER 'Request Sent to Backend flow';
+	   DECLARE createdBy2 TIMESTAMP CURRENT_TIMESTAMP;
+	   PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus2,createdBy2,msg_Id);
+	   
+	   DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
+	   DECLARE domainName1 CHARACTER 'SOAP';
+	   DECLARE payload1 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
+	   SET OutputRoot.SOAP = NULL;
+	   CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	   DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
+	   CALL PayloadLogging(msg_Id,payload1,'FLEXCUBE_REQ',MessageFlowLabel,OutRef1);
+	   
+	   SET OutputRoot = InputRoot;
+	   SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
+
+	   CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','FLEXCUBE_REQ data is: '||payload1) INTO rc;
+	   CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','...............Request Sent to Backend flow..............') INTO rc;
+		
+	END;
+END MODULE;
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+CREATE COMPUTE MODULE ResponseToChannel
+	
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		  CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+	    
+	    DECLARE refId CHARACTER SUBSTRING(Environment.id FROM 3);
+       DECLARE refId1 INTEGER LENGTH(refId);
+       SET refId = SUBSTRING(refId FROM 1 FOR refId1-1);
+    
+	    SET Environment.ccidRef1 = InputRoot.Properties.CodedCharSetId;
+        SET Environment.encodeRef1 = InputRoot.Properties.Encoding;
+	    SET Environment.domainDataRef1 = InputRoot.SOAP.Body;
+	    SET Environment.domainName1 = FIELDNAME(InputBody); 
+	    
+	    DECLARE transactionStatus3 CHARACTER 'Response Received from Backend flow';
+	    DECLARE createdOn3 TIMESTAMP CURRENT_TIMESTAMP;
+	    DECLARE qry11 CHARACTER 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID LIKE ''%'||refId||'%''';
+	    SET Environment.val1[] = PASSTHRU(qry11 TO Database.{DSN_NAME} VALUES(transactionStatus3,createdOn3));
+	 --   PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus3,createdOn3,Environment.id);
+	   
+
+      DECLARE ccidRef INTEGER Environment.ccidRef1;
+      DECLARE encodeRef INTEGER Environment.encodeRef1;
+	  DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
+	  DECLARE domainName CHARACTER Environment.domainName1; 
+	  DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+	  CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	  DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+	  CALL PayloadLogging(Environment.id,payload,'FLEXCUBE_RESP',MessageFlowLabel,OutRef);
+		
+		CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','------------Response Received from Backend flow---------------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','FLEXCUBE_RESP data is: '||payload) INTO rc;
+	            
+	--	SET OutputRoot.HTTPResponseHeader."Content-Type" = id1;
+        SET OutputRoot.SOAP = InputRoot.SOAP;
+   --     SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = CAST(Environment.id1 AS BLOB);
+	
+        
+        DECLARE transactionStatus4 CHARACTER 'Response Sent to END USER';
+	    DECLARE createdOn4 TIMESTAMP CURRENT_TIMESTAMP;
+	    SET Environment.val2[] = PASSTHRU(qry11 TO Database.{DSN_NAME} VALUES(transactionStatus4,createdOn4));
+	--    PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus4,createdOn4,Environment.id);
+		
+		DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
+	   DECLARE domainName1 CHARACTER 'SOAP';
+	   DECLARE payload1 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
+	   SET OutputRoot.SOAP = NULL;
+	   CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	   DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
+	   CALL PayloadLogging(Environment.id,payload1,'CHANNEL_RESP',MessageFlowLabel,OutRef1);
+	   SET OutputRoot = InputRoot;
+
+	    CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','CHANNEL_RESP data is: '||payload1) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','------------Response Sent to END USER------------') INTO rc;
+		
+	END;
+END MODULE;
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+CREATE COMPUTE MODULE BuildExceptionResponse
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		 CALL BuildExceptionResponse();
+		RETURN TRUE;
+	END;
+	
+	CREATE PROCEDURE BuildExceptionResponse() BEGIN
+		CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','..............Error Logging Started...........') INTO rc;
+		DECLARE inRef REFERENCE TO InputRoot.SOAP;
+		DECLARE envRef REFERENCE TO Environment;
+		DECLARE outRefer,outRef REFERENCE TO OutputRoot;
+		DECLARE encodeID INTEGER InputRoot.Properties.Encoding;
+		DECLARE ccsID INTEGER InputRoot.Properties.CodedCharSetId;
+		DECLARE domainName CHARACTER FIELDNAME(InputBody);
+		DECLARE domainDataRef REFERENCE TO InputBody;
+		--DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
+		--DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,encodeID,ccsID);
+		--CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
+		---CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
+		--CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
+		--CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME 'DriverLookUp';
+		--CALL BuildExceptionDetails(excpRef,envRef,'DriverLookUp');
+		--SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
+		--MOVE domainDataRef TO Environment.XMLNSC;
+		--SET domainName = FIELDNAME(domainDataRef);
+		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,encodeID,ccsID);
+		CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','Application Built Exception:'||resPayload) INTO rc;
+		------------Error  Logging in DB----------
+		--CALL ConstructErrorDBLog(CURRENT_TIMESTAMP,CREATED_BY,envRef.ErrorType,MessageFlowLabel,ApplicationLabel,ExecutionGroupLabel,
+		---excpPayload,Environment.REQUEST_PAYLOAD,excpRef.excpNumber,envRef.ErrorCode,outRef);
+		-------------------------------------------
+		SET OutputRoot.XMLNSC = InputRoot.XMLNSC;
+		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
+		CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','..............End of Error Logging ...........') INTO rc;
+	END;
+END MODULE;
