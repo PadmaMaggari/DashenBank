@@ -50,6 +50,8 @@ CREATE COMPUTE MODULE cbs_Compute1
 		SET OutputRoot.SOAP.Body.ns5:CLOSEAMTBLK_FSFSResponse  = InputRoot.XMLNSC.CLOSEAMTBLK_FSFSResponse;
 		WHEN Service_Name='DriverLookupResponse' THEN
 		SET OutputRoot.SOAP.Body  = InputRoot.XMLNSC;
+		WHEN Service_Name='SubmitPaymentResponse' THEN
+		SET OutputRoot.SOAP.Body  = InputRoot.XMLNSC;
 		ELSE
 		SET OutputRoot.SOAP = NULL;
 		END CASE;

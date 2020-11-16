@@ -52,6 +52,8 @@ CREATE COMPUTE MODULE cbs_Compute
 		SET FILENAME = 'cbsresponse.xml';
 		WHEN Service_Name='DriverLookup' THEN
 		SET FILENAME = 'DriverLookupRES.xml';
+		WHEN Service_Name='SubmitPayment' THEN
+		SET FILENAME = 'SubmitPaymentRES.xml';
 		ELSE
 		SET FILENAME = NULL;	
 		END CASE;
