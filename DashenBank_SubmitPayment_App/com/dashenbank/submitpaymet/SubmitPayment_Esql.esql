@@ -50,7 +50,7 @@ CREATE COMPUTE MODULE RequestToBackend
 	   DECLARE serviceName CHARACTER 'SubmitPayment';
 	   DECLARE operationName CHARACTER 'SubmitPayment';
 	   SET Environment.SEQ[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
-       SET seq_Id = CAST(Environment.SEQ[1] AS INTEGER);
+       SET seq_Id = CAST(Environment.SEQ[1].NEXTVAL AS INTEGER);
 	   PASSTHRU 'INSERT INTO TRANSACTION_LOG VALUES(?,?,?,?,?,?,?)' TO Database.{DSN_NAME} VALUES(seq_Id,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,'ACE USER');
 	   COMMIT;
 
