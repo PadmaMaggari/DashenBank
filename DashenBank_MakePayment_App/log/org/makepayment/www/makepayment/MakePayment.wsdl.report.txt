@@ -1,0 +1,19 @@
+
+
+Importing file: C:\Users\SRIKANTH\IBM\ACET11\DashenBankProject\DashenBank_MakePayment_App\MakePayment.wsdl
+
+
+The following is a list of WS-I warning messages found when importing:
+XSD: The location 'MakePayment_InlineSchema1.xsd' has not been resolved, Line: 13, Column: 1
+WSDL: The 'MakePayment' element referenced by the parameters part cannot be resolved., Line: 17, Column: 5
+WSDL: The 'MakePaymentResponse' element referenced by the parameters part cannot be resolved., Line: 20, Column: 5
+
+
+The WSDL import will proceed with bindings MakePaymentSOAP.
+Creating wsdl schema document for file:///C:/Users/SRIKANTH/IBM/ACET11/DashenBankProject/DashenBank_MakePayment_App/MakePayment.wsdl.
+Parsing wsdl binding {http://www.MakePayment.org/MakePayment/}MakePaymentSOAP.
+Parsing wsdl binding input MakePayment.
+Parsing wsdl binding output MakePayment.
+Processing doc style for operation MakePayment.
+Populating WSDL schema MakePayment.xsd.
+Creating file MakePayment.xsd in the workspace.

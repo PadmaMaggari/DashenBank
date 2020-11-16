@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="MakePayment" targetNamespace="http://www.MakePayment.org/MakePayment/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.MakePayment.org/MakePayment/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:documentation>
+    <wsdl:appinfo source="WMQI_APPINFO">
+      <MRWSDLAppInfo imported="true">
+        <generatedXSD location="MakePayment_InlineSchema1.xsd"/>
+        <binding hasEncoding="false" imported="true" name="MakePaymentSOAP" originalBindingStyle="document"/>
+      </MRWSDLAppInfo>
+    </wsdl:appinfo>
+  </wsdl:documentation>
+  <wsdl:types>
+    
+          <xsd:schema targetNamespace="http://www.MakePayment.org/MakePayment/" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions">
+<xsd:include schemaLocation="MakePayment_InlineSchema1.xsd"/>
+    </xsd:schema>
+    </wsdl:types>
+  <wsdl:message name="MakePaymentRequest">
+    <wsdl:part element="tns:MakePayment" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="MakePaymentResponse">
+    <wsdl:part element="tns:MakePaymentResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="MakePayment">
+    <wsdl:operation name="MakePayment">
+      <wsdl:input message="tns:MakePaymentRequest"/>
+      <wsdl:output message="tns:MakePaymentResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="MakePaymentSOAP" type="tns:MakePayment">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="MakePayment">
+      <soap:operation soapAction="http://www.MakePayment.org/MakePayment/MakePayment"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="MakePayment">
+    <wsdl:port binding="tns:MakePaymentSOAP" name="MakePaymentSOAP">
+      <soap:address location="http://192.168.3.60:7802/DashenBank_MakePayment"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
