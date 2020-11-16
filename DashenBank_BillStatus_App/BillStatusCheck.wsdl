@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="BillStatusCheck" targetNamespace="http://www.example.org/BillStatusCheck/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/BillStatusCheck/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:documentation>
+    <wsdl:appinfo source="WMQI_APPINFO">
+      <MRWSDLAppInfo imported="true">
+        <generatedXSD location="BillStatusCheck_InlineSchema1.xsd"/>
+        <binding hasEncoding="false" imported="true" name="BillStatusCheckSOAP" originalBindingStyle="document"/>
+      </MRWSDLAppInfo>
+    </wsdl:appinfo>
+  </wsdl:documentation>
+  <wsdl:types>
+    
+          <xsd:schema targetNamespace="http://www.example.org/BillStatusCheck/" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions">
+<xsd:include schemaLocation="BillStatusCheck_InlineSchema1.xsd"/>
+    </xsd:schema>
+    </wsdl:types>
+  <wsdl:message name="BillStatusRequest">
+    <wsdl:part element="tns:CheckStatus" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="BillStatusResponse">
+    <wsdl:part element="tns:CheckStatusResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="BillStatusCheck">
+    <wsdl:operation name="BillStatus">
+      <wsdl:input message="tns:BillStatusRequest"/>
+      <wsdl:output message="tns:BillStatusResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BillStatusCheckSOAP" type="tns:BillStatusCheck">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="BillStatus">
+      <soap:operation soapAction="http://www.example.org/BillStatusCheck/BillStatus"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="BillStatusCheck">
+    <wsdl:port binding="tns:BillStatusCheckSOAP" name="BillStatusCheckSOAP">
+      <soap:address location="http://192.168.3.60:7802/DashenBank_BillStatus"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
