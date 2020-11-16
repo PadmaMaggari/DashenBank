@@ -1,0 +1,22 @@
+
+
+Importing file: C:\DashenBank\DashenBank_AccountSummary_App\ESB_AccountSummary.wsdl
+
+The WSDL import will proceed with bindings ESB_AccountSummarySOAP.
+Creating wsdl schema document for file:///C:/DashenBank/DashenBank_AccountSummary_App/ESB_AccountSummary.wsdl.
+Parsing wsdl binding {http://www.example.org/ESB_AccountSummary/}ESB_AccountSummarySOAP.
+Parsing wsdl binding input AccountSummary.
+Parsing wsdl binding output AccountSummary.
+Processing doc style for operation AccountSummary.
+Populating WSDL schema ESB_AccountSummary.xsd.
+Creating file ESB_AccountSummary.xsd in the workspace.
+Creating file ESB_AccountSummary_InlineSchema1.xsd in the workspace.
+Copying source WSDL ESB_AccountSummary.wsdl to ESB_AccountSummary.wsdl.
+
+Elapsed time processing this message definition file: 0.829 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+
