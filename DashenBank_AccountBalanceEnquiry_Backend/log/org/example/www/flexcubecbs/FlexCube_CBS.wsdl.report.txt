@@ -1,0 +1,22 @@
+
+
+Importing file: C:\Users\SRIKANTH\IBM\ACET11\DashenBankProject\FlexCubeSOAP_Backend\FlexCube_CBS.wsdl
+
+The WSDL import will proceed with bindings FlexCube_CBSSOAP.
+Creating wsdl schema document for file:///C:/Users/SRIKANTH/IBM/ACET11/DashenBankProject/FlexCubeSOAP_Backend/FlexCube_CBS.wsdl.
+Parsing wsdl binding {http://www.example.org/FlexCube_CBS/}FlexCube_CBSSOAP.
+Parsing wsdl binding input NewOperation.
+Parsing wsdl binding output NewOperation.
+Processing doc style for operation NewOperation.
+Populating WSDL schema FlexCube_CBS.xsd.
+Creating file FlexCube_CBS.xsd in the workspace.
+Creating file FlexCube_CBS_InlineSchema1.xsd in the workspace.
+Copying source WSDL FlexCube_CBS.wsdl to FlexCube_CBS.wsdl.
+
+Elapsed time processing this message definition file: 0.216 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+

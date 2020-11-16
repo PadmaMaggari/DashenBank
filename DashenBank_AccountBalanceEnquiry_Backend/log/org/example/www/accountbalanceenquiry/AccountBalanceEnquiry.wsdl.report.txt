@@ -1,0 +1,22 @@
+
+
+Importing file: C:\Users\SRIKANTH\IBM\ACET11\DashenBankProject\FlexCubeSOAP_Backend\AccountBalanceEnquiry.wsdl
+
+The WSDL import will proceed with bindings AccountBalanceEnquirySOAP.
+Creating wsdl schema document for file:///C:/Users/SRIKANTH/IBM/ACET11/DashenBankProject/FlexCubeSOAP_Backend/AccountBalanceEnquiry.wsdl.
+Parsing wsdl binding {http://www.example.org/AccountBalanceEnquiry/}AccountBalanceEnquirySOAP.
+Parsing wsdl binding input NewOperation.
+Parsing wsdl binding output NewOperation.
+Processing doc style for operation NewOperation.
+Populating WSDL schema AccountBalanceEnquiry.xsd.
+Creating file AccountBalanceEnquiry.xsd in the workspace.
+Creating file AccountBalanceEnquiry_InlineSchema1.xsd in the workspace.
+Copying source WSDL AccountBalanceEnquiry.wsdl to AccountBalanceEnquiry.wsdl.
+
+Elapsed time processing this message definition file: 0.272 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+
