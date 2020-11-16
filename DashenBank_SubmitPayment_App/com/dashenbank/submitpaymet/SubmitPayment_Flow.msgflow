@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ComIbmCallableFlowInvoke.msgnode="ComIbmCallableFlowInvoke.msgnode" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ComIbmSOAPInput.msgnode="ComIbmSOAPInput.msgnode" xmlns:ComIbmSOAPReply.msgnode="ComIbmSOAPReply.msgnode" xmlns:ComIbmSOAPRequest.msgnode="ComIbmSOAPRequest.msgnode" xmlns:com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow="com/dashenbank/genericsubflow/ExceptionHandlerSubFlow.subflow" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" nsURI="com/dashenbank/submitpaymet/SubmitPayment_Flow.msgflow" nsPrefix="com_dashenbank_submitpaymet_SubmitPayment_Flow.msgflow">
+  <eClassifiers xmi:type="eflow:FCMComposite" name="FCMComposite_1">
+    <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_CONFIG_PATH" name="LOG_CONFIG_PATH" defaultValueLiteral="C:/DashenBank/Log4j/broker.xml">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR_MSG" name="LOG4J_ERROR_MSG" defaultValueLiteral="Log4j Initialization Error.">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://localhost:7800/CBS_BACKEND">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.DSN_NAME" name="DSN_NAME" defaultValueLiteral="DBDSN">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" key="SubmitPayment_Flow" bundleName="com/dashenbank/submitpaymet/SubmitPayment_Flow" pluginId="DashenBank_SubmitPayment_App"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_SubmitPayment_App/icons/full/obj16/SubmitPayment_Flow.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_SubmitPayment_App/icons/full/obj30/SubmitPayment_Flow.gif"/>
+    <composition>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="490,129" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.submitpaymet#ResponseToChannel.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="ResponseToChannel"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="353,7" rotation="BOTTOM_TO_TOP" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
+        <translation xmi:type="utility:ConstantString" string="PayloadLogging"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="506,221" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.submitpaymet#BuildExceptionResponse.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="BuildBusinessError"/>
+      </nodes>
+      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="648,123">
+        <translation xmi:type="utility:ConstantString" string="SubmitPayment_Response"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="194,128" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.submitpaymet#RequestToBackend.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
+      </nodes>
+      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="347,129" wsdlOperationMode="gateway" wsdlFileName="Gateway.wsdl" selectedPortType="InternalTransfer" selectedBinding="InternalTransfer" selectedOperation="InternalTransfer" selectedPort="InternalTransfer" useHTTPTransport="true" webServiceURL="http://localhost:7800/CBS_IFT" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+        <translation xmi:type="utility:ConstantString" string="BackendSystemCall"/>
+      </nodes>
+      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_7" location="236,226">
+        <translation xmi:type="utility:ConstantString" string="ExceptionHandler"/>
+      </nodes>
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="14,128" wsdlOperationMode="gateway" wsdlFileName="RTSERVICE.wsdl" selectedPortType="RTSERVICE" selectedBinding="RTSERVICESOAP" selectedPort="RTSERVICESOAP" useHTTPTransport="true" urlSelector="/ESB_SubmitPayment" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+        <translation xmi:type="utility:ConstantString" string="SubmitPayment_Request"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.catch" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_1" sourceNode="FCMComposite_1_6" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_6" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.timeout" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_7" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_8" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_10" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_7" sourceTerminalName="OutTerminal.Output" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_11" targetNode="FCMComposite_1_4" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+    </composition>
+    <propertyOrganizer>
+      <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG_CONFIG_PATH">
+        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG_CONFIG_PATH" bundleName="com/dashenbank/submitpaymet/SubmitPayment_Flow" pluginId="DashenBank_SubmitPayment_App"/>
+        <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_ERROR_MSG">
+          <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR_MSG" bundleName="com/dashenbank/submitpaymet/SubmitPayment_Flow" pluginId="DashenBank_SubmitPayment_App"/>
+          <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.BACKEND_URL">
+            <propertyName xmi:type="utility:TranslatableString" key="Property.BACKEND_URL" bundleName="com/dashenbank/submitpaymet/SubmitPayment_Flow" pluginId="DashenBank_SubmitPayment_App"/>
+            <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.DSN_NAME">
+              <propertyName xmi:type="utility:TranslatableString" key="Property.DSN_NAME" bundleName="com/dashenbank/submitpaymet/SubmitPayment_Flow" pluginId="DashenBank_SubmitPayment_App"/>
+            </propertyDescriptor>
+          </propertyDescriptor>
+        </propertyDescriptor>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <stickyBoard/>
+  </eClassifiers>
+</ecore:EPackage>
