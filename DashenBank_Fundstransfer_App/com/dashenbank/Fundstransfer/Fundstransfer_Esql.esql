@@ -53,8 +53,8 @@ CREATE COMPUTE MODULE RequestToBackend
 	   DECLARE operationName CHARACTER InputRoot.SOAP.Body.ns:RTSERVICE.RT_HEADER.OPERATION;
 	   PASSTHRU 'INSERT INTO TRANSACTION_LOG VALUES(?,?,?,?,?,?,?)' TO Database.{DSN_NAME} VALUES(seq_Id.NEXTVAL,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,createdBy1);
 	 --  INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(seq_Id.NEXTVAL,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,createdBy1);
-	   PASSTHRU 'COMMIT' TO Database.{DSN_NAME};
-	    
+	 --  PASSTHRU 'COMMIT' TO Database.{DSN_NAME};
+	    COMMIT;
 
       DECLARE ccidRef INTEGER Environment.ccidRef;
       DECLARE encodeRef INTEGER Environment.encodeRef;
