@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/AccountBalEnq/" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/AccountBalEnq/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:element name="NewOperation">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="in" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="NewOperationResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="out" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element ibmSchExtn:docRoot="true" name="QUERYACCBAL_IOFS_RES" type="tns:QUERYACCBAL_IOFS_RES">
+      </xsd:element>
+
+      <xsd:complexType name="QUERYACCBAL_IOFS_RES">
+      	<xsd:sequence>
+      		<xsd:element name="FCUBS_HEADER" type="tns:FCUBS_HEADER">
+      		</xsd:element>
+      		<xsd:element name="FCUBS_BODY" type="tns:FCUBS_BODY"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="FCUBS_HEADER">
+      	<xsd:sequence>
+      		<xsd:element name="SOURCE" type="xsd:string"/>
+      		<xsd:element name="UBSCOMP" type="xsd:string"/>
+      		<xsd:element name="MSGID" type="xsd:string"/>
+      		<xsd:element name="USERID" type="xsd:string"/>
+      		<xsd:element name="BRANCH" type="xsd:string"/>
+      		<xsd:element name="MODULEID" type="xsd:string"/>
+      		<xsd:element name="SERVICE" type="xsd:string"/>
+      		<xsd:element name="OPERATION" type="xsd:string"/>
+      		<xsd:element name="SOURCE_OPERATION" type="xsd:string"/>
+      		<xsd:element name="DESTINATION" type="xsd:string"/>
+      		<xsd:element name="MULTITRIPID" type="xsd:string"/>
+      		<xsd:element name="FUNCTIONID" type="xsd:string"/>
+      		<xsd:element name="ACTION" type="xsd:string"/>
+      		<xsd:element name="MSGSTAT" type="xsd:string"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="FCUBS_BODY">
+      	<xsd:sequence>
+      		<xsd:element name="ACC-Balance" type="tns:ACC-Balance"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="ACC-Balance">
+      	<xsd:sequence>
+      		<xsd:element name="ACC_BAL" type="tns:ACC_BAL"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="ACC_BAL">
+      	<xsd:sequence>
+      		<xsd:element name="BRANCH_CODE" type="xsd:string"/>
+      		<xsd:element name="CUST_AC_NO" type="xsd:string"/>
+      		<xsd:element name="CCY" type="xsd:string"/>
+      		<xsd:element name="TRNDT" type="xsd:string"/>
+      		<xsd:element name="OPNBAL" type="xsd:string"/>
+      		<xsd:element name="CURBAL" type="xsd:string"/>
+      		<xsd:element name="AVLBAL" type="xsd:string"/>
+      		<xsd:element name="UNCOLAMT" type="xsd:string"/>
+      		<xsd:element name="AVLCR" type="xsd:string"/>
+      		<xsd:element name="MTDTOVCR" type="xsd:string"/>
+      		<xsd:element name="MTDTOVDR" type="xsd:string"/>
+      		<xsd:element name="ACY_BKD_AMT" type="xsd:string"/>
+      		<xsd:element name="ACCR_DR" type="xsd:string"/>
+      		<xsd:element name="ACCR_CR" type="xsd:string"/>
+      		<xsd:element name="SUBLIMIT" type="xsd:string"/>
+      		<xsd:element name="ACY_TANK_CR" type="xsd:string"/>
+      		<xsd:element name="ACY_TANK_DR" type="xsd:string"/>
+      		<xsd:element name="ACY_TANK_UNCOL" type="xsd:string"/>
+      		<xsd:element name="ACY_UNAUTH_DR" type="xsd:string"/>
+      		<xsd:element name="ACY_UNAUTH_TANK_DR" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element name="ACY_UNAUTH_CR" type="xsd:string"/>
+      		<xsd:element name="ACY_UNAUTH_TANK_CR" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element name="ACY_UNAUTH_UNCOL" type="xsd:string"/>
+      		<xsd:element name="ACY_UNAUTH_TANK_UNCOL" type="xsd:string"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+      <xsd:element ibmSchExtn:docRoot="true" name="FCUBS_REQ_ENV" type="tns:FCUBS_REQ_ENV"/>
+
+      <xsd:complexType name="FCUBS_REQ_ENV">
+      	<xsd:sequence>
+      		<xsd:element name="FCUB_HEADER" type="tns:FCUB_HEADER"/>
+      		<xsd:element name="FCUB_BODY" type="tns:FCUB_BODY"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="FCUB_HEADER">
+      	<xsd:sequence>
+      		<xsd:element name="SOURCE" type="xsd:string"/>
+      		<xsd:element name="UBSCOMP" type="xsd:string"/>
+      		<xsd:element name="USERID" type="xsd:string"/>
+      		<xsd:element name="BRANCH" type="xsd:int"/>
+      		<xsd:element name="MODULEID" type="xsd:string"/>
+      		<xsd:element name="SERVICE" type="xsd:string"/>
+      		<xsd:element name="OPERATION" type="xsd:string"/>
+      		<xsd:element name="MSGSTAT" type="xsd:string"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="FCUB_BODY">
+      	<xsd:sequence>
+      		<xsd:element name="AC-Balance" type="tns:AC-Balance"/>
+      		
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="AC-Balance">
+      	<xsd:sequence>
+      		<xsd:element name="AC_BAL" type="tns:AC_BAL"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="AC_BAL">
+      	<xsd:sequence>
+      		<xsd:element name="BRANCH_CODE" type="xsd:int"/>
+      		<xsd:element name="CUST_AC_NO" type="xsd:int"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
