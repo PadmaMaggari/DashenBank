@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/ESB_AccountSummary/" xmlns:esb="http://www.example.org/ESB_AccountSummary/" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:element ibmSchExtn:docRoot="true" name="AccountSummary" type="esb:QUERYACCSUMM_IOFS_REQ">
+
+      </xsd:element>
+      <xsd:element ibmSchExtn:docRoot="true" name="AccountSummaryResponse" type="esb:QUERYACCSUMM_IOFS_RES">
+
+      </xsd:element>
+
+      <xsd:complexType name="QUERYACCSUMM_IOFS_REQ">
+      	<xsd:sequence>
+      		<xsd:element name="FCUBS_HEADER" type="esb:REQ_FCUBS_HEADER">
+      		</xsd:element>
+      		<xsd:element name="FCUBS_BODY" type="esb:REQ_FCUBS_BODY"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="REQ_FCUBS_HEADER">
+      	<xsd:sequence>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="SOURCE" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="UBSCOMP" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="MSGID" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="CORRELID" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="USERID" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="BRANCH" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="SERVICE" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="OPERATION" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="MSGSTAT" type="xsd:string"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="REQ_FCUBS_BODY">
+      	<xsd:sequence>
+      		<xsd:element name="Stvw-Account-Sumary-IO" type="esb:Stvw-Account-Sumary-IO"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="Stvw-Account-Sumary-IO">
+      	<xsd:sequence>
+      		<xsd:element name="CUST_NO" type="xsd:string"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="QUERYACCSUMM_IOFS_RES">
+      	<xsd:sequence>
+      		<xsd:element name="FCUBS_HEADER" type="esb:RES_FCUBS_HEADER">
+      		</xsd:element>
+      		<xsd:element name="FCUBS_BODY" type="esb:RES_FCUBS_BODY"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="RES_FCUBS_HEADER">
+      	<xsd:sequence>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="SOURCE" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="UBSCOMP" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="MSGID" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="CORRELID" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="USERID" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="ENTITY" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="BRANCH" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="SERVICE" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="OPERATION" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="DESTINATION" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="FUNCTIONID" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="ACTION" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="MSGSTAT" type="xsd:string"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="RES_FCUBS_BODY">
+      	<xsd:sequence>
+      		<xsd:element minOccurs="1" name="Stvw-Account-Sumary-Full" type="esb:Stvw-Account-Sumary-Full">
+      		</xsd:element>
+      		<xsd:element name="FCUBS_WARNING_RESP" type="esb:FCUBS_WARNING_RESP"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="Stvw-Account-Sumary-Full">
+      	<xsd:sequence>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="CUST_NO" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="1" name="Stvw-Account-Sumary--A" type="esb:Stvw-Account-Sumary--A"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="Stvw-Account-Sumary--A">
+      	<xsd:sequence>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="CUSTACNO" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="BRANCH_CODE" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="CCY" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="CURRBAL" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="ACCOUNT_TYPE" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="CUSTOMER_NAME" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="AC_DESC" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="ACCOUNT_CLASS" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="ACCLASSDESC" type="xsd:string"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="FCUBS_WARNING_RESP">
+      	<xsd:sequence>
+      		<xsd:element name="WARNING" type="esb:WARNING"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="WARNING">
+      	<xsd:sequence>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="WCODE" type="xsd:string">
+      		</xsd:element>
+      		<xsd:element maxOccurs="1" minOccurs="0" name="WDESC" type="xsd:string"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>
