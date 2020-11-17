@@ -2,6 +2,10 @@ BROKER SCHEMA com.dashenbank.DriverLookUp
 
 PATH com.dashenbank.genericfunctions;
 
+--DECLARE ns NAMESPACE 'https://www.fintech-group.com/services/Finpay';
+--DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
+--DECLARE esb NAMESPACE 'http://www.dashenbank.org/ESB_SubmitPaymentService/';
+
 DECLARE rc BOOLEAN;
 DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER;
 DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER;
@@ -33,8 +37,7 @@ CREATE COMPUTE MODULE RequestToBackend
 	END;
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
-	--	DECLARE id CHARACTER InputRoot.HTTPInputHeader."Content-Type";
-	    DECLARE msg_Id CHARACTER CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
+	    DECLARE msg_Id CHARACTER InputRoot.SOAP.Body.DriverLookup.providerID;
 	    SET Environment.id = msg_Id;
 	    SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
         SET Environment.encodeRef = InputRoot.Properties.Encoding;
@@ -44,13 +47,12 @@ CREATE COMPUTE MODULE RequestToBackend
 	   DECLARE seq_Id INTEGER;
 	   DECLARE transactionStatus1 CHARACTER 'Request Received from END USER';
 	   DECLARE createdOn1 TIMESTAMP CURRENT_TIMESTAMP;
-	   DECLARE createdBy1 CHARACTER 'ACE USER';
 	   DECLARE serviceName CHARACTER 'DriverLookUp';
 	   DECLARE operationName CHARACTER 'DriverLookUp';
-	   PASSTHRU 'INSERT INTO TRANSACTION_LOG VALUES(?,?,?,?,?,?,?)' TO Database.{DSN_NAME} VALUES(seq_Id.NEXTVAL,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,createdBy1);
-	 --  INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(seq_Id.NEXTVAL,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,createdBy1);
-	 --  PASSTHRU 'COMMIT' TO Database.{DSN_NAME}; 
-	 COMMIT;
+	   SET Environment.SEQ[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
+       SET seq_Id = CAST(Environment.SEQ[1].NEXTVAL AS INTEGER);
+	   PASSTHRU 'INSERT INTO TRANSACTION_LOG VALUES(?,?,?,?,?,?,?)' TO Database.{DSN_NAME} VALUES(seq_Id,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,'ACE USER');
+	   COMMIT;
 
       DECLARE ccidRef INTEGER Environment.ccidRef;
       DECLARE encodeRef INTEGER Environment.encodeRef;
@@ -117,10 +119,6 @@ CREATE COMPUTE MODULE ResponseToChannel
 	END;
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
-	    
-	    DECLARE refId CHARACTER SUBSTRING(Environment.id FROM 3);
-       DECLARE refId1 INTEGER LENGTH(refId);
-       SET refId = SUBSTRING(refId FROM 1 FOR refId1-1);
     
 	    SET Environment.ccidRef1 = InputRoot.Properties.CodedCharSetId;
         SET Environment.encodeRef1 = InputRoot.Properties.Encoding;
@@ -129,9 +127,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 	    
 	    DECLARE transactionStatus3 CHARACTER 'Response Received from Backend flow';
 	    DECLARE createdOn3 TIMESTAMP CURRENT_TIMESTAMP;
-	    DECLARE qry11 CHARACTER 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID LIKE ''%'||refId||'%''';
-	    SET Environment.val1[] = PASSTHRU(qry11 TO Database.{DSN_NAME} VALUES(transactionStatus3,createdOn3));
-	 --   PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus3,createdOn3,Environment.id);
+	    PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus3,createdOn3,Environment.id);
 	   
 
       DECLARE ccidRef INTEGER Environment.ccidRef1;
@@ -146,15 +142,11 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','------------Response Received from Backend flow---------------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','FLEXCUBE_RESP data is: '||payload) INTO rc;
 	            
-	--	SET OutputRoot.HTTPResponseHeader."Content-Type" = id1;
         SET OutputRoot.SOAP = InputRoot.SOAP;
-   --     SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = CAST(Environment.id1 AS BLOB);
 	
-        
         DECLARE transactionStatus4 CHARACTER 'Response Sent to END USER';
 	    DECLARE createdOn4 TIMESTAMP CURRENT_TIMESTAMP;
-	    SET Environment.val2[] = PASSTHRU(qry11 TO Database.{DSN_NAME} VALUES(transactionStatus4,createdOn4));
-	--    PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus4,createdOn4,Environment.id);
+	    PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus4,createdOn4,Environment.id);
 		
 		DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
 	   DECLARE domainName1 CHARACTER 'SOAP';
