@@ -1,0 +1,27 @@
+
+
+Importing file: E:\EIDIKO\IBM_ACE\Project\Dashen\DashenBank\BulkFundTransfer.wsdl
+
+
+The following is a list of WS-I warning messages found when importing:
+WS-I BP 1.1: (BP2118) The binding does not have the same list of operations as the BulkFundTransfer port type to which it refers., Line: 556, Column: 3
+
+
+The WSDL import will proceed with bindings BulkFundTransferSOAP.
+Creating wsdl schema document for file:///E:/EIDIKO/IBM_ACE/Project/Dashen/DashenBank/BulkFundTransfer.wsdl.
+Parsing wsdl binding {http://www.example.org/BulkFundTransfer/}BulkFundTransferSOAP.
+Parsing wsdl binding input CREATEMJRNLBOOK.
+Parsing wsdl binding output CREATEMJRNLBOOK.
+Processing doc style for operation CREATEMJRNLBOOK.
+Populating WSDL schema BulkFundTransfer.xsd.
+Creating file BulkFundTransfer.xsd in the workspace.
+Creating file BulkFundTransfer_InlineSchema1.xsd in the workspace.
+Copying source WSDL BulkFundTransfer.wsdl to BulkFundTransfer.wsdl.
+
+Elapsed time processing this message definition file: 1.431 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+
