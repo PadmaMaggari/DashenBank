@@ -56,6 +56,8 @@ CREATE COMPUTE MODULE cbs_Compute
 		SET FILENAME = 'SubmitPaymentRES.xml';
 		WHEN Service_Name='RegisterPenalty' THEN
 		SET FILENAME = 'RegisterPenaltyRES.xml';
+		WHEN Service_Name='GetTaxDuebalance' THEN
+		SET FILENAME = 'GetTaxDuebalanceRES.xml';
 		ELSE
 		SET FILENAME = NULL;	
 		END CASE;
