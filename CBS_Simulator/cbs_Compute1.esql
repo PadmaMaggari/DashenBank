@@ -56,6 +56,8 @@ CREATE COMPUTE MODULE cbs_Compute1
 		SET OutputRoot.SOAP.Body  = InputRoot.XMLNSC;
 		WHEN Service_Name='GetTaxDuebalanceResponse' THEN
 		SET OutputRoot.SOAP.Body  = InputRoot.XMLNSC;
+		WHEN Service_Name='RetrievePenaltyResponse' THEN
+		SET OutputRoot.SOAP.Body  = InputRoot.XMLNSC;
 		ELSE
 		SET OutputRoot.SOAP = NULL;
 		END CASE;
