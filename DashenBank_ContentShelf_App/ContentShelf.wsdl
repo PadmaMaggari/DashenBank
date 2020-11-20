@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="ContentShelf" targetNamespace="http://www.example.org/ContentShelf/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/ContentShelf/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:documentation>
+    <wsdl:appinfo source="WMQI_APPINFO">
+      <MRWSDLAppInfo imported="true">
+        <generatedXSD location="ContentShelf_InlineSchema1.xsd"/>
+        <binding hasEncoding="false" imported="true" name="ContentShelfSOAP" originalBindingStyle="document"/>
+      </MRWSDLAppInfo>
+    </wsdl:appinfo>
+  </wsdl:documentation>
+  <wsdl:types>
+    
+          <xsd:schema targetNamespace="http://www.example.org/ContentShelf/" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions">
+<xsd:include schemaLocation="ContentShelf_InlineSchema1.xsd"/>
+    </xsd:schema>
+    </wsdl:types>
+  <wsdl:message name="ContentShelfRequest">
+    <wsdl:part element="tns:ContentShelf" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="ContentShelfResponse">
+    <wsdl:part element="tns:ContentShelfResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="ContentShelf">
+    <wsdl:operation name="ContentShelf">
+      <wsdl:input message="tns:ContentShelfRequest"/>
+      <wsdl:output message="tns:ContentShelfResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ContentShelfSOAP" type="tns:ContentShelf">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ContentShelf">
+      <soap:operation soapAction="http://www.example.org/ContentShelf/ContentShelf"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ContentShelf">
+    <wsdl:port binding="tns:ContentShelfSOAP" name="ContentShelfSOAP">
+      <soap:address location="http://localhost:7800/DashenBank_ContentShelf"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

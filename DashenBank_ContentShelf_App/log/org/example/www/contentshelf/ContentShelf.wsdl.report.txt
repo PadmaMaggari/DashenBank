@@ -1,0 +1,22 @@
+
+
+Importing file: C:\Users\SRIKANTH\IBM\ACET11\DashenBankProject\DashenBank_ContentShelf_App\ContentShelf.wsdl
+
+The WSDL import will proceed with bindings ContentShelfSOAP.
+Creating wsdl schema document for file:///C:/Users/SRIKANTH/IBM/ACET11/DashenBankProject/DashenBank_ContentShelf_App/ContentShelf.wsdl.
+Parsing wsdl binding {http://www.example.org/ContentShelf/}ContentShelfSOAP.
+Parsing wsdl binding input ContentShelf.
+Parsing wsdl binding output ContentShelf.
+Processing doc style for operation ContentShelf.
+Populating WSDL schema ContentShelf.xsd.
+Creating file ContentShelf.xsd in the workspace.
+Creating file ContentShelf_InlineSchema1.xsd in the workspace.
+Copying source WSDL ContentShelf.wsdl to ContentShelf.wsdl.
+
+Elapsed time processing this message definition file: 0.562 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+
