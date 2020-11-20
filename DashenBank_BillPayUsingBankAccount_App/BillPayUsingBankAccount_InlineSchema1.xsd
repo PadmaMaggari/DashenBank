@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/BillPayUsingBankAccount/" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/BillPayUsingBankAccount/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+      <xsd:element ibmSchExtn:docRoot="true" name="BillPayUsingBankAccount">
+        <xsd:complexType>
+          <xsd:sequence>
+          	<xsd:element name="providerID" type="xsd:int"/>
+          	<xsd:element name="appcode" type="xsd:string"/>
+          	<xsd:element name="apppassphrase" type="xsd:string"/>
+          	<xsd:element name="token" type="xsd:string"/>
+          	<xsd:element name="licenseNumber" type="xsd:string"/>
+          	<xsd:element name="ReceiptNo" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element ibmSchExtn:docRoot="true" name="BillPayUsingBankAccountResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+
+          	<xsd:element name="BillPayUsingBankAccountResult" type="tns:BillPayUsingBankAccountResult">
+          	</xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    
+      <xsd:complexType name="BillPayUsingBankAccountResult">
+      	<xsd:sequence>
+      		<xsd:element name="BillPayUsingBankAccountResponse" type="tns:BillPayUsingBankAccountResponse">
+      		</xsd:element>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="BillPayUsingBankAccountResponse">
+      	<xsd:sequence>
+      		<xsd:element name="UtilAPIVoidPaymentResponse" type="tns:UtilAPIVoidPaymentResponse">
+      		</xsd:element>
+      		<xsd:element name="Successful" type="xsd:boolean"/>
+      		<xsd:element name="Remarks" type="xsd:string"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    
+      <xsd:complexType name="UtilAPIVoidPaymentResponse">
+      	<xsd:sequence>
+      		<xsd:element name="IsSaved" type="xsd:boolean"/>
+      		<xsd:element name="ErrorMessage" type="xsd:string"/>
+      		<xsd:element name="ErrorCode" type="xsd:int"/>
+      	</xsd:sequence>
+      </xsd:complexType>
+    </xsd:schema>

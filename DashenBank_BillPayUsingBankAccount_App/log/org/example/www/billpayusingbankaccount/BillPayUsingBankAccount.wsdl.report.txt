@@ -1,0 +1,22 @@
+
+
+Importing file: C:\Users\SRIKANTH\IBM\ACET11\DashenBankProject\DashenBank_BillPayUsingBankAccount_App\BillPayUsingBankAccount.wsdl
+
+The WSDL import will proceed with bindings BillPayUsingBankAccountSOAP.
+Creating wsdl schema document for file:///C:/Users/SRIKANTH/IBM/ACET11/DashenBankProject/DashenBank_BillPayUsingBankAccount_App/BillPayUsingBankAccount.wsdl.
+Parsing wsdl binding {http://www.example.org/BillPayUsingBankAccount/}BillPayUsingBankAccountSOAP.
+Parsing wsdl binding input BillPayUsingBankAccount.
+Parsing wsdl binding output BillPayUsingBankAccount.
+Processing doc style for operation BillPayUsingBankAccount.
+Populating WSDL schema BillPayUsingBankAccount.xsd.
+Creating file BillPayUsingBankAccount.xsd in the workspace.
+Creating file BillPayUsingBankAccount_InlineSchema1.xsd in the workspace.
+Copying source WSDL BillPayUsingBankAccount.wsdl to BillPayUsingBankAccount.wsdl.
+
+Elapsed time processing this message definition file: 0.51 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+
