@@ -60,6 +60,8 @@ CREATE COMPUTE MODULE cbs_Compute
 		SET FILENAME = 'GetTaxDuebalanceRES.xml';
 		WHEN Service_Name='RetrievePenalty' THEN
 		SET FILENAME = 'RetrievePenaltyRES.xml';
+		WHEN Service_Name='FullStatement' THEN
+		SET FILENAME = 'FullStatementRES.xml';
 		ELSE
 		SET FILENAME = NULL;	
 		END CASE;
