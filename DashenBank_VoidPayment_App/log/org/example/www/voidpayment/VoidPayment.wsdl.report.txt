@@ -1,0 +1,22 @@
+
+
+Importing file: C:\Users\SRIKANTH\IBM\ACET11\DashenBankProject\DashenBank_VoidPayment_App\VoidPayment.wsdl
+
+The WSDL import will proceed with bindings VoidPaymentSOAP.
+Creating wsdl schema document for file:///C:/Users/SRIKANTH/IBM/ACET11/DashenBankProject/DashenBank_VoidPayment_App/VoidPayment.wsdl.
+Parsing wsdl binding {http://www.example.org/VoidPayment/}VoidPaymentSOAP.
+Parsing wsdl binding input VoidPayment.
+Parsing wsdl binding output VoidPayment.
+Processing doc style for operation VoidPayment.
+Populating WSDL schema VoidPayment.xsd.
+Creating file VoidPayment.xsd in the workspace.
+Creating file VoidPayment_InlineSchema1.xsd in the workspace.
+Copying source WSDL VoidPayment.wsdl to VoidPayment.wsdl.
+
+Elapsed time processing this message definition file: 0.682 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="VoidPayment" targetNamespace="http://www.example.org/VoidPayment/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/VoidPayment/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:documentation>
+    <wsdl:appinfo source="WMQI_APPINFO">
+      <MRWSDLAppInfo imported="true">
+        <generatedXSD location="VoidPayment_InlineSchema1.xsd"/>
+        <binding hasEncoding="false" imported="true" name="VoidPaymentSOAP" originalBindingStyle="document"/>
+      </MRWSDLAppInfo>
+    </wsdl:appinfo>
+  </wsdl:documentation>
+  <wsdl:types>
+    
+          <xsd:schema targetNamespace="http://www.example.org/VoidPayment/" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions">
+<xsd:include schemaLocation="VoidPayment_InlineSchema1.xsd"/>
+    </xsd:schema>
+    </wsdl:types>
+  <wsdl:message name="VoidPaymentRequest">
+    <wsdl:part element="tns:VoidPayment" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="VoidPaymentResponse">
+    <wsdl:part element="tns:VoidPaymentResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="VoidPayment">
+    <wsdl:operation name="VoidPayment">
+      <wsdl:input message="tns:VoidPaymentRequest"/>
+      <wsdl:output message="tns:VoidPaymentResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="VoidPaymentSOAP" type="tns:VoidPayment">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="VoidPayment">
+      <soap:operation soapAction="http://www.example.org/VoidPayment/VoidPayment"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="VoidPayment">
+    <wsdl:port binding="tns:VoidPaymentSOAP" name="VoidPaymentSOAP">
+      <soap:address location="http://localhost:7800/DashenBank_VoidPayment"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
