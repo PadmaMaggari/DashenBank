@@ -1,0 +1,22 @@
+
+
+Importing file: C:\Users\SRIKANTH\IBM\ACET11\DashenBankProject\DashenBank_BillStatus_App\BillStatusCheck.wsdl
+
+The WSDL import will proceed with bindings BillStatusCheckSOAP.
+Creating wsdl schema document for file:///C:/Users/SRIKANTH/IBM/ACET11/DashenBankProject/DashenBank_BillStatus_App/BillStatusCheck.wsdl.
+Parsing wsdl binding {http://www.example.org/BillStatusCheck/}BillStatusCheckSOAP.
+Parsing wsdl binding input BillStatus.
+Parsing wsdl binding output BillStatus.
+Processing doc style for operation BillStatus.
+Populating WSDL schema BillStatusCheck.xsd.
+Creating file BillStatusCheck.xsd in the workspace.
+Creating file BillStatusCheck_InlineSchema1.xsd in the workspace.
+Copying source WSDL BillStatusCheck.wsdl to BillStatusCheck.wsdl.
+
+Elapsed time processing this message definition file: 0.436 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+
