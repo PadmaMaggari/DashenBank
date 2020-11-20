@@ -1,0 +1,29 @@
+
+DECLARE ns NAMESPACE 'http://www.example.org/BillPayUsingBankAccount/';
+
+CREATE COMPUTE MODULE BillPayUsingBankAccount_backend_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot.SOAP.Body.ns:BillPayUsingBankAccountResponse.BillPayUsingBankAccountResult.BillPayUsingBankAccountResponse.UtilAPIVoidPaymentResponse.IsSaved = 'boolean';
+SET OutputRoot.SOAP.Body.ns:BillPayUsingBankAccountResponse.BillPayUsingBankAccountResult.BillPayUsingBankAccountResponse.UtilAPIVoidPaymentResponse.ErrorMessage = 'string';
+SET OutputRoot.SOAP.Body.ns:BillPayUsingBankAccountResponse.BillPayUsingBankAccountResult.BillPayUsingBankAccountResponse.UtilAPIVoidPaymentResponse.ErrorCode = 12345;
+SET OutputRoot.SOAP.Body.ns:BillPayUsingBankAccountResponse.BillPayUsingBankAccountResult.BillPayUsingBankAccountResponse.Remarks = CAST(InputRoot.SOAP.Body.ns:BillPayUsingBankAccount.providerID AS CHARACTER);
+SET OutputRoot.SOAP.Body.ns:BillPayUsingBankAccountResponse.BillPayUsingBankAccountResult.BillPayUsingBankAccountResponse.Successful = 'boolean';
+	END;
+END MODULE;
