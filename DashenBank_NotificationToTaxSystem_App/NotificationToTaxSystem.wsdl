@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="NotificationToTaxSystem" targetNamespace="http://www.example.org/NotificationToTaxSystem/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/NotificationToTaxSystem/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:documentation>
+    <wsdl:appinfo source="WMQI_APPINFO">
+      <MRWSDLAppInfo imported="true">
+        <generatedXSD location="NotificationToTaxSystem_InlineSchema1.xsd"/>
+        <binding hasEncoding="false" imported="true" name="NotificationToTaxSystemSOAP" originalBindingStyle="document"/>
+      </MRWSDLAppInfo>
+    </wsdl:appinfo>
+  </wsdl:documentation>
+  <wsdl:types>
+    
+          <xsd:schema targetNamespace="http://www.example.org/NotificationToTaxSystem/" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions">
+<xsd:include schemaLocation="NotificationToTaxSystem_InlineSchema1.xsd"/>
+    </xsd:schema>
+    </wsdl:types>
+  <wsdl:message name="NotifyTaxRequest">
+    <wsdl:part element="tns:NotifyAuthority" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="NotifyTaxResponse">
+    <wsdl:part element="tns:NotifyAuthorityResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="NotificationToTaxSystem">
+    <wsdl:operation name="NotifyTax">
+      <wsdl:input message="tns:NotifyTaxRequest"/>
+      <wsdl:output message="tns:NotifyTaxResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="NotificationToTaxSystemSOAP" type="tns:NotificationToTaxSystem">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="NotifyTax">
+      <soap:operation soapAction="http://www.example.org/NotificationToTaxSystem/NotifyTax"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="NotificationToTaxSystem">
+    <wsdl:port binding="tns:NotificationToTaxSystemSOAP" name="NotificationToTaxSystemSOAP">
+      <soap:address location="http://localhost:7800/DashenBank_NotificationToTaxSystem"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
