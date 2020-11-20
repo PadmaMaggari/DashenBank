@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="BillPayUsingWallet" targetNamespace="http://www.example.org/BillPayUsingWallet/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.example.org/BillPayUsingWallet/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:documentation>
+    <wsdl:appinfo source="WMQI_APPINFO">
+      <MRWSDLAppInfo imported="true">
+        <generatedXSD location="BillPayUsingWallet_InlineSchema1.xsd"/>
+        <binding hasEncoding="false" imported="true" name="BillPayUsingWalletSOAP" originalBindingStyle="document"/>
+      </MRWSDLAppInfo>
+    </wsdl:appinfo>
+  </wsdl:documentation>
+  <wsdl:types>
+    
+          <xsd:schema targetNamespace="http://www.example.org/BillPayUsingWallet/" xmlns:ibmSchExtn="http://www.ibm.com/schema/extensions">
+<xsd:include schemaLocation="BillPayUsingWallet_InlineSchema1.xsd"/>
+    </xsd:schema>
+    </wsdl:types>
+  <wsdl:message name="BillPayUsingWalletRequest">
+    <wsdl:part element="tns:BillPayUsingWallet" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="BillPayUsingWalletResponse">
+    <wsdl:part element="tns:BillPayUsingWalletResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="BillPayUsingWallet">
+    <wsdl:operation name="BillPayUsingWallet">
+      <wsdl:input message="tns:BillPayUsingWalletRequest"/>
+      <wsdl:output message="tns:BillPayUsingWalletResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BillPayUsingWalletSOAP" type="tns:BillPayUsingWallet">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="BillPayUsingWallet">
+      <soap:operation soapAction="http://www.example.org/BillPayUsingWallet/BillPayUsingWallet"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="BillPayUsingWallet">
+    <wsdl:port binding="tns:BillPayUsingWalletSOAP" name="BillPayUsingWalletSOAP">
+      <soap:address location="http://localhost:7800/DashenBank_BillPayUsingWallet"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
