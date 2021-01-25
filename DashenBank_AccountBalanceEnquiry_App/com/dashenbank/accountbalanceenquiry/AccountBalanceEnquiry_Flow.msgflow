@@ -25,7 +25,7 @@
       <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="681,40" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
         <translation xmi:type="utility:ConstantString" string="PayloadLogging"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="485,172" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7801/AccountBalanceEnquiry" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="485,172" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/AccountBalanceEnquiry" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="FlexCube_Call"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="908,168">
