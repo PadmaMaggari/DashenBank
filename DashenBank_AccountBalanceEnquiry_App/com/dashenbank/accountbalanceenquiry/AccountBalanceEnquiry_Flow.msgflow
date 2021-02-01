@@ -22,28 +22,28 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_AccountBalanceEnquiry_App/icons/full/obj16/AccountBalanceEnquiry_Flow.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_AccountBalanceEnquiry_App/icons/full/obj30/AccountBalanceEnquiry_Flow.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="681,40" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
+      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="427,6" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
         <translation xmi:type="utility:ConstantString" string="PayloadLogging"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="485,172" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/AccountBalanceEnquiry" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="289,117" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/AccountBalanceEnquiry" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="FlexCube_Call"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="908,168">
+      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="620,111">
         <translation xmi:type="utility:ConstantString" string="Service_Response"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="47,170" wsdlFileName="AccountBalEnq.wsdl" selectedPortType="AccountBalEnq" selectedBinding="AccountBalEnqSOAP" selectedPort="AccountBalEnqSOAP" targetNamespace="http://www.example.org/AccountBalEnq/" useHTTPTransport="true" urlSelector="/DashenBank_AccountBalanceEnquiry" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="29,120" wsdlFileName="AccountBalEnq.wsdl" selectedPortType="AccountBalEnq" selectedBinding="AccountBalEnqSOAP" selectedPort="AccountBalEnqSOAP" targetNamespace="http://www.example.org/AccountBalEnq/" useHTTPTransport="true" urlSelector="/DashenBank_AccountBalanceEnquiry" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Service_Request"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="236,166" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.accountbalanceenquiry#RequestToFlexCube.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="151,117" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.accountbalanceenquiry#RequestToFlexCube.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="RequestToFlexcube"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_13" location="617,167" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.accountbalanceenquiry#ResponseToChannel.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_13" location="382,118" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.accountbalanceenquiry#ResponseToChannel.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_17" location="853,256" computeExpression="esql://routine/com.dashenbank.accountbalanceenquiry#AccountBalanceEnquiry_BuildExceptionResponse.Main">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_17" location="568,193" computeExpression="esql://routine/com.dashenbank.accountbalanceenquiry#AccountBalanceEnquiry_BuildExceptionResponse.Main">
         <translation xmi:type="utility:ConstantString" string="BuildBusinessError "/>
       </nodes>
-      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_1" location="773,358">
+      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_1" location="489,260">
         <translation xmi:type="utility:ConstantString" string="ExceptionHandlerSubFlow"/>
       </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_11" sourceNode="FCMComposite_1_7" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
