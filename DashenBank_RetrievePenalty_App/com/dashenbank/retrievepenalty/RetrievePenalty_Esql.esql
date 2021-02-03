@@ -1,3 +1,5 @@
+
+
 BROKER SCHEMA com.dashenbank.retrievepenalty
 
 
@@ -13,14 +15,14 @@ DECLARE BACKEND_URL EXTERNAL CHARACTER;
 DECLARE DSN_NAME EXTERNAL CHARACTER;
 
 CREATE COMPUTE MODULE RequestToBackend
-	
+
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
 		IF (rc = TRUE) THEN
-		-- CALL CopyMessageHeaders();
-		  CALL CopyEntireMessage();
-		  ELSE
+			-- CALL CopyMessageHeaders();
+			CALL CopyEntireMessage();
+		ELSE
 			SET OutputRoot.SOAP.Body.Log.Message = LOG4J_ERROR_MSG;
 		END IF;
 		RETURN TRUE;
@@ -37,59 +39,55 @@ CREATE COMPUTE MODULE RequestToBackend
 	END;
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
-	    DECLARE msg_Id CHARACTER InputRoot.SOAP.Body.RetrievePenalty.providerID;
-	    SET Environment.id = msg_Id;
-	    SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
-        SET Environment.encodeRef = InputRoot.Properties.Encoding;
-	    SET Environment.domainDataRef = InputRoot.SOAP.Body;
-	    SET Environment.domainName = FIELDNAME(InputBody); 
-	    
-	   DECLARE seq_Id INTEGER;
-	   DECLARE transactionStatus1 CHARACTER 'Request Received from END USER';
-	   DECLARE createdOn1 TIMESTAMP CURRENT_TIMESTAMP;
-	   DECLARE serviceName CHARACTER 'RetrievePenalty';
-	   DECLARE operationName CHARACTER 'RetrievePenalty';
-	   SET Environment.SEQ[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
-       SET seq_Id = CAST(Environment.SEQ[1].NEXTVAL AS INTEGER);
-	   PASSTHRU 'INSERT INTO TRANSACTION_LOG VALUES(?,?,?,?,?,?,?)' TO Database.{DSN_NAME} VALUES(seq_Id,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,'ACE USER');
-	   COMMIT;
+		DECLARE msg_Id CHARACTER InputRoot.SOAP.Body.RetrievePenalty.providerID;
+		SET Environment.id = msg_Id;
+		SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
+		SET Environment.encodeRef = InputRoot.Properties.Encoding;
+		SET Environment.domainDataRef = InputRoot.SOAP.Body;
+		SET Environment.domainName = FIELDNAME(InputBody);
+		-- DECLARE seq_Id INTEGER;
+		-- DECLARE transactionStatus1 CHARACTER 'Request Received from END USER';
+		-- DECLARE createdOn1 TIMESTAMP CURRENT_TIMESTAMP;
+		-- DECLARE serviceName CHARACTER 'RetrievePenalty';
+		-- DECLARE operationName CHARACTER 'RetrievePenalty';
+		-- SET Environment.SEQ[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
+		-- SET seq_Id = CAST(Environment.SEQ[1].NEXTVAL AS INTEGER);
+		-- PASSTHRU 'INSERT INTO TRANSACTION_LOG VALUES(?,?,?,?,?,?,?)' TO Database.{DSN_NAME} VALUES(seq_Id,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,'ACE USER');
+		-- COMMIT;
 
-      DECLARE ccidRef INTEGER Environment.ccidRef;
-      DECLARE encodeRef INTEGER Environment.encodeRef;
-	  DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
-	  DECLARE domainName CHARACTER Environment.domainName; 
-	  DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-	  CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-	  DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-	  CALL PayloadLogging(msg_Id,payload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
-	    
-	   CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','..........Request Received from END USER...........') INTO rc;
-	   CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','CHANNEL_REQ data is: '||payload) INTO rc;
-	   
-	   SET OutputRoot.SOAP = InputRoot.SOAP;
-       
-       DECLARE transactionStatus2 CHARACTER 'Request Sent to Backend flow';
-	   DECLARE createdBy2 TIMESTAMP CURRENT_TIMESTAMP;
-	   PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus2,createdBy2,msg_Id);
-	   
-	   DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
-	   DECLARE domainName1 CHARACTER 'SOAP';
-	   DECLARE payload1 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
-	   SET OutputRoot.SOAP = NULL;
-	   CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-	   DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-	   CALL PayloadLogging(msg_Id,payload1,'FLEXCUBE_REQ',MessageFlowLabel,OutRef1);
-	   
-	   SET OutputRoot = InputRoot;
-	   SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
+		DECLARE ccidRef INTEGER Environment.ccidRef;
+		DECLARE encodeRef INTEGER Environment.encodeRef;
+		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
+		DECLARE domainName CHARACTER Environment.domainName;
+		DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+		CALL PayloadLogging(msg_Id,payload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
 
-	   CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','FLEXCUBE_REQ data is: '||payload1) INTO rc;
-	   CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','...............Request Sent to Backend flow..............') INTO rc;
-		
+		CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','..........Request Received from END USER...........') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','CHANNEL_REQ data is: '||payload) INTO rc;
+
+		SET OutputRoot.SOAP = InputRoot.SOAP;
+		-- DECLARE transactionStatus2 CHARACTER 'Request Sent to Backend flow';
+		-- DECLARE createdBy2 TIMESTAMP CURRENT_TIMESTAMP;
+		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus2,createdBy2,msg_Id);
+
+		DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
+		DECLARE domainName1 CHARACTER 'SOAP';
+		DECLARE payload1 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
+		SET OutputRoot.SOAP = NULL;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
+		CALL PayloadLogging(msg_Id,payload1,'FLEXCUBE_REQ',MessageFlowLabel,OutRef1);
+
+		SET OutputRoot = InputRoot;
+		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
+
+		CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','FLEXCUBE_REQ data is: '||payload1) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','...............Request Sent to Backend flow..............') INTO rc;
+
 	END;
 END MODULE;
-
-
 
 
 
@@ -100,11 +98,11 @@ END MODULE;
 
 
 CREATE COMPUTE MODULE ResponseToChannel
-	
+
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		-- CALL CopyMessageHeaders();
-		  CALL CopyEntireMessage();
+		CALL CopyEntireMessage();
 		RETURN TRUE;
 	END;
 
@@ -119,51 +117,47 @@ CREATE COMPUTE MODULE ResponseToChannel
 	END;
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
-    
-	    SET Environment.ccidRef1 = InputRoot.Properties.CodedCharSetId;
-        SET Environment.encodeRef1 = InputRoot.Properties.Encoding;
-	    SET Environment.domainDataRef1 = InputRoot.SOAP.Body;
-	    SET Environment.domainName1 = FIELDNAME(InputBody); 
-	    
-	    DECLARE transactionStatus3 CHARACTER 'Response Received from Backend flow';
-	    DECLARE createdOn3 TIMESTAMP CURRENT_TIMESTAMP;
-	    PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus3,createdOn3,Environment.id);
-	   
 
-      DECLARE ccidRef INTEGER Environment.ccidRef1;
-      DECLARE encodeRef INTEGER Environment.encodeRef1;
-	  DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
-	  DECLARE domainName CHARACTER Environment.domainName1; 
-	  DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-	  CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-	  DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-	  CALL PayloadLogging(Environment.id,payload,'FLEXCUBE_RESP',MessageFlowLabel,OutRef);
-		
-		CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','------------Response Received from Backend flow---------------') INTO rc;
+		SET Environment.ccidRef1 = InputRoot.Properties.CodedCharSetId;
+		SET Environment.encodeRef1 = InputRoot.Properties.Encoding;
+		SET Environment.domainDataRef1 = InputRoot.SOAP.Body;
+		SET Environment.domainName1 = FIELDNAME(InputBody);
+		-- DECLARE transactionStatus3 CHARACTER 'Response Received from Backend flow';
+		-- DECLARE createdOn3 TIMESTAMP CURRENT_TIMESTAMP;
+		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus3,createdOn3,Environment.id);
+		--
+
+		DECLARE ccidRef INTEGER Environment.ccidRef1;
+		DECLARE encodeRef INTEGER Environment.encodeRef1;
+		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
+		DECLARE domainName CHARACTER Environment.domainName1;
+		DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+		CALL PayloadLogging(Environment.id,payload,'FLEXCUBE_RESP',MessageFlowLabel,OutRef);
+
+		CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG',' ------------Response Received from Backend flow---------------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','FLEXCUBE_RESP data is: '||payload) INTO rc;
-	            
-        SET OutputRoot.SOAP = InputRoot.SOAP;
-	        
-        DECLARE transactionStatus4 CHARACTER 'Response Sent to END USER';
-	    DECLARE createdOn4 TIMESTAMP CURRENT_TIMESTAMP;
-	    PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus4,createdOn4,Environment.id);
-		
-		DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
-	   DECLARE domainName1 CHARACTER 'SOAP';
-	   DECLARE payload1 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
-	   SET OutputRoot.SOAP = NULL;
-	   CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-	   DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-	   CALL PayloadLogging(Environment.id,payload1,'CHANNEL_RESP',MessageFlowLabel,OutRef1);
-	   SET OutputRoot = InputRoot;
 
-	    CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','CHANNEL_RESP data is: '||payload1) INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','------------Response Sent to END USER------------') INTO rc;
-		
+		SET OutputRoot.SOAP = InputRoot.SOAP;
+		-- DECLARE transactionStatus4 CHARACTER 'Response Sent to END USER';
+		-- DECLARE createdOn4 TIMESTAMP CURRENT_TIMESTAMP;
+		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus4,createdOn4,Environment.id);
+
+		DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
+		DECLARE domainName1 CHARACTER 'SOAP';
+		DECLARE payload1 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
+		SET OutputRoot.SOAP = NULL;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
+		CALL PayloadLogging(Environment.id,payload1,'CHANNEL_RESP',MessageFlowLabel,OutRef1);
+		SET OutputRoot = InputRoot;
+
+		CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','CHANNEL_RESP data is: '||payload1) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG',' ------------Response Sent to END USER------------') INTO rc;
+
 	END;
 END MODULE;
-
-
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -171,10 +165,10 @@ END MODULE;
 CREATE COMPUTE MODULE BuildExceptionResponse
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		 CALL BuildExceptionResponse();
+		CALL BuildExceptionResponse();
 		RETURN TRUE;
 	END;
-	
+
 	CREATE PROCEDURE BuildExceptionResponse() BEGIN
 		CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','..............Error Logging Started...........') INTO rc;
 		DECLARE inRef REFERENCE TO InputRoot.SOAP;
@@ -196,7 +190,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		--SET domainName = FIELDNAME(domainDataRef);
 		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,encodeID,ccsID);
 		CALL writeToLogFile(MessageFlowLabel,'retrievepenaltyLogger','DEBUG','Application Built Exception:'||resPayload) INTO rc;
-		------------Error  Logging in DB----------
+		------------Error Logging in DB----------
 		--CALL ConstructErrorDBLog(CURRENT_TIMESTAMP,CREATED_BY,envRef.ErrorType,MessageFlowLabel,ApplicationLabel,ExecutionGroupLabel,
 		---excpPayload,Environment.REQUEST_PAYLOAD,excpRef.excpNumber,envRef.ErrorCode,outRef);
 		-------------------------------------------

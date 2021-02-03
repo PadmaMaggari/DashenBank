@@ -1,3 +1,5 @@
+
+
 BROKER SCHEMA com.dashenbank.reversal
 PATH com.dashenbank.genericfunctions;
 DECLARE ns NAMESPACE 'http://www.example.org/Reversal/';
@@ -10,7 +12,6 @@ DECLARE LOG_TYPE EXTERNAL CHARACTER '';
 DECLARE IP EXTERNAL CHARACTER '';
 DECLARE PORT EXTERNAL CHARACTER '';
 DECLARE baseURL EXTERNAL CHARACTER '';
-
 --------Global Variables----------
 DECLARE rc BOOLEAN FALSE;
 DECLARE SEQ_ID INTEGER 1;
@@ -24,7 +25,7 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		CALL initLog4j(LOG4J_CONFIG_PATH) INTO rc;
 		IF ( rc = TRUE ) THEN
 			CALL GenerateReqToFlexcube();
-		ELSE	
+		ELSE
 			SET Environment.Variables.Log4j.ErrorMsg = LOG4J_ERROR_MSG;
 		END IF;
 		RETURN TRUE;
@@ -41,42 +42,40 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		SET Environment.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET Environment.REQUEST_PAYLOAD = Environment.reqPayload;
-		SET TRANSACTION_STATUS = 'Request Received from Channel';
-		SET CREATED_BY = 'ACE USER';
-		SET SERVICE_NAME = inRef.*:FCUBS_HEADER.*:SERVICE;
-		SET OPERATION_NAME = inRef.*:FCUBS_HEADER.*:OPERATION;
-		SET MSG_ID = inRef.*:FCUBS_HEADER.*:MSGID;
-		SET Environment.MSG_ID = MSG_ID;
-		SET Environment.ID[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
-		SET SEQ_ID = CAST(Environment.ID[1].NEXTVAL AS INTEGER);
+		-- SET TRANSACTION_STATUS = 'Request Received from Channel';
+		-- SET CREATED_BY = 'ACE USER';
+		-- SET SERVICE_NAME = inRef.*:FCUBS_HEADER.*:SERVICE;
+		-- SET OPERATION_NAME = inRef.*:FCUBS_HEADER.*:OPERATION;
+		-- SET MSG_ID = inRef.*:FCUBS_HEADER.*:MSGID;
+		-- SET Environment.MSG_ID = MSG_ID;
+		-- SET Environment.ID[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
+		-- SET SEQ_ID = CAST(Environment.ID[1].NEXTVAL AS INTEGER);
 		----------------------Request Logging-------------------------
-		--INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) 
+		--INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY)
 		--VALUES(SEQ_ID.NEXTVAL,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY);
-		PASSTHRU 'INSERT INTO TRANSACTION_LOG (SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(?,?,?,?,?,?,?)' 
-		TO Database.DBDSN VALUES(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CURRENT_TIMESTAMP,'ACE-USER');
-		COMMIT;
+		-- PASSTHRU 'INSERT INTO TRANSACTION_LOG (SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(?,?,?,?,?,?,?)'
+		-- TO Database.DBDSN VALUES(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CURRENT_TIMESTAMP,'ACE-USER');
+		-- COMMIT;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
 		CALL PayloadLogging(MSG_ID,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Request Received from Channel ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.reqPayload) INTO rc;
 		----------------------------------------------------
-		
 		-------------Business Logic-------------------------
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Preparing business logic ------') INTO rc;
-	   	SET OutputRoot.SOAP = InputRoot.SOAP;
-	    SET OutputRoot.SOAP.Body.ns:Header.REQ_IDENTIFIER = MSG_ID;
+		SET OutputRoot.SOAP = InputRoot.SOAP;
+		SET OutputRoot.SOAP.Body.ns:Header.REQ_IDENTIFIER = MSG_ID;
 		----------------------------------------------------
-		
 		----------------------Response Logging-------------------------
-		SET TRANSACTION_STATUS = 'Request Sent to Flexcube';
-		SET CREATED_ON = CURRENT_TIMESTAMP;
+		-- SET TRANSACTION_STATUS = 'Request Sent to Flexcube';
+		-- SET CREATED_ON = CURRENT_TIMESTAMP;
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		MOVE OutRef TO OutputRoot.XMLNSC;
-		PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN 
-		VALUES(TRANSACTION_STATUS,CURRENT_TIMESTAMP,MSG_ID);
+		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN
+		-- VALUES(TRANSACTION_STATUS,CURRENT_TIMESTAMP,MSG_ID);
 		CALL PayloadLogging(MSG_ID,Environment.reqPayload,'FLEXCUBE_REQ',MessageFlowLabel,OutRef);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Request to Flexcube ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.resPayload) INTO rc;
@@ -88,7 +87,7 @@ END MODULE;
 CREATE COMPUTE MODULE ResponseToFrontEnd
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-	 CALL GenerateResToFrontEnd();
+		CALL GenerateResToFrontEnd();
 		RETURN TRUE;
 	END;
 
@@ -100,41 +99,40 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		DECLARE SERVICE_NAME,OPERATION_NAME CHARACTER;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		SET TRANSACTION_STATUS = 'Response Received from Flexcube';
-		SET CREATED_BY = 'ACE USER';
-		SET SERVICE_NAME = inRef.*:FCUBS_HEADER.*:SERVICE;
-		SET OPERATION_NAME = inRef.*:FCUBS_HEADER.*:OPERATION;
+		-- SET TRANSACTION_STATUS = 'Response Received from Flexcube';
+		-- SET CREATED_BY = 'ACE USER';
+		-- SET SERVICE_NAME = inRef.*:FCUBS_HEADER.*:SERVICE;
+		-- SET OPERATION_NAME = inRef.*:FCUBS_HEADER.*:OPERATION;
 		IF MSG_ID IS NULL OR MSG_ID = '' THEN
-		SET MSG_ID = Environment.MSG_ID;
+			SET MSG_ID = Environment.MSG_ID;
 		END IF;
-
 		----------------------Request Logging-------------------------
-		--INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) 
+		--INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY)
 		--VALUES(SEQ_ID.NEXTVAL,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY);
-		PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN 
-		VALUES(TRANSACTION_STATUS,CURRENT_TIMESTAMP,MSG_ID);
+		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN
+		-- VALUES(TRANSACTION_STATUS,CURRENT_TIMESTAMP,MSG_ID);
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
 		CALL PayloadLogging(MSG_ID,Environment.reqPayload,'FLEXCUBE_RES',MessageFlowLabel,OutRef);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Response Received from Flexcube ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.reqPayload) INTO rc;
 		----------------------------------------------------
-		
 		-------------Business Logic-------------------------
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Preparing Business Logic ------') INTO rc;
-	   	SET OutputRoot.SOAP = InputRoot.SOAP;
-	    SET OutputRoot.SOAP.Body.ns:Header.REQ_IDENTIFIER = MSG_ID;
+		SET OutputRoot.SOAP = InputRoot.SOAP;
+		SET OutputRoot.SOAP.Body.ns:Header.REQ_IDENTIFIER = MSG_ID;
 		----------------------------------------------------
-		
 		----------------------Response Logging-------------------------
-		SET TRANSACTION_STATUS = 'Response Sent to Channel';
-		SET CREATED_ON = CURRENT_TIMESTAMP;
+		-- SET TRANSACTION_STATUS = 'Response Sent to Channel';
+		-- SET CREATED_ON = CURRENT_TIMESTAMP;
+
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		MOVE OutRef TO OutputRoot.XMLNSC;
-		PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN 
-		VALUES(TRANSACTION_STATUS,CURRENT_TIMESTAMP,MSG_ID);
+		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN
+		-- VALUES(TRANSACTION_STATUS,CURRENT_TIMESTAMP,MSG_ID);
+
 		CALL PayloadLogging(MSG_ID,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Response to Frontend ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.resPayload) INTO rc;
@@ -147,10 +145,10 @@ END MODULE;
 CREATE COMPUTE MODULE BuildExceptionResponse
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		 CALL Build_BusinessErrorResponse();
+		CALL Build_BusinessErrorResponse();
 		RETURN TRUE;
 	END;
-	
+
 	CREATE PROCEDURE Build_BusinessErrorResponse() BEGIN
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
 		DECLARE inRef REFERENCE TO InputRoot.XMLNSC;
@@ -172,7 +170,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		--SET domainName = FIELDNAME(domainDataRef);
 		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,encodeID,ccsID);
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'Application Built Exception:'||resPayload) INTO rc;
-		------------Error  Logging in DB----------
+		------------Error Logging in DB----------
 		--CALL ConstructErrorDBLog(CURRENT_TIMESTAMP,CREATED_BY,envRef.ErrorType,MessageFlowLabel,ApplicationLabel,ExecutionGroupLabel,
 		---excpPayload,Environment.REQUEST_PAYLOAD,excpRef.excpNumber,envRef.ErrorCode,outRef);
 		-------------------------------------------
