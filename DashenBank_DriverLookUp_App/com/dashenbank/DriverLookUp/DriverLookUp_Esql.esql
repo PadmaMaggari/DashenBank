@@ -44,15 +44,15 @@ CREATE COMPUTE MODULE RequestToBackend
 	    SET Environment.domainDataRef = InputRoot.SOAP.Body;
 	    SET Environment.domainName = FIELDNAME(InputBody); 
 	    
-	   DECLARE seq_Id INTEGER;
-	   DECLARE transactionStatus1 CHARACTER 'Request Received from END USER';
-	   DECLARE createdOn1 TIMESTAMP CURRENT_TIMESTAMP;
-	   DECLARE serviceName CHARACTER 'DriverLookUp';
-	   DECLARE operationName CHARACTER 'DriverLookUp';
-	   SET Environment.SEQ[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
-       SET seq_Id = CAST(Environment.SEQ[1].NEXTVAL AS INTEGER);
-	   PASSTHRU 'INSERT INTO TRANSACTION_LOG VALUES(?,?,?,?,?,?,?)' TO Database.{DSN_NAME} VALUES(seq_Id,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,'ACE USER');
-	   COMMIT;
+	--   DECLARE seq_Id INTEGER;
+	--   DECLARE transactionStatus1 CHARACTER 'Request Received from END USER';
+	--   DECLARE createdOn1 TIMESTAMP CURRENT_TIMESTAMP;
+	 --  DECLARE serviceName CHARACTER 'DriverLookUp';
+	 --  DECLARE operationName CHARACTER 'DriverLookUp';
+	--   SET Environment.SEQ[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
+    --   SET seq_Id = CAST(Environment.SEQ[1].NEXTVAL AS INTEGER);
+	--   PASSTHRU 'INSERT INTO TRANSACTION_LOG VALUES(?,?,?,?,?,?,?)' TO Database.{DSN_NAME} VALUES(seq_Id,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,'ACE USER');
+	 --  COMMIT;
 
       DECLARE ccidRef INTEGER Environment.ccidRef;
       DECLARE encodeRef INTEGER Environment.encodeRef;
@@ -68,9 +68,9 @@ CREATE COMPUTE MODULE RequestToBackend
 	   
 	   SET OutputRoot.SOAP = InputRoot.SOAP;
        
-       DECLARE transactionStatus2 CHARACTER 'Request Sent to Backend flow';
-	   DECLARE createdBy2 TIMESTAMP CURRENT_TIMESTAMP;
-	   PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus2,createdBy2,msg_Id);
+    --   DECLARE transactionStatus2 CHARACTER 'Request Sent to Backend flow';
+	 --  DECLARE createdBy2 TIMESTAMP CURRENT_TIMESTAMP;
+	--   PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus2,createdBy2,msg_Id);
 	   
 	   DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
 	   DECLARE domainName1 CHARACTER 'SOAP';
@@ -125,9 +125,9 @@ CREATE COMPUTE MODULE ResponseToChannel
 	    SET Environment.domainDataRef1 = InputRoot.SOAP.Body;
 	    SET Environment.domainName1 = FIELDNAME(InputBody); 
 	    
-	    DECLARE transactionStatus3 CHARACTER 'Response Received from Backend flow';
-	    DECLARE createdOn3 TIMESTAMP CURRENT_TIMESTAMP;
-	    PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus3,createdOn3,Environment.id);
+--	    DECLARE transactionStatus3 CHARACTER 'Response Received from Backend flow';
+--	    DECLARE createdOn3 TIMESTAMP CURRENT_TIMESTAMP;
+--	    PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus3,createdOn3,Environment.id);
 	   
 
       DECLARE ccidRef INTEGER Environment.ccidRef1;
@@ -143,11 +143,11 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,'DriverlookupLogger','DEBUG','FLEXCUBE_RESP data is: '||payload) INTO rc;
 	            
         SET OutputRoot.SOAP = InputRoot.SOAP;
-	
-        DECLARE transactionStatus4 CHARACTER 'Response Sent to END USER';
-	    DECLARE createdOn4 TIMESTAMP CURRENT_TIMESTAMP;
-	    PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus4,createdOn4,Environment.id);
-		
+--	
+--        DECLARE transactionStatus4 CHARACTER 'Response Sent to END USER';
+--	    DECLARE createdOn4 TIMESTAMP CURRENT_TIMESTAMP;
+--	    PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus4,createdOn4,Environment.id);
+--		
 		DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
 	   DECLARE domainName1 CHARACTER 'SOAP';
 	   DECLARE payload1 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
