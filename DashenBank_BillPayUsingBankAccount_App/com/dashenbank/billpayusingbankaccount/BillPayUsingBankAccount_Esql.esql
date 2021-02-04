@@ -2,6 +2,8 @@
 
 
 
+
+
 BROKER SCHEMA com.dashenbank.billpayusingbankaccount
 PATH com.dashenbank.genericfunctions;
 DECLARE ns NAMESPACE 'http://www.example.org/BillPayUsingBankAccount/';
@@ -33,20 +35,18 @@ CREATE COMPUTE MODULE RequestToFlexCube
 		SET Environment.variables.encodeRef = InputRoot.Properties.Encoding;
 		SET Environment.variables.domainDataRef = InputRoot.SOAP;
 		SET Environment.variables.domainName = FIELDNAME(InputBody);
-
-		DECLARE seqId INTEGER;
-		-- DECLARE id1,SEQ_ID INTEGER;
-		SET Environment.ID[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
-		SET seqId = CAST(Environment.ID[1].NEXTVAL AS INTEGER);
-
-		DECLARE operationName CHARACTER 'BillPayUsingBankAccount';
-		DECLARE transactionStatus1 CHARACTER 'Request received from Channel ';
-		DECLARE createdOn1 TIMESTAMP CURRENT_TIMESTAMP;
-		DECLARE createdBy1 CHARACTER 'ACE_USER';
-		DECLARE serviceName CHARACTER ApplicationLabel;
-		PASSTHRU 'INSERT INTO TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(?,?,?,?,?,?,?)' TO Database.DBDSN VALUES(seqId.NEXTVAL,reqIdentifier,serviceName,operationName,transactionStatus1,createdOn1,createdBy1);
-		-- INSERT INTO Database.TRANSACTION_LOG(seqId,MSG_ID,serviceName,operationName,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(seqId.NEXTVAL,reqIdentifier,serviceName,operationName,transactionStatus1,createdOn1,createdBy1);
-		PASSTHRU 'COMMIT'; -- TO Database.DBDSN;
+		-- DECLARE seqId INTEGER;
+		-- -- DECLARE id1,SEQ_ID INTEGER;
+		-- SET Environment.ID[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
+		-- SET seqId = CAST(Environment.ID[1].NEXTVAL AS INTEGER);
+		-- DECLARE operationName CHARACTER 'BillPayUsingBankAccount';
+		-- DECLARE transactionStatus1 CHARACTER 'Request received from Channel ';
+		-- DECLARE createdOn1 TIMESTAMP CURRENT_TIMESTAMP;
+		-- DECLARE createdBy1 CHARACTER 'ACE_USER';
+		-- DECLARE serviceName CHARACTER ApplicationLabel;
+		-- PASSTHRU 'INSERT INTO TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(?,?,?,?,?,?,?)' TO Database.DBDSN VALUES(seqId.NEXTVAL,reqIdentifier,serviceName,operationName,transactionStatus1,createdOn1,createdBy1);
+		-- -- INSERT INTO Database.TRANSACTION_LOG(seqId,MSG_ID,serviceName,operationName,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(seqId.NEXTVAL,reqIdentifier,serviceName,operationName,transactionStatus1,createdOn1,createdBy1);
+		-- PASSTHRU 'COMMIT'; -- TO Database.DBDSN;
 		DECLARE ccidRef INTEGER Environment.variables.ccidRef;
 		DECLARE encodeRef INTEGER Environment.variables.encodeRef;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
@@ -74,11 +74,9 @@ CREATE COMPUTE MODULE RequestToFlexCube
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
 		DECLARE payload1 CHARACTER getPayLoad('SOAP',OutputRoot.SOAP,OutputRoot.Properties.Encoding,OutputRoot.Properties.CodedCharSetId);
 		CALL PayloadLogging(reqIdentifier,payload1,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
-
-
-		DECLARE transactionStatus2 CHARACTER 'Request sent to Flexcube';
-		DECLARE createdOn2 TIMESTAMP CURRENT_TIMESTAMP;
-		PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN VALUES(transactionStatus2,createdOn2,reqIdentifier);
+		-- DECLARE transactionStatus2 CHARACTER 'Request sent to Flexcube';
+		-- DECLARE createdOn2 TIMESTAMP CURRENT_TIMESTAMP;
+		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN VALUES(transactionStatus2,createdOn2,reqIdentifier);
 		-- INSERT INTO Database.TRANSACTION_LOG(seqId,MSG_ID,serviceName,operationName,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES (seqId.NEXTVAL,reqIdentifier,serviceName,operationName,transactionStatus2,createdOn2,createdBy1);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
@@ -111,17 +109,16 @@ CREATE COMPUTE MODULE ResponseToChannel
 		SET Environment.variables.encodeRef1 = InputRoot.Properties.Encoding;
 		SET Environment.variables.domainDataRef1 = InputRoot.SOAP;
 		SET Environment.variables.domainName1 = FIELDNAME(InputBody);
-
-		DECLARE transactionStatus3 CHARACTER 'Response received from Flexcube';
-		DECLARE createdOn3 TIMESTAMP CURRENT_TIMESTAMP;
-		DECLARE seqId INTEGER;
-		DECLARE operationName CHARACTER;
-		SET operationName = 'BillPayUsingBankAccount'; --> Operation name is not given in req
-		DECLARE serviceName CHARACTER ApplicationLabel;
+		-- DECLARE transactionStatus3 CHARACTER 'Response received from Flexcube';
+		-- DECLARE createdOn3 TIMESTAMP CURRENT_TIMESTAMP;
+		-- DECLARE seqId INTEGER;
+		-- DECLARE operationName CHARACTER;
+		-- SET operationName = 'BillPayUsingBankAccount'; --> Operation name is not given in req
+		-- DECLARE serviceName CHARACTER ApplicationLabel;
 		-- DECLARE CREATED_BY CHARACTER;
 		-- DECLARE qry11 CHARACTER 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE REQ_ID LIKE ''%'||refid||'%''';
 		-- SET Environment.val1[] = PASSTHRU(qry11 TO Database.DBDSN VALUES(transactionStatus3,createdOn3));
-		PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN VALUES(transactionStatus3,createdOn3,reqIdentifier);
+		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN VALUES(transactionStatus3,createdOn3,reqIdentifier);
 		-- INSERT INTO Database.TRANSACTION_LOG(seqId,MSG_ID,serviceName,operationName,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES (seqId.NEXTVAL,reqIdentifier,serviceName,operationName,transactionStatus3,createdOn3,'IBM_ACE');
 		DECLARE ccidRef INTEGER Environment.variables.ccidRef1;
 		DECLARE encodeRef INTEGER Environment.variables.encodeRef1;
@@ -137,7 +134,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- FLEXCUBE_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RESP data  is: '||payload) INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;		
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 
 
 		SET OutputRoot = InputRoot;
@@ -159,7 +156,6 @@ CREATE COMPUTE MODULE ResponseToChannel
 
 	END;
 END MODULE;
-
 --===================================================================
 
 CREATE COMPUTE MODULE BillPayUsingBankAccount_BuildExceptionResponse
