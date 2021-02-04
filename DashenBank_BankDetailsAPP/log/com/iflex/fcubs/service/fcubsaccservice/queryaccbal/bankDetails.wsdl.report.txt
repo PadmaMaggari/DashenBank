@@ -1,0 +1,22 @@
+
+
+Importing file: C:\Users\Administrator\IBM\ACET11\Dashen\BankDetailsAPI\bankDetails.wsdl
+
+The WSDL import will proceed with bindings bankDetailsSOAP.
+Creating wsdl schema document for file:///C:/Users/Administrator/IBM/ACET11/Dashen/BankDetailsAPI/bankDetails.wsdl.
+Parsing wsdl binding {http://fcubs.iflex.com/service/FCUBSAccService/QueryAccBal}bankDetailsSOAP.
+Parsing wsdl binding input NewOperation.
+Parsing wsdl binding output NewOperation.
+Processing doc style for operation NewOperation.
+Populating WSDL schema bankDetails.xsd.
+Creating file bankDetails.xsd in the workspace.
+Creating file bankDetails_InlineSchema1.xsd in the workspace.
+Copying source WSDL bankDetails.wsdl to bankDetails.wsdl.
+
+Elapsed time processing this message definition file: 0.503 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+
