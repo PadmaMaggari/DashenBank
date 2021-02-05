@@ -1,4 +1,6 @@
 
+
+
 BROKER SCHEMA com.dashenbank.accountbalanceenquiry
 
 PATH com.dashenbank.genericfunctions;
@@ -71,7 +73,7 @@ CREATE COMPUTE MODULE RequestToFlexCube
 		SET outputbodyRef.Body.*:FCUBS_REQ_ENV.FCUB_BODY."AC-Balance".AC_BAL.CUST_AC_NO = inputbodyRef.FCUB_BODY."AC-Balance".AC_BAL.CUST_AC_NO;
 		-- SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.BRANCH = reqIdentifier;
 
-		SET Environment.inSOAP = OutputRoot.SOAP;
+		SET Environment.outSOAP = OutputRoot.SOAP;
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
@@ -80,7 +82,7 @@ CREATE COMPUTE MODULE RequestToFlexCube
 		CALL PayloadLogging(reqIdentifier,outRefPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPInputHeader = InputRoot.HTTPInputHeader;
-		SET OutputRoot.SOAP = Environment.inSOAP;
+		SET OutputRoot.SOAP = Environment.outSOAP;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||outRefPayload) INTO rc;
@@ -175,7 +177,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_UNCOL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_UNCOL;
 		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_UNCOL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_UNCOL;
 
-		SET Environment.inSOAP = OutputRoot.SOAP;
+		SET Environment.outSOAP = OutputRoot.SOAP;
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
@@ -184,7 +186,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CALL PayloadLogging(Environment.ID,outRefPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader= InputRoot.HTTPResponseHeader;
-		SET OutputRoot.SOAP = Environment.inSOAP;
+		SET OutputRoot.SOAP = Environment.outSOAP;
 
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
