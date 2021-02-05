@@ -34,7 +34,7 @@
       <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="507,9" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
         <translation xmi:type="utility:ConstantString" string="PayloadLogging"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="27,118" wsdlFileName="RTSERVICE.wsdl" selectedPortType="RTSERVICE" selectedBinding="RTSERVICESOAP" selectedPort="RTSERVICESOAP" targetNamespace="http://localhost:7800/RTSERVICE/" useHTTPTransport="true" urlSelector="/ESB_RTSERVICE" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="27,118" wsdlOperationMode="gateway" wsdlFileName="RTSERVICE.wsdl" selectedPortType="RTSERVICE" selectedBinding="RTSERVICESOAP" selectedPort="RTSERVICESOAP" targetNamespace="http://localhost:7800/RTSERVICE/" useHTTPTransport="true" urlSelector="/ESB_RTSERVICE" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Fundstransfer_Request"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="319,115" wsdlOperationMode="gateway" wsdlFileName="Gateway.wsdl" selectedPortType="InternalTransfer" selectedBinding="InternalTransfer" selectedOperation="InternalTransfer" selectedPort="InternalTransfer" useHTTPTransport="true" webServiceURL="http://localhost:7800/Backend" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
