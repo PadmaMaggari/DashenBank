@@ -12,11 +12,11 @@ DECLARE BACKEND_URL EXTERNAL CHARACTER '';
 DECLARE LOGGER_NAME EXTERNAL CHARACTER '';
 DECLARE LOG_TYPE EXTERNAL CHARACTER '';
 --------------Global variables--------
-DECLARE rc BOOLEAN TRUE;
+ DECLARE rc BOOLEAN TRUE;
 -------------------------------------
 
 CREATE COMPUTE MODULE RequestToFlexCube
-	-- DECLARE rc BOOLEAN;
+-- DECLARE rc BOOLEAN;
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
@@ -30,24 +30,13 @@ CREATE COMPUTE MODULE RequestToFlexCube
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
 		DECLARE reqIdentifier CHARACTER InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
-
+        SET Environment.ID = reqIdentifier;
+        
 		SET Environment.variables.ccidRef = InputRoot.Properties.CodedCharSetId;
 		SET Environment.variables.encodeRef = InputRoot.Properties.Encoding;
 		SET Environment.variables.domainDataRef = InputRoot.SOAP;
 		SET Environment.variables.domainName = FIELDNAME(InputBody);
-		-- DECLARE seqId INTEGER;
-		-- DECLARE id1,SEQ_ID INTEGER;
-		-- SET Environment.ID[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
-		-- SET seqId = CAST(Environment.ID[1].NEXTVAL AS INTEGER);
-		--
-		-- DECLARE operationName CHARACTER InputRoot.SOAP.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.OPERATION;
-		-- DECLARE transactionStatus1 CHARACTER 'Request received from Channel';
-		-- DECLARE createdOn1 TIMESTAMP CURRENT_TIMESTAMP;
-		-- DECLARE createdBy1 CHARACTER 'ACE_USER';
-		-- DECLARE serviceName CHARACTER ApplicationLabel;
-		-- PASSTHRU 'INSERT INTO TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(?,?,?,?,?,?,?)' TO Database.DBDSN VALUES(seqId,reqIdentifier,serviceName,operationName,transactionStatus1,createdOn1,createdBy1);
-		-- INSERT INTO Database.TRANSACTION_LOG(seqId,MSG_ID,serviceName,operationName,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(seqId.NEXTVAL,reqIdentifier,serviceName,operationName,transactionStatus1,createdOn1,createdBy1);
-		-- PASSTHRU 'COMMIT'; --TO Database.DBDSN;
+		
 		DECLARE ccidRef INTEGER Environment.variables.ccidRef;
 		DECLARE encodeRef INTEGER Environment.variables.encodeRef;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
@@ -69,8 +58,8 @@ CREATE COMPUTE MODULE RequestToFlexCube
 
 		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.SOURCE = inputbodyRef.FCUB_HEADER.SOURCE;
 		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.UBSCOMP = inputbodyRef.FCUB_HEADER.UBSCOMP;
-		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.USERID = inputbodyRef.FCUB_HEADER.USERID;
-		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.BRANCH = inputbodyRef.FCUB_HEADER.reqIdentifier;
+		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.USERID = reqIdentifier;
+		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.BRANCH = inputbodyRef.FCUB_HEADER.BRANCH;
 		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.MODULEID = inputbodyRef.FCUB_HEADER.MODULEID;
 		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.SERVICE = inputbodyRef.FCUB_HEADER.SERVICE;
 		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.OPERATION = inputbodyRef.FCUB_HEADER.OPERATION;
@@ -86,12 +75,8 @@ CREATE COMPUTE MODULE RequestToFlexCube
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
 		DECLARE outRefPayload CHARACTER getPayLoad('SOAP',OutputRoot.SOAP,OutputRoot.Properties.Encoding,OutputRoot.Properties.CodedCharSetId);
 		CALL PayloadLogging(reqIdentifier,outRefPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
-		-- DECLARE transactionStatus2 CHARACTER 'Request sent to Flexcube';
-		-- DECLARE createdOn2 TIMESTAMP CURRENT_TIMESTAMP;
-		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN VALUES(transactionStatus2,createdOn2,reqIdentifier);
-		-- INSERT INTO Database.TRANSACTION_LOG(seqId,MSG_ID,serviceName,operationName,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES (seqId.NEXTVAL,reqIdentifier,serviceName,operationName,transactionStatus2,createdOn2,createdBy1);
-
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
+		
+    	CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||outRefPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
 
@@ -107,8 +92,8 @@ CREATE COMPUTE MODULE ResponseToChannel
 		RETURN TRUE;
 	END;
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
-		DECLARE reqIdentifier CHARACTER;
-		SET reqIdentifier = CAST(InputRoot.SOAP.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGID AS CHARACTER);
+	--	DECLARE reqIdentifier CHARACTER;
+	--	SET reqIdentifier = CAST(InputRoot.SOAP.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGID AS CHARACTER);
 		SET Environment.variables.ccidRef1 = InputRoot.Properties.CodedCharSetId;
 		SET Environment.variables.encodeRef1 = InputRoot.Properties.Encoding;
 		SET Environment.variables.domainDataRef1 = InputRoot.SOAP;
@@ -123,7 +108,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(reqIdentifier,inRefPayload,'FLEXCUBE_RESP',ApplicationLabel,OutRef);
+		CALL PayloadLogging(Environment.ID,inRefPayload,'FLEXCUBE_RESP',ApplicationLabel,OutRef);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- FLEXCUBE_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RESP data  is: '||inRefPayload) INTO rc;
@@ -132,6 +117,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		DECLARE inputbodyRef REFERENCE TO InputRoot.SOAP.Body.ns68:QUERYACCBAL_IOFS_RES;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
+		
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		-- DECLARE outRef REFERENCE TO OutputRoot.SOAP;
 		-- SET outRef.Context.Namespace.soapenv = 'http://schemas.xmlsoap.org/soap/envelope/';
@@ -146,7 +132,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 
 		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.SOURCE = inputbodyRef.FCUBS_HEADER.SOURCE;
 		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.UBSCOMP = inputbodyRef.FCUBS_HEADER.UBSCOMP;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGID = inputbodyRef.FCUBS_HEADER.MSGID;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGID = Environment.ID;
 		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.USERID = inputbodyRef.FCUBS_HEADER.USERID;
 		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.BRANCH = inputbodyRef.FCUBS_HEADER.BRANCH;
 		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MODULEID = inputbodyRef.FCUBS_HEADER.MODULEID;
@@ -189,11 +175,8 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
 		DECLARE outRefPayload CHARACTER getPayLoad('SOAP',OutputRoot.SOAP,OutputRoot.Properties.Encoding,OutputRoot.Properties.CodedCharSetId);
-		CALL PayloadLogging(reqIdentifier,outRefPayload,'CHANNEL_RESP',ApplicationLabel,OutRef1);
-		-- DECLARE transactionStatus4 CHARACTER 'Response sent to Channel';
-		-- DECLARE createdOn4 TIMESTAMP CURRENT_TIMESTAMP;
-		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN VALUES(transactionStatus4,createdOn4,reqIdentifier);
-		-- INSERT INTO Database.TRANSACTION_LOG(seqId,MSG_ID,serviceName,operationName,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES (seqId.NEXTVAL,reqIdentifier,serviceName,operationName,transactionStatus4,createdOn4,'IBM ACE');
+		CALL PayloadLogging(Environment.ID,outRefPayload,'CHANNEL_RESP',ApplicationLabel,OutRef1);
+		
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||outRefPayload) INTO rc;
