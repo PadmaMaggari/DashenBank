@@ -12,11 +12,11 @@ DECLARE BACKEND_URL EXTERNAL CHARACTER '';
 DECLARE LOGGER_NAME EXTERNAL CHARACTER '';
 DECLARE LOG_TYPE EXTERNAL CHARACTER '';
 --------------Global variables--------
- DECLARE rc BOOLEAN TRUE;
+DECLARE rc BOOLEAN TRUE;
 -------------------------------------
 
 CREATE COMPUTE MODULE RequestToFlexCube
--- DECLARE rc BOOLEAN;
+	-- DECLARE rc BOOLEAN;
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
@@ -30,17 +30,19 @@ CREATE COMPUTE MODULE RequestToFlexCube
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
 		DECLARE reqIdentifier CHARACTER InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
-        SET Environment.ID = reqIdentifier;
-        
+		SET Environment.ID = reqIdentifier;
+
 		SET Environment.variables.ccidRef = InputRoot.Properties.CodedCharSetId;
 		SET Environment.variables.encodeRef = InputRoot.Properties.Encoding;
 		SET Environment.variables.domainDataRef = InputRoot.SOAP;
 		SET Environment.variables.domainName = FIELDNAME(InputBody);
-		
+		-- DECLARE InRef REFERENCE TO InputRoot.SOAP[>];
+
 		DECLARE ccidRef INTEGER Environment.variables.ccidRef;
 		DECLARE encodeRef INTEGER Environment.variables.encodeRef;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER Environment.variables.domainName;
+
 		DECLARE inRefPayload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -51,32 +53,36 @@ CREATE COMPUTE MODULE RequestToFlexCube
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||inRefPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
 		------ FIELD_TO_FIELD_MAPPING_--------
-		DECLARE inputbodyRef REFERENCE TO InputRoot.SOAP.Body.ns68:FCUBS_REQ_ENV;
+		DECLARE inputbodyRef REFERENCE TO InputRoot.SOAP.Body.*:FCUBS_REQ_ENV;
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
-		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.SOURCE = inputbodyRef.FCUB_HEADER.SOURCE;
-		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.UBSCOMP = inputbodyRef.FCUB_HEADER.UBSCOMP;
-		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.USERID = reqIdentifier;
-		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.BRANCH = inputbodyRef.FCUB_HEADER.BRANCH;
-		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.MODULEID = inputbodyRef.FCUB_HEADER.MODULEID;
-		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.SERVICE = inputbodyRef.FCUB_HEADER.SERVICE;
-		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.OPERATION = inputbodyRef.FCUB_HEADER.OPERATION;
-		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.MSGSTAT = inputbodyRef.FCUB_HEADER.MSGSTAT;
-		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_BODY."AC-Balance".AC_BAL.BRANCH_CODE = inputbodyRef.FCUB_BODY."AC-Balance".AC_BAL.BRANCH_CODE;
-		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_BODY."AC-Balance".AC_BAL.CUST_AC_NO = inputbodyRef.FCUB_BODY."AC-Balance".AC_BAL.CUST_AC_NO;
-	--	SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.BRANCH = reqIdentifier;
 
-		SET OutputRoot.Properties = InputRoot.Properties;
+		SET outputbodyRef.Body.*:FCUBS_REQ_ENV.FCUB_HEADER.SOURCE = inputbodyRef.FCUB_HEADER.SOURCE;
+		SET outputbodyRef.Body.*:FCUBS_REQ_ENV.FCUB_HEADER.UBSCOMP = inputbodyRef.FCUB_HEADER.UBSCOMP;
+		SET outputbodyRef.Body.*:FCUBS_REQ_ENV.FCUB_HEADER.USERID = reqIdentifier;
+		SET outputbodyRef.Body.*:FCUBS_REQ_ENV.FCUB_HEADER.BRANCH = inputbodyRef.FCUB_HEADER.BRANCH;
+		SET outputbodyRef.Body.*:FCUBS_REQ_ENV.FCUB_HEADER.MODULEID = inputbodyRef.FCUB_HEADER.MODULEID;
+		SET outputbodyRef.Body.*:FCUBS_REQ_ENV.FCUB_HEADER.SERVICE = inputbodyRef.FCUB_HEADER.SERVICE;
+		SET outputbodyRef.Body.*:FCUBS_REQ_ENV.FCUB_HEADER.OPERATION = inputbodyRef.FCUB_HEADER.OPERATION;
+		SET outputbodyRef.Body.*:FCUBS_REQ_ENV.FCUB_HEADER.MSGSTAT = inputbodyRef.FCUB_HEADER.MSGSTAT;
+		SET outputbodyRef.Body.*:FCUBS_REQ_ENV.FCUB_BODY."AC-Balance".AC_BAL.BRANCH_CODE = inputbodyRef.FCUB_BODY."AC-Balance".AC_BAL.BRANCH_CODE;
+		SET outputbodyRef.Body.*:FCUBS_REQ_ENV.FCUB_BODY."AC-Balance".AC_BAL.CUST_AC_NO = inputbodyRef.FCUB_BODY."AC-Balance".AC_BAL.CUST_AC_NO;
+		-- SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.BRANCH = reqIdentifier;
 
+		SET Environment.inSOAP = OutputRoot.SOAP;
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-		DECLARE outRefPayload CHARACTER getPayLoad('SOAP',OutputRoot.SOAP,OutputRoot.Properties.Encoding,OutputRoot.Properties.CodedCharSetId);
+		DECLARE outRefPayload CHARACTER getPayLoad(domainName,OutputRoot.SOAP,encodeRef,ccidRef);
+		SET OutputRoot.SOAP = NULL;
 		CALL PayloadLogging(reqIdentifier,outRefPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
-		
-    	CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.HTTPInputHeader = InputRoot.HTTPInputHeader;
+		SET OutputRoot.SOAP = Environment.inSOAP;
+
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||outRefPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
 
@@ -92,8 +98,8 @@ CREATE COMPUTE MODULE ResponseToChannel
 		RETURN TRUE;
 	END;
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
-	--	DECLARE reqIdentifier CHARACTER;
-	--	SET reqIdentifier = CAST(InputRoot.SOAP.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGID AS CHARACTER);
+		-- DECLARE reqIdentifier CHARACTER;
+		-- SET reqIdentifier = CAST(InputRoot.SOAP.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGID AS CHARACTER);
 		SET Environment.variables.ccidRef1 = InputRoot.Properties.CodedCharSetId;
 		SET Environment.variables.encodeRef1 = InputRoot.Properties.Encoding;
 		SET Environment.variables.domainDataRef1 = InputRoot.SOAP;
@@ -104,7 +110,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER Environment.variables.domainName1;
 		DECLARE inRefPayload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		
+
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
@@ -114,10 +120,9 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RESP data  is: '||inRefPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		---------- FIELD_TO_FIELD_MAPPING ----------
-		DECLARE inputbodyRef REFERENCE TO InputRoot.SOAP.Body.ns68:QUERYACCBAL_IOFS_RES;
+		DECLARE inputbodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYACCBAL_IOFS_RES;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
-		
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		-- DECLARE outRef REFERENCE TO OutputRoot.SOAP;
 		-- SET outRef.Context.Namespace.soapenv = 'http://schemas.xmlsoap.org/soap/envelope/';
@@ -130,53 +135,57 @@ CREATE COMPUTE MODULE ResponseToChannel
 		-- SET outWebReqRef.company = inRef.WebRequestCommon.company;
 
 
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.SOURCE = inputbodyRef.FCUBS_HEADER.SOURCE;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.UBSCOMP = inputbodyRef.FCUBS_HEADER.UBSCOMP;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGID = Environment.ID;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.USERID = inputbodyRef.FCUBS_HEADER.USERID;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.BRANCH = inputbodyRef.FCUBS_HEADER.BRANCH;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MODULEID = inputbodyRef.FCUBS_HEADER.MODULEID;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.SERVICE = inputbodyRef.FCUBS_HEADER.SERVICE;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.OPERATION = inputbodyRef.FCUBS_HEADER.OPERATION;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.SOURCE_OPERATION = inputbodyRef.FCUBS_HEADER.SOURCE_OPERATION;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.DESTINATION = inputbodyRef.FCUBS_HEADER.DESTINATION;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MULTITRIPID = inputbodyRef.FCUBS_HEADER.MULTITRIPID;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.FUNCTIONID = inputbodyRef.FCUBS_HEADER.FUNCTIONID;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.ACTION = inputbodyRef.FCUBS_HEADER.ACTION;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGSTAT = inputbodyRef.FCUBS_HEADER.MSGSTAT;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.SOURCE = inputbodyRef.FCUBS_HEADER.SOURCE;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.UBSCOMP = inputbodyRef.FCUBS_HEADER.UBSCOMP;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGID = Environment.ID;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.USERID = inputbodyRef.FCUBS_HEADER.USERID;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.BRANCH = inputbodyRef.FCUBS_HEADER.BRANCH;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MODULEID = inputbodyRef.FCUBS_HEADER.MODULEID;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.SERVICE = inputbodyRef.FCUBS_HEADER.SERVICE;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.OPERATION = inputbodyRef.FCUBS_HEADER.OPERATION;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.SOURCE_OPERATION = inputbodyRef.FCUBS_HEADER.SOURCE_OPERATION;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.DESTINATION = inputbodyRef.FCUBS_HEADER.DESTINATION;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MULTITRIPID = inputbodyRef.FCUBS_HEADER.MULTITRIPID;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.FUNCTIONID = inputbodyRef.FCUBS_HEADER.FUNCTIONID;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.ACTION = inputbodyRef.FCUBS_HEADER.ACTION;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGSTAT = inputbodyRef.FCUBS_HEADER.MSGSTAT;
 
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.BRANCH_CODE = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.BRANCH_CODE;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.CUST_AC_NO = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.CUST_AC_NO;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.CCY = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.CCY;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.TRNDT = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.TRNDT;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.OPNBAL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.OPNBAL;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.CURBAL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.CURBAL;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.AVLBAL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.AVLBAL;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.UNCOLAMT = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.UNCOLAMT;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.AVLCR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.AVLCR;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.MTDTOVCR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.MTDTOVCR;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.MTDTOVDR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.MTDTOVDR;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_BKD_AMT = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_BKD_AMT;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACCR_DR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACCR_DR;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACCR_CR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACCR_CR;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.SUBLIMIT = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.SUBLIMIT;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_CR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_CR;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_DR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_DR;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_UNCOL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_UNCOL;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_DR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_DR;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_DR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_DR;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_CR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_CR;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_CR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_CR;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_UNCOL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_UNCOL;
-		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_UNCOL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_UNCOL;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.BRANCH_CODE = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.BRANCH_CODE;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.CUST_AC_NO = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.CUST_AC_NO;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.CCY = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.CCY;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.TRNDT = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.TRNDT;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.OPNBAL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.OPNBAL;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.CURBAL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.CURBAL;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.AVLBAL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.AVLBAL;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.UNCOLAMT = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.UNCOLAMT;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.AVLCR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.AVLCR;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.MTDTOVCR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.MTDTOVCR;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.MTDTOVDR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.MTDTOVDR;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_BKD_AMT = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_BKD_AMT;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACCR_DR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACCR_DR;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACCR_CR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACCR_CR;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.SUBLIMIT = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.SUBLIMIT;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_CR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_CR;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_DR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_DR;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_UNCOL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_UNCOL;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_DR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_DR;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_DR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_DR;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_CR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_CR;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_CR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_CR;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_UNCOL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_UNCOL;
+		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_UNCOL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_UNCOL;
 
-		SET OutputRoot.Properties = InputRoot.Properties;
+		SET Environment.inSOAP = OutputRoot.SOAP;
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-		DECLARE outRefPayload CHARACTER getPayLoad('SOAP',OutputRoot.SOAP,OutputRoot.Properties.Encoding,OutputRoot.Properties.CodedCharSetId);
-		CALL PayloadLogging(Environment.ID,outRefPayload,'CHANNEL_RESP',ApplicationLabel,OutRef1);
-		
+		DECLARE outRefPayload CHARACTER getPayLoad(domainName,OutputRoot.SOAP,encodeRef,ccidRef);
+		SET OutputRoot.SOAP = NULL;
+		CALL PayloadLogging(Environment.ID,outRefPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.HTTPResponseHeader= InputRoot.HTTPResponseHeader;
+		SET OutputRoot.SOAP = Environment.inSOAP;
+
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||outRefPayload) INTO rc;

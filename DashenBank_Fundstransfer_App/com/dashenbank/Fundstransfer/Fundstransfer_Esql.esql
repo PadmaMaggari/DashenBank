@@ -1,10 +1,4 @@
 
-
-
-
-
-
-
 BROKER SCHEMA com.dashenbank.Fundstransfer
 
 PATH com.dashenbank.genericfunctions;
@@ -27,7 +21,6 @@ CREATE COMPUTE MODULE RequestToBackend
 	BEGIN
 		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
 		IF (rc = TRUE) THEN
-
 			CALL CopyEntireMessage();
 		ELSE
 			SET OutputRoot.SOAP.Body.Log.Message = LOG4J_ERROR_MSG;
@@ -38,16 +31,19 @@ CREATE COMPUTE MODULE RequestToBackend
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
 		DECLARE msg_Id CHARACTER InputRoot.SOAP.Body.ns:RTSERVICE.RT_HEADER.MSGID;
 		SET Environment.id = msg_Id;
-		SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
-		SET Environment.encodeRef = InputRoot.Properties.Encoding;
-		SET Environment.domainDataRef = InputRoot.SOAP.Body;
-		SET Environment.domainName = FIELDNAME(InputBody);
+		
+		SET Environment.variables.ccidRef = InputRoot.Properties.CodedCharSetId;
+		SET Environment.variables.encodeRef = InputRoot.Properties.Encoding;
+		SET Environment.variables.domainDataRef = InputRoot.SOAP;
+		SET Environment.variables.domainName = FIELDNAME(InputBody);
 
 		DECLARE ccidRef INTEGER Environment.ccidRef;
 		DECLARE encodeRef INTEGER Environment.encodeRef;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
 		DECLARE domainName CHARACTER Environment.domainName;
+		
 		DECLARE inRefPayload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
 		CALL PayloadLogging(msg_Id,inRefPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
@@ -61,7 +57,6 @@ CREATE COMPUTE MODULE RequestToBackend
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
-
 		SET outputbodyRef.Body.ns:RTSERVICE.RT_HEADER.SOURCE = inputbodyRef.RT_HEADER.SOURCE;
 		SET outputbodyRef.Body.ns:RTSERVICE.RT_HEADER.UBSCOMP = inputbodyRef.RT_HEADER.UBSCOMP;
 		SET outputbodyRef.Body.ns:RTSERVICE.RT_HEADER.MSGID = inputbodyRef.RT_HEADER.MSGID;
@@ -71,10 +66,8 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outputbodyRef.Body.ns:RTSERVICE.RT_HEADER.MODULEID = inputbodyRef.RT_HEADER.MODULEID;
 		SET outputbodyRef.Body.ns:RTSERVICE.RT_HEADER.SERVICE = inputbodyRef.RT_HEADER.SERVICE;
 		SET outputbodyRef.Body.ns:RTSERVICE.RT_HEADER.OPERATION = inputbodyRef.RT_HEADER.OPERATION;
-		SET outputbodyRef.Body.ns:RTSERVICE.RT_HEADER.SOURCE_USERID = inputbodyRef.RT_HEADER.SOURCE_USERID;	
+		SET outputbodyRef.Body.ns:RTSERVICE.RT_HEADER.SOURCE_USERID = inputbodyRef.RT_HEADER.SOURCE_USERID;
 
-	
-	
 		SET outputbodyRef.Body.ns:RTSERVICE.RT_BODY."Transaction-Details".XREF = inputbodyRef.RT_BODY."Transaction-Details".XREF;
 		SET outputbodyRef.Body.ns:RTSERVICE.RT_BODY."Transaction-Details".PRD = inputbodyRef.RT_BODY."Transaction-Details".PRD;
 		SET outputbodyRef.Body.ns:RTSERVICE.RT_BODY."Transaction-Details".BRN = inputbodyRef.RT_BODY."Transaction-Details".BRN;
@@ -94,27 +87,27 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outputbodyRef.Body.ns:RTSERVICE.RT_BODY."Transaction-Details".NARRATIVE = inputbodyRef.RT_BODY."Transaction-Details".NARRATIVE;
 		SET outputbodyRef.Body.ns:RTSERVICE.RT_BODY."Transaction-Details".AUTHSTAT = inputbodyRef.RT_BODY."Transaction-Details".AUTHSTAT;
 
-
-
-		DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
-		DECLARE domainName1 CHARACTER 'SOAP';
-		DECLARE outRefPayload CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
-		SET OutputRoot.SOAP = NULL;
+        SET Environment.inSOAP = OutputRoot.SOAP;
+ 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(msg_Id,outRefPayload,'FLEXCUBE_REQ',MessageFlowLabel,OutRef1);
-
-		SET OutputRoot = InputRoot;
-		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
+		DECLARE outRefPayload CHARACTER getPayLoad(domainName,OutputRoot.SOAP,encodeRef,ccidRef);
+		SET OutputRoot.SOAP = NULL;
+		CALL PayloadLogging(reqIdentifier,outRefPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.HTTPInputHeader = InputRoot.HTTPInputHeader;
+		SET OutputRoot.SOAP = Environment.inSOAP;
+		
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||outRefPayload) INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'...............Request Sent to Backend flow..............') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'-------------------------------------------------------------------------') INTO rc;
+
+		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
 
 	END;
 END MODULE;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 
 CREATE COMPUTE MODULE ResponseToChannel
 
@@ -129,11 +122,6 @@ CREATE COMPUTE MODULE ResponseToChannel
 		SET Environment.encodeRef1 = InputRoot.Properties.Encoding;
 		SET Environment.domainDataRef1 = InputRoot.SOAP.Body;
 		SET Environment.domainName1 = FIELDNAME(InputBody);
-		--
-		-- DECLARE transactionStatus3 CHARACTER 'Response Received from Backend flow';
-		-- DECLARE createdOn3 TIMESTAMP CURRENT_TIMESTAMP;
-		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus3,createdOn3,Environment.id);
-
 
 		DECLARE ccidRef INTEGER Environment.ccidRef1;
 		DECLARE encodeRef INTEGER Environment.encodeRef1;
@@ -150,18 +138,19 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 
 		SET OutputRoot.SOAP = InputRoot.SOAP;
-		-- DECLARE transactionStatus4 CHARACTER 'Response Sent to END USER';
-		-- DECLARE createdOn4 TIMESTAMP CURRENT_TIMESTAMP;
-		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus4,createdOn4,Environment.id);
+		
+		
+			SET Environment.inSOAP = OutputRoot.SOAP;
 
-		DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
-		DECLARE domainName1 CHARACTER 'SOAP';
-		DECLARE outRefPayload CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
-		SET OutputRoot.SOAP = NULL;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(Environment.id,outRefPayload,'CHANNEL_RESP',MessageFlowLabel,OutRef1);
-		SET OutputRoot = InputRoot;
+		DECLARE outRefPayload CHARACTER getPayLoad(domainName,OutputRoot.SOAP,encodeRef,ccidRef);
+		SET OutputRoot.SOAP = NULL;
+		CALL PayloadLogging(Environment.ID,outRefPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.HTTPResponseHeader= InputRoot.HTTPResponseHeader;
+		SET OutputRoot.SOAP = Environment.inSOAP;
+		
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||outRefPayload) INTO rc;
