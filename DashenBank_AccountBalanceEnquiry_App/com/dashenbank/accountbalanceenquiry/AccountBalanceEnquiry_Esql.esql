@@ -1,7 +1,4 @@
 
-
-
-
 BROKER SCHEMA com.dashenbank.accountbalanceenquiry
 
 PATH com.dashenbank.genericfunctions;
@@ -38,8 +35,7 @@ CREATE COMPUTE MODULE RequestToFlexCube
 		SET Environment.variables.encodeRef = InputRoot.Properties.Encoding;
 		SET Environment.variables.domainDataRef = InputRoot.SOAP;
 		SET Environment.variables.domainName = FIELDNAME(InputBody);
-
-		DECLARE seqId INTEGER;
+		-- DECLARE seqId INTEGER;
 		-- DECLARE id1,SEQ_ID INTEGER;
 		-- SET Environment.ID[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
 		-- SET seqId = CAST(Environment.ID[1].NEXTVAL AS INTEGER);
@@ -56,51 +52,58 @@ CREATE COMPUTE MODULE RequestToFlexCube
 		DECLARE encodeRef INTEGER Environment.variables.encodeRef;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER Environment.variables.domainName;
-		DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		DECLARE inRefPayload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(reqIdentifier,payload,'CHANNEL_REQ',ApplicationLabel,OutRef);
+		CALL PayloadLogging(reqIdentifier,inRefPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||payload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||inRefPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
+		------ FIELD_TO_FIELD_MAPPING_--------
+		DECLARE inputbodyRef REFERENCE TO InputRoot.SOAP.Body.ns68:FCUBS_REQ_ENV;
 
-		SET OutputRoot.SOAP = InputRoot.SOAP;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
-		SET OutputRoot.SOAP.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.BRANCH = reqIdentifier;
+		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.SOURCE = inputbodyRef.FCUB_HEADER.SOURCE;
+		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.UBSCOMP = inputbodyRef.FCUB_HEADER.UBSCOMP;
+		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.USERID = inputbodyRef.FCUB_HEADER.USERID;
+		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.BRANCH = inputbodyRef.FCUB_HEADER.reqIdentifier;
+		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.MODULEID = inputbodyRef.FCUB_HEADER.MODULEID;
+		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.SERVICE = inputbodyRef.FCUB_HEADER.SERVICE;
+		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.OPERATION = inputbodyRef.FCUB_HEADER.OPERATION;
+		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.MSGSTAT = inputbodyRef.FCUB_HEADER.MSGSTAT;
+		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_BODY."AC-Balance".AC_BAL.BRANCH_CODE = inputbodyRef.FCUB_BODY."AC-Balance".AC_BAL.BRANCH_CODE;
+		SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_BODY."AC-Balance".AC_BAL.CUST_AC_NO = inputbodyRef.FCUB_BODY."AC-Balance".AC_BAL.CUST_AC_NO;
+	--	SET outputbodyRef.Body.ns68:FCUBS_REQ_ENV.FCUB_HEADER.BRANCH = reqIdentifier;
+
 		SET OutputRoot.Properties = InputRoot.Properties;
 
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-		DECLARE payload1 CHARACTER getPayLoad('SOAP',OutputRoot.SOAP,OutputRoot.Properties.Encoding,OutputRoot.Properties.CodedCharSetId);
-		CALL PayloadLogging(reqIdentifier,payload1,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
+		DECLARE outRefPayload CHARACTER getPayLoad('SOAP',OutputRoot.SOAP,OutputRoot.Properties.Encoding,OutputRoot.Properties.CodedCharSetId);
+		CALL PayloadLogging(reqIdentifier,outRefPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
 		-- DECLARE transactionStatus2 CHARACTER 'Request sent to Flexcube';
 		-- DECLARE createdOn2 TIMESTAMP CURRENT_TIMESTAMP;
 		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN VALUES(transactionStatus2,createdOn2,reqIdentifier);
 		-- INSERT INTO Database.TRANSACTION_LOG(seqId,MSG_ID,serviceName,operationName,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES (seqId.NEXTVAL,reqIdentifier,serviceName,operationName,transactionStatus2,createdOn2,createdBy1);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||payload1) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||outRefPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
 
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
 	END;
 END MODULE;
 ---------------------------------------------------------------------------------------------------
---DECLARE ns68 NAMESPACE 'http://www.example.org/AccountBalEnq/';
 
 CREATE COMPUTE MODULE ResponseToChannel
-	-- DECLARE rc BOOLEAN;
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		CALL initLog4j(LOG_CONFIG_PATH ) INTO rc;
-		IF (rc = TRUE) THEN
-			CALL CopyEntireMessage();
-		ELSE
-			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR;
-		END IF;
+		CALL CopyEntireMessage();
 		RETURN TRUE;
 	END;
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
@@ -110,47 +113,90 @@ CREATE COMPUTE MODULE ResponseToChannel
 		SET Environment.variables.encodeRef1 = InputRoot.Properties.Encoding;
 		SET Environment.variables.domainDataRef1 = InputRoot.SOAP;
 		SET Environment.variables.domainName1 = FIELDNAME(InputBody);
-		-- DECLARE transactionStatus3 CHARACTER 'Response received from Flexcube';
-		-- DECLARE createdOn3 TIMESTAMP CURRENT_TIMESTAMP;
-		-- DECLARE seqId INTEGER;
-		-- DECLARE operationName CHARACTER;
-		-- SET operationName = InputRoot.SOAP.Body.ns68:QUEcreatedOn3RYACCBAL_IOFS_RES.FCUBS_HEADER.OPERATION;
-		-- DECLARE serviceName CHARACTER ApplicationLabel;
-		-- DECLARE CREATED_BY CHARACTER;
-		-- DECLARE qry11 CHARACTER 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE REQ_ID LIKE ''%'||refid||'%''';
-		-- SET Environment.val1[] = PASSTHRU(qry11 TO Database.DBDSN VALUES(transactionStatus3,createdOn3));
-		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN VALUES(transactionStatus3,createdOn3,reqIdentifier);
-		-- INSERT INTO Database.TRANSACTION_LOG(seqId,MSG_ID,serviceName,operationName,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES (seqId.NEXTVAL,reqIdentifier,serviceName,operationName,transactionStatus3,createdOn3,'IBM_ACE');
+
 		DECLARE ccidRef INTEGER Environment.variables.ccidRef1;
 		DECLARE encodeRef INTEGER Environment.variables.encodeRef1;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER Environment.variables.domainName1;
-		DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		-- DECLARE payload CHARACTER '';
-		-- SET payload = CAST(ASBITSTREAM(InputRoot CCSID InputRoot.Properties.CodedCharSetId) AS CHARACTER CCSID InputRoot.Properties.CodedCharSetId);
+		DECLARE inRefPayload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(reqIdentifier,payload,'FLEXCUBE_RESP',ApplicationLabel,OutRef);
+		CALL PayloadLogging(reqIdentifier,inRefPayload,'FLEXCUBE_RESP',ApplicationLabel,OutRef);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- FLEXCUBE_RESP -------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RESP data  is: '||payload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RESP data  is: '||inRefPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
+		---------- FIELD_TO_FIELD_MAPPING ----------
+		DECLARE inputbodyRef REFERENCE TO InputRoot.SOAP.Body.ns68:QUERYACCBAL_IOFS_RES;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
+		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		-- DECLARE outRef REFERENCE TO OutputRoot.SOAP;
+		-- SET outRef.Context.Namespace.soapenv = 'http://schemas.xmlsoap.org/soap/envelope/';
+		-- SET outRef.Context.Namespace.mmt = 'http://temenos.com/MMT';
+		-- SET outRef.Context.XmlRoot.Envelope.Header = '';
+		-- SET outRef.Context.XmlRoot.Envelope.Body = '';
+		-- SET outRef.Header = '';
+		-- DECLARE outWebReqRef REFERENCE TO OutputRoot.SOAP.Body.ns:STOPPAYMENTCHEQUE_Validate.WebRequestCommon ;
+		-- CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:STOPPAYMENTCHEQUE_Validate AS outWebReqRef NAME 'WebRequestCommon';
+		-- SET outWebReqRef.company = inRef.WebRequestCommon.company;
 
-		SET OutputRoot.SOAP = InputRoot.SOAP;
+
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.SOURCE = inputbodyRef.FCUBS_HEADER.SOURCE;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.UBSCOMP = inputbodyRef.FCUBS_HEADER.UBSCOMP;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGID = inputbodyRef.FCUBS_HEADER.MSGID;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.USERID = inputbodyRef.FCUBS_HEADER.USERID;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.BRANCH = inputbodyRef.FCUBS_HEADER.BRANCH;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MODULEID = inputbodyRef.FCUBS_HEADER.MODULEID;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.SERVICE = inputbodyRef.FCUBS_HEADER.SERVICE;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.OPERATION = inputbodyRef.FCUBS_HEADER.OPERATION;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.SOURCE_OPERATION = inputbodyRef.FCUBS_HEADER.SOURCE_OPERATION;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.DESTINATION = inputbodyRef.FCUBS_HEADER.DESTINATION;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MULTITRIPID = inputbodyRef.FCUBS_HEADER.MULTITRIPID;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.FUNCTIONID = inputbodyRef.FCUBS_HEADER.FUNCTIONID;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.ACTION = inputbodyRef.FCUBS_HEADER.ACTION;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGSTAT = inputbodyRef.FCUBS_HEADER.MSGSTAT;
+
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.BRANCH_CODE = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.BRANCH_CODE;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.CUST_AC_NO = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.CUST_AC_NO;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.CCY = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.CCY;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.TRNDT = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.TRNDT;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.OPNBAL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.OPNBAL;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.CURBAL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.CURBAL;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.AVLBAL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.AVLBAL;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.UNCOLAMT = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.UNCOLAMT;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.AVLCR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.AVLCR;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.MTDTOVCR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.MTDTOVCR;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.MTDTOVDR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.MTDTOVDR;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_BKD_AMT = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_BKD_AMT;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACCR_DR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACCR_DR;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACCR_CR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACCR_CR;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.SUBLIMIT = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.SUBLIMIT;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_CR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_CR;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_DR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_DR;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_UNCOL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_TANK_UNCOL;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_DR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_DR;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_DR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_DR;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_CR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_CR;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_CR = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_CR;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_UNCOL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_UNCOL;
+		SET outputbodyRef.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_UNCOL = inputbodyRef.FCUBS_BODY."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_UNCOL;
+
 		SET OutputRoot.Properties = InputRoot.Properties;
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-		DECLARE payload1 CHARACTER getPayLoad('SOAP',OutputRoot.SOAP,OutputRoot.Properties.Encoding,OutputRoot.Properties.CodedCharSetId);
-		CALL PayloadLogging(reqIdentifier,payload1,'CHANNEL_RESP',ApplicationLabel,OutRef1);
+		DECLARE outRefPayload CHARACTER getPayLoad('SOAP',OutputRoot.SOAP,OutputRoot.Properties.Encoding,OutputRoot.Properties.CodedCharSetId);
+		CALL PayloadLogging(reqIdentifier,outRefPayload,'CHANNEL_RESP',ApplicationLabel,OutRef1);
 		-- DECLARE transactionStatus4 CHARACTER 'Response sent to Channel';
 		-- DECLARE createdOn4 TIMESTAMP CURRENT_TIMESTAMP;
 		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN VALUES(transactionStatus4,createdOn4,reqIdentifier);
 		-- INSERT INTO Database.TRANSACTION_LOG(seqId,MSG_ID,serviceName,operationName,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES (seqId.NEXTVAL,reqIdentifier,serviceName,operationName,transactionStatus4,createdOn4,'IBM ACE');
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||payload1) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||outRefPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'**********************************************************************') INTO rc;
 
 	END;

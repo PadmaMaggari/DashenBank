@@ -6,7 +6,7 @@
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_CONFIG_PATH" name="LOG_CONFIG_PATH" defaultValueLiteral="C:\DashenBank\Log4j\broker.xml">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://localhost:7800/AccountBalanceEnquiry">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://localhost:7800/Backend_Simulator">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR" name="LOG4J_ERROR" defaultValueLiteral="Log4j Initialization Error">
@@ -28,10 +28,10 @@
       <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="264,118" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/AccountBalanceEnquiry" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="BackendSystem_Call"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="620,111">
+      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="638,118">
         <translation xmi:type="utility:ConstantString" string="Service_Response"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="29,120" wsdlFileName="AccountBalEnq.wsdl" selectedPortType="AccountBalEnq" selectedBinding="AccountBalEnqSOAP" selectedPort="AccountBalEnqSOAP" targetNamespace="http://www.example.org/AccountBalEnq/" useHTTPTransport="true" urlSelector="/DashenBank_AccountBalanceEnquiry" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="29,120" wsdlOperationMode="gateway" wsdlFileName="AccountBalEnq.wsdl" selectedPortType="AccountBalEnq" selectedBinding="AccountBalEnqSOAP" selectedPort="AccountBalEnqSOAP" targetNamespace="http://www.example.org/AccountBalEnq/" useHTTPTransport="true" urlSelector="/DashenBank_AccountBalanceEnquiry" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Service_Request"/>
       </nodes>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="151,117" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.accountbalanceenquiry#RequestToFlexCube.Main" computeMode="all">
