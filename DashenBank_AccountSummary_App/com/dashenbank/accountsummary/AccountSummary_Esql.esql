@@ -1,30 +1,29 @@
+
+
 BROKER SCHEMA com.dashenbank.accountsummary
 PATH com.dashenbank.genericfunctions;
-DECLARE ns NAMESPACE 'http://www.example.org/AccountSummary/';
-DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
-DECLARE esb NAMESPACE 'http://www.dashenbank.org/ESB_AccountSummaryService/';
+-- DECLARE ns NAMESPACE 'http://www.example.org/AccountSummary/';
+-- DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
+-- DECLARE esb NAMESPACE 'http://www.dashenbank.org/ESB_AccountSummaryService/';
 DECLARE LOG4J_CONFIG_PATH EXTERNAL CHARACTER '';
 DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER '';
 DECLARE LOGGER_NAME EXTERNAL CHARACTER '';
 DECLARE LOG_TYPE EXTERNAL CHARACTER '';
-DECLARE IP EXTERNAL CHARACTER '';
-DECLARE PORT EXTERNAL CHARACTER '';
-DECLARE baseURL EXTERNAL CHARACTER '';
+ DECLARE ns1 NAMESPACE 'http://fcubs.ofss.com/service/FCUBSAccService';
+ DECLARE ns2 NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
 
+DECLARE BACKEND_URL EXTERNAL CHARACTER '';
 --------Global Variables----------
-DECLARE rc BOOLEAN FALSE;
-DECLARE SEQ_ID INTEGER 1;
-DECLARE TRANSACTION_STATUS CHARACTER '';
-DECLARE CREATED_ON TIMESTAMP CURRENT_TIMESTAMP;
-DECLARE CREATED_BY CHARACTER 'ACE_USER';
+DECLARE rc BOOLEAN TRUE;
 DECLARE MSG_ID CHARACTER '';
+
 CREATE COMPUTE MODULE RequestToFlexcube
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		CALL initLog4j(LOG4J_CONFIG_PATH) INTO rc;
 		IF ( rc = TRUE ) THEN
 			CALL GenerateReqToFlexcube();
-		ELSE	
+		ELSE
 			SET Environment.Variables.Log4j.ErrorMsg = LOG4J_ERROR_MSG;
 		END IF;
 		RETURN TRUE;
@@ -32,125 +31,175 @@ CREATE COMPUTE MODULE RequestToFlexcube
 
 	CREATE PROCEDURE GenerateReqToFlexcube() BEGIN
 		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_REQ;
+
+		
+		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
-		DECLARE SERVICE_NAME,OPERATION_NAME CHARACTER;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Start of Account Summary ------') INTO rc;
+		
 		SET Environment.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		SET Environment.REQUEST_PAYLOAD = Environment.reqPayload;
-	--	SET TRANSACTION_STATUS = 'Request Received from Channel';
-	--	SET CREATED_BY = 'ACE USER';
-	--	SET SERVICE_NAME = inRef.*:FCUBS_HEADER.*:SERVICE;
-	--	SET OPERATION_NAME = inRef.*:FCUBS_HEADER.*:OPERATION;
+		-- SET Environment.REQUEST_PAYLOAD = Environment.reqPayload;
+
 		SET MSG_ID = inRef.*:FCUBS_HEADER.*:MSGID;
 		SET Environment.MSG_ID = MSG_ID;
-	--	SET Environment.ID[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
-	--	SET SEQ_ID = CAST(Environment.ID[1].NEXTVAL AS INTEGER);
+
+        ----------------------------------------------------
 		----------------------Request Logging-------------------------
-		--INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) 
-		--VALUES(SEQ_ID.NEXTVAL,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY);
---		PASSTHRU 'INSERT INTO TRANSACTION_LOG (SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(?,?,?,?,?,?,?)' 
---		TO Database.DBDSN VALUES(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CURRENT_TIMESTAMP,'ACE-USER');
---		COMMIT;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(MSG_ID,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Request Received from Channel ------') INTO rc;
+		CALL PayloadLogging(MSG_ID,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.reqPayload) INTO rc;
 		----------------------------------------------------
-		
 		-------------Business Logic-------------------------
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Preparing business logic ------') INTO rc;
-	   	SET OutputRoot.SOAP = InputRoot.SOAP;
-	    SET OutputRoot.SOAP.Body.ns:Header.REQ_IDENTIFIER = MSG_ID;
+		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER;
+		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_BODY;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		DECLARE outputRef REFERENCE TO OutputRoot.SOAP;
+
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:ACTION = inputHeaderRef.*:ACTION;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:DESTINATION = inputHeaderRef.*:DESTINATION;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:ENTITY = inputHeaderRef.*:ENTITY;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MODULEID = inputHeaderRef.*:MODULEID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MSGID = inputHeaderRef.*:MSGID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MULTITRIPID = inputHeaderRef.*:MULTITRIPID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
+
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_BODY.*:"Stvw-Account-Sumary-IO".*:CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO;
+
+		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------------------------------------
-		
 		----------------------Response Logging-------------------------
-	--	SET TRANSACTION_STATUS = 'Request Sent to Flexcube';
-	--	SET CREATED_ON = CURRENT_TIMESTAMP;
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		SET OutputRoot.SOAP = NULL;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		MOVE OutRef TO OutputRoot.XMLNSC;
-	--	PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN 
-	--	VALUES(TRANSACTION_STATUS,CURRENT_TIMESTAMP,MSG_ID);
-		CALL PayloadLogging(MSG_ID,Environment.reqPayload,'FLEXCUBE_REQ',MessageFlowLabel,OutRef);
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Request to Flexcube ------') INTO rc;
+		CALL PayloadLogging(MSG_ID,Environment.resPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef);
+
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.SOAP = Environment.outputData;
+
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------  FLEXCUBE_REQ  ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.resPayload) INTO rc;
 		---------------------------------------------------------------
-		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = 'http://'||IP||':'||PORT||baseURL;
+		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
 	END;
 END MODULE;
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 CREATE COMPUTE MODULE ResponseToFrontEnd
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-	 CALL GenerateResToFrontEnd();
+		CALL GenerateResToFrontEnd();
 		RETURN TRUE;
 	END;
 
 	CREATE PROCEDURE GenerateResToFrontEnd() BEGIN
-		DECLARE inRef REFERENCE TO InputRoot.SOAP;
+
+		SET Environment.domainDataRef = InputRoot.SOAP;
+		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_RES;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
-		DECLARE SERVICE_NAME,OPERATION_NAME CHARACTER;
-		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-	--	SET TRANSACTION_STATUS = 'Response Received from Flexcube';
-	--	SET CREATED_BY = 'ACE USER';
-	--	SET SERVICE_NAME = inRef.*:FCUBS_HEADER.*:SERVICE;
-	--	SET OPERATION_NAME = inRef.*:FCUBS_HEADER.*:OPERATION;
-	--	IF MSG_ID IS NULL OR MSG_ID = '' THEN
-	--	SET MSG_ID = Environment.MSG_ID;
-	--	END IF;
 
+		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+
+		----------------------------------------------------
 		----------------------Request Logging-------------------------
-		--INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) 
-		--VALUES(SEQ_ID.NEXTVAL,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY);
-	--	PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN 
-	--	VALUES(TRANSACTION_STATUS,CURRENT_TIMESTAMP,MSG_ID);
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(MSG_ID,Environment.reqPayload,'FLEXCUBE_RES',MessageFlowLabel,OutRef);
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Response Received from Flexcube ------') INTO rc;
+		CALL PayloadLogging(Environment.MSG_ID,Environment.reqPayload,'FLEXCUBE_RES',ApplicationLabel,OutRef);
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_RES ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.reqPayload) INTO rc;
 		----------------------------------------------------
-		
 		-------------Business Logic-------------------------
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Preparing Business Logic ------') INTO rc;
-	   	SET OutputRoot.SOAP = InputRoot.SOAP;
-	    SET OutputRoot.SOAP.Body.ns:Header.REQ_IDENTIFIER = MSG_ID;
-		----------------------------------------------------
+
+		DECLARE inputHeaderRef REFERENCE TO inRef.*:FCUBS_HEADER;
+		DECLARE inputBodyRef REFERENCE TO inRef.*:FCUBS_BODY;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		DECLARE outputRef REFERENCE TO OutputRoot.SOAP;
 		
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:ACTION = inputHeaderRef.*:ACTION;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:DESTINATION = inputHeaderRef.*:DESTINATION;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:ENTITY = inputHeaderRef.*:ENTITY;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:MODULEID = inputHeaderRef.*:MODULEID;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:MSGID = inputHeaderRef.*:MSGID;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:MULTITRIPID = inputHeaderRef.*:MULTITRIPID;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
+
+	--	SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY."ACC-Balance".ACC_BAL = inputBodyRef."ACC-Balance".ACC_BAL;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:CUSTACNO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTACNO;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:BRANCH_CODE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:BRANCH_CODE;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:CCY = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CCY;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:CURRBAL = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CURRBAL;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:ACCOUNT_TYPE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_TYPE;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:CUSTOMER_NAME = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTOMER_NAME;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:AC_DESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:AC_DESC;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:ACCOUNT_CLASS = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_CLASS;
+		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:ACCLASSDESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCLASSDESC;
+	--	SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY."Stvw-Account-Sumary-IO".CUST_NO = inputBodyRef."Stvw-Account-Sumary-IO".CUST_NO;
+
+		SET Environment.outputData = OutputRoot.SOAP;
+		----------------------------------------------------
 		----------------------Response Logging-------------------------
-	--	SET TRANSACTION_STATUS = 'Response Sent to Channel';
-	--	SET CREATED_ON = CURRENT_TIMESTAMP;
+
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		MOVE OutRef TO OutputRoot.XMLNSC;
-	--	PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.DBDSN 
-	--	VALUES(TRANSACTION_STATUS,CURRENT_TIMESTAMP,MSG_ID);
-		CALL PayloadLogging(MSG_ID,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Response to Frontend ------') INTO rc;
+		SET OutputRoot.SOAP = NULL;
+
+		CALL PayloadLogging(Environment.MSG_ID,Environment.reqPayload,'CHANNEL_RES',ApplicationLabel,OutRef);
+
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+		SET OutputRoot.SOAP = Environment.outputData;
+
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_RES ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.resPayload) INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ End of Account Summary ------') INTO rc;
-		---------------------------------------------------------------
+		
+
 	END;
 END MODULE;
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 
 CREATE COMPUTE MODULE BuildExceptionResponse
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		 CALL Build_BusinessErrorResponse();
+		CALL Build_BusinessErrorResponse();
 		RETURN TRUE;
 	END;
-	
+
 	CREATE PROCEDURE Build_BusinessErrorResponse() BEGIN
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
 		DECLARE inRef REFERENCE TO InputRoot.XMLNSC;
@@ -172,7 +221,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		--SET domainName = FIELDNAME(domainDataRef);
 		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,encodeID,ccsID);
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'Application Built Exception:'||resPayload) INTO rc;
-		------------Error  Logging in DB----------
+		------------Error Logging in DB----------
 		--CALL ConstructErrorDBLog(CURRENT_TIMESTAMP,CREATED_BY,envRef.ErrorType,MessageFlowLabel,ApplicationLabel,ExecutionGroupLabel,
 		---excpPayload,Environment.REQUEST_PAYLOAD,excpRef.excpNumber,envRef.ErrorCode,outRef);
 		-------------------------------------------

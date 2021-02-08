@@ -12,44 +12,38 @@
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOGGER_NAME" name="LOGGER_NAME" lowerBound="1" defaultValueLiteral="AccountSummaryLogger">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_TYPE" name="LOG_TYPE" lowerBound="1" defaultValueLiteral="INFO">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_TYPE" name="LOG_TYPE" lowerBound="1" defaultValueLiteral="DEBUG">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.IP" name="IP" lowerBound="1" defaultValueLiteral="127.0.0.1">
-      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.PORT" name="PORT" lowerBound="1" defaultValueLiteral="7800">
-      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.baseURL" name="baseURL" defaultValueLiteral="/flexcube/service">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" lowerBound="1" defaultValueLiteral="http://localhost:7800/Backend_Simulator">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
     <translation xmi:type="utility:TranslatableString" key="AccountSummary_Flow" bundleName="com/dashenbank/accountsummary/AccountSummary_Flow" pluginId="DashenBank_AccountSummary_App"/>
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_AccountSummary_App/icons/full/obj16/AccountSummary_Flow.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_AccountSummary_App/icons/full/obj30/AccountSummary_Flow.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="521,248" computeExpression="esql://routine/com.dashenbank.accountsummary#BuildExceptionResponse.Main" computeMode="destinationAndMessage">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="526,175" computeExpression="esql://routine/com.dashenbank.accountsummary#BuildExceptionResponse.Main" computeMode="destinationAndMessage">
         <translation xmi:type="utility:ConstantString" string="BuildBusinessError"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="225,123" dataSource="DBDSN" transaction="commit" computeExpression="esql://routine/com.dashenbank.accountsummary#RequestToFlexcube.Main" computeMode="all">
-        <translation xmi:type="utility:ConstantString" string="RequestToFlexcube"/>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="185,110" dataSource="DBDSN" transaction="commit" computeExpression="esql://routine/com.dashenbank.accountsummary#RequestToFlexcube.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="69,127" wsdlOperationMode="gateway" wsdlFileName="ESB_BatchUploadService.wsdl" selectedPortType="ESB_BatchUploadService" selectedBinding="ESB_BatchUploadServiceSOAP" selectedPort="ESB_BatchUploadServiceSOAP" useHTTPTransport="true" urlSelector="/accountSummary" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="45,113" wsdlOperationMode="gateway" wsdlFileName="ESB_BatchUploadService.wsdl" selectedPortType="ESB_BatchUploadService" selectedBinding="ESB_BatchUploadServiceSOAP" selectedPort="ESB_BatchUploadServiceSOAP" useHTTPTransport="true" urlSelector="/ESB_AccountSummary" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Service_Request"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="531,123" dataSource="DBDSN" transaction="commit" computeExpression="esql://routine/com.dashenbank.accountsummary#ResponseToFrontEnd.Main" computeMode="all">
-        <translation xmi:type="utility:ConstantString" string="ResponseToFrontEnd"/>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="427,119" dataSource="DBDSN" transaction="commit" computeExpression="esql://routine/com.dashenbank.accountsummary#ResponseToFrontEnd.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="ResponseToChannel"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="764,123">
+      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="628,119">
         <translation xmi:type="utility:ConstantString" string="Service_Reply"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="388,124" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/Flexcube/simulator/service" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
-        <translation xmi:type="utility:ConstantString" string="FlexCubeCall"/>
+      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="289,96" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/Flexcube/simulator/service" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+        <translation xmi:type="utility:ConstantString" string="BackendService_Call"/>
       </nodes>
-      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="416,-17" rotation="BOTTOM_TO_TOP" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
+      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="334,0" rotation="BOTTOM_TO_TOP" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
         <translation xmi:type="utility:ConstantString" string="PayloadLogging"/>
       </nodes>
-      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_9" location="258,248">
+      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_9" location="417,196">
         <translation xmi:type="utility:ConstantString" string="ExceptionHandler"/>
       </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.catch" targetTerminalName="InTerminal.Input"/>
@@ -63,6 +57,8 @@
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_10" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_3" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.Input"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_11" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_12" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_6" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.Input"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_13" targetNode="FCMComposite_1_9" sourceNode="FCMComposite_1_6" sourceTerminalName="OutTerminal.fault" targetTerminalName="InTerminal.Input"/>
     </composition>
     <propertyOrganizer>
       <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_CONFIG_PATH">
@@ -73,14 +69,8 @@
             <propertyName xmi:type="utility:TranslatableString" key="Property.LOGGER_NAME" bundleName="com/dashenbank/accountsummary/AccountSummary_Flow" pluginId="DashenBank_AccountSummary_App"/>
             <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG_TYPE">
               <propertyName xmi:type="utility:TranslatableString" key="Property.LOG_TYPE" bundleName="com/dashenbank/accountsummary/AccountSummary_Flow" pluginId="DashenBank_AccountSummary_App"/>
-              <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.IP">
-                <propertyName xmi:type="utility:TranslatableString" key="Property.IP" bundleName="com/dashenbank/accountsummary/AccountSummary_Flow" pluginId="DashenBank_AccountSummary_App"/>
-                <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.PORT">
-                  <propertyName xmi:type="utility:TranslatableString" key="Property.PORT" bundleName="com/dashenbank/accountsummary/AccountSummary_Flow" pluginId="DashenBank_AccountSummary_App"/>
-                  <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.baseURL">
-                    <propertyName xmi:type="utility:TranslatableString" key="Property.baseURL" bundleName="com/dashenbank/accountsummary/AccountSummary_Flow" pluginId="DashenBank_AccountSummary_App"/>
-                  </propertyDescriptor>
-                </propertyDescriptor>
+              <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.BACKEND_URL">
+                <propertyName xmi:type="utility:TranslatableString" key="Property.BACKEND_URL" bundleName="com/dashenbank/accountsummary/AccountSummary_Flow" pluginId="DashenBank_AccountSummary_App"/>
               </propertyDescriptor>
             </propertyDescriptor>
           </propertyDescriptor>
