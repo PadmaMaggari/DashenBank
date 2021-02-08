@@ -182,7 +182,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
 		DECLARE outRefPayload CHARACTER getPayLoad(domainName,OutputRoot.SOAP,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(Environment.ID,outRefPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
+		CALL PayloadLogging(Environment.ID,outRefPayload,'CHANNEL_RESP',ApplicationLabel,OutRef1);
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader= InputRoot.HTTPResponseHeader;
 		SET OutputRoot.SOAP = Environment.outSOAP;

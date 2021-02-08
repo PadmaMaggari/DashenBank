@@ -1,30 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 BROKER SCHEMA com.dashenbank.BankAccountDetails
 
 PATH com.dashenbank.genericfunctions;
@@ -83,15 +57,15 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToFlexcube
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
-		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
-		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
-		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:MSGID = inputHeaderRef.*:MSGID;
-		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
-		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
-		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
-		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
-		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
-		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
+		SET outputbodyRef.Body.QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outputbodyRef.Body.QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outputbodyRef.Body.QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:MSGID = inputHeaderRef.*:MSGID;
+		SET outputbodyRef.Body.QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outputbodyRef.Body.QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
+		SET outputbodyRef.Body.QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outputbodyRef.Body.QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outputbodyRef.Body.QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
+		SET outputbodyRef.Body.QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
 
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_BODY.*:"Cust-Account-IO".*:BRN = inputBodyRef.*:BRN;
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_BODY.*:"Cust-Account-IO".*:ACC = inputBodyRef.*:ACC;
@@ -410,7 +384,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
 		DECLARE outRefPayload CHARACTER getPayLoad(domainName,OutputRoot.SOAP,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(Environment.ID,outRefPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
+		CALL PayloadLogging(Environment.ID,outRefPayload,'CHANNEL_RESP',ApplicationLabel,OutRef1);
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader= InputRoot.HTTPResponseHeader;
 		SET OutputRoot.SOAP = Environment.outSOAP;
