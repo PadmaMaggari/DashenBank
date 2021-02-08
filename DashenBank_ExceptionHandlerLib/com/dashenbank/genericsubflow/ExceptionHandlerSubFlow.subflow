@@ -27,7 +27,7 @@
       <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.Input" location="17,25">
         <translation xmi:type="utility:TranslatableString" key="InTerminal.Input" bundleName="com/dashenbank/genericsubflow/ExceptionHandlerSubFlow" pluginId="DashenBank_ExceptionHandlerLib"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="147,25" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.genericsubflow#ExceptionHandler_Esql.Main" computeMode="destinationAndMessage">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="147,25" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.genericsubflow#ExceptionHandler_Esql.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="GenerateExceptionDetails"/>
       </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="OutTerminal.Output" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
