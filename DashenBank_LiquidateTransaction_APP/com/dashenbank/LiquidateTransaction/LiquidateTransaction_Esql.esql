@@ -1,4 +1,5 @@
 
+
 BROKER SCHEMA com.dashenbank.LiquidateTransaction
 PATH com.dashenbank.genericfunctions;
 --DECLARE bloc NAMESPACE 'http://www.example.org/BlockingAmount/';
@@ -7,56 +8,83 @@ DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER;
 DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER;
 DECLARE BACKEND_URL EXTERNAL CHARACTER;
 DECLARE DSN_NAME EXTERNAL CHARACTER;
+
 CREATE COMPUTE MODULE RequestToBackend
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
 		IF (rc = TRUE) THEN
-			CALL CopyEntireMessage();
+			CALL request_from_channnel();
 		ELSE
 			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR_MSG;
 		END IF;
 		RETURN TRUE;
 	END;
-	CREATE PROCEDURE CopyEntireMessage() BEGIN
+	CREATE PROCEDURE request_from_channnel() BEGIN
 		DECLARE id CHARACTER InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.id = id;
+
 		SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
 		SET Environment.encodeRef = InputRoot.Properties.Encoding;
 		SET Environment.domainDataRef = InputRoot.SOAP.Body;
 		SET Environment.domainName = FIELDNAME(InputBody);
+
 		DECLARE ccidRef INTEGER Environment.ccidRef;
 		DECLARE encodeRef INTEGER Environment.encodeRef;
-		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
-		DECLARE domainName CHARACTER Environment.domainName;
-		DECLARE payLoad CHARACTER getPayload(domainName,domainDataRef,encodeRef,ccidRef);
+		DECLARE inputDomainDataRef REFERENCE TO InputRoot.SOAP.Body;
+		DECLARE inputDomainName CHARACTER Environment.domainName;
+		DECLARE inputPayLoad CHARACTER getPayload(inputDomainName,inputDomainDataRef,encodeRef,ccidRef);
+
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE outRef REFERENCE TO OutputRoot.XMLNSC;
-		SET OutputRoot.SOAP = InputRoot.SOAP;
-		-- DECLARE id1,SEQ_ID INTEGER;
-		-- DECLARE TRANSACTION_STATUS1 CHARACTER 'Request Received from END USER';
-		--DECLARE createdOn TIMESTAMP CURRENT_TIMESTAMP;
-		--DECLARE createdBy CHARACTER 'ACE USER';
-		--DECLARE SERVICE_NAME CHARACTER InputRoot.SOAP.Body.LIQUIDATETRANSACTION_IOPK_REQ.FCUBS_HEADER.SERVICE;
-		-- DECLARE OPERATION_NAME CHARACTER InputRoot.SOAP.Body.LIQUIDATETRANSACTION_IOPK_REQ.FCUBS_HEADER.OPERATION;
-		-- SET Environment.ID[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
-		-- SET SEQ_ID = CAST(Environment.ID[1].NEXTVAL AS INTEGER);
-		--PASSTHRU 'INSERT INTO TRANSACTION_LOG (SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(?,?,?,?,?,?,?)' TO Database.{DSN_NAME} VALUES(SEQ_ID,id,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS1,CURRENT_TIMESTAMP,'ACE-USER');
-		-- COMMIT;
-		CALL PayloadLogging(id,payLoad,'CHANNEL_REQ',MessageFlowLabel,outRef);
-		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO','..........Request Received from END USER...........') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO','CHANNEL_REQ data is: '||payLoad) INTO rc;
-		DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
-		DECLARE domainName1 CHARACTER 'SOAP';
-		DECLARE payload1 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
+
+		CALL PayloadLogging(id,inputPayLoad,'CHANNEL_REQ',MessageFlowLabel,outRef);
+		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO',' ------ CHANNEL_REQ ------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO','CHANNEL_REQ data is: '||inputPayLoad) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO',' -----------------------------------------------------------------------') INTO rc;
+
+		DECLARE inRef REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_REQ;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		DECLARE outDataRef REFERENCE TO OutputRoot.SOAP ;
+
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:UBSCOMP;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:USERID = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:USERID;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:BRANCH = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:BRANCH;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MODULEID = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MODULEID;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SERVICE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SERVICE;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:OPERATION = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:OPERATION;
+
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:XREF = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:XREF;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRTYPE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRTYPE;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:ISSBRN = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:ISSBRN;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRSTAT = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRSTAT;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:DDMICRNO = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:DDMICRNO;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:ACBRN = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:ACBRN;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:ACNO = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:ACNO;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRNO = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRNO;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRAMT = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRAMT;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:NARRATIVE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:NARRATIVE;
+		SET Environment.INSOAP = OutputRoot.SOAP;
+
+
+
+		DECLARE outputDomainDataRef REFERENCE TO OutputRoot.SOAP.Body;
+		DECLARE outputDomainName CHARACTER 'SOAP';
+		DECLARE outputPayload CHARACTER getPayLoad(outputDomainName,outputDomainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
+
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(id,payload1,'FLEXCUBE_REQ',MessageFlowLabel,OutRef1);
+		CALL PayloadLogging(id,outputPayload,'FLEXCUBE_REQ',MessageFlowLabel,OutRef1);
+
 		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.SOAP = Environment.INSOAP;
+		
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
-		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO','FLEXCUBE_REQ data is: '||payload1) INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO','..........Request Sent to Backend Flow...........') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO',' ------ FLEXCUBE_REQ ------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO','FLEXCUBE_REQ data is: '||outputPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO',' -----------------------------------------------------------------------') INTO rc;
 	END;
 END MODULE;
 ---------------------------------------------------------------------------------------------------------------------
@@ -64,42 +92,117 @@ END MODULE;
 CREATE COMPUTE MODULE ResponseToChannel
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		CALL CopyEntireMessage();
+		CALL response_from_flexcube();
 		RETURN TRUE;
 	END;
-	CREATE PROCEDURE CopyEntireMessage() BEGIN
+	CREATE PROCEDURE response_from_flexcube() BEGIN
+
 		SET Environment.ccidRef1 = InputRoot.Properties.CodedCharSetId;
 		SET Environment.encodeRef1 = InputRoot.Properties.Encoding;
 		SET Environment.domainDataRef1 = InputRoot.SOAP.Body;
 		SET Environment.domainName1 = FIELDNAME(InputBody);
-		-- DECLARE TRANSACTION_STATUS3 CHARACTER 'Response Received from BackEnd flow';
-		-- DECLARE CREATED_ON3 TIMESTAMP CURRENT_TIMESTAMP;
-		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(TRANSACTION_STATUS3,CREATED_ON3,Environment.id);
+
 		DECLARE ccidRef INTEGER Environment.ccidRef1;
 		DECLARE encodeRef INTEGER Environment.encodeRef1;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
 		DECLARE domainName CHARACTER Environment.domainName1;
-		DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		DECLARE inputPayLoad CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(Environment.id,payload,'FLEXCUBE_RESP',MessageFlowLabel,OutRef);
-		SET OutputRoot.SOAP.Body = InputRoot.SOAP.Body;
-		-- DECLARE TRANSACTION_STATUS4 CHARACTER 'Response Sent to End User';
-		-- DECLARE CREATED_ON4 TIMESTAMP CURRENT_TIMESTAMP;
-		-- PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(TRANSACTION_STATUS4,CREATED_ON4,Environment.id);
-		DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
-		DECLARE domainName1 CHARACTER 'SOAP';
-		DECLARE payload1 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
+		CALL PayloadLogging(Environment.id,inputPayLoad,'FLEXCUBE_RESP',MessageFlowLabel,OutRef);
+
+		DECLARE inRef REFERENCE TO InputRoot.SOAP.Body;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		DECLARE outDataRef REFERENCE TO OutputRoot.SOAP ;
+
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SOURCE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SOURCE;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:UBSCOMP = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:UBSCOMP;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MSGID = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MSGID;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:USERID = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:USERID;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:BRANCH = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:BRANCH;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MODULEID = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MODULEID;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SERVICE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SERVICE;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:OPERATION = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:OPERATION;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SOURCE_OPERATION = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SOURCE_OPERATION;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:DESTINATION = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:DESTINATION;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MULTITRIPID = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MULTITRIPID;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:FUNCTIONID = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:FUNCTIONID;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:ACTION = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:ACTION;
+		SET OutputRoot.SOAP.body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MSGSTAT = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MSGSTAT;
+
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".XREF = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:XREF;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".PRODUCTCODE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:PRODUCTCODE;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".FCCREF = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:FCCREF;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".VERNO = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:VERNO;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".ESN = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:ESN;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".INSTRTYPE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRTYPE;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".ISSBRN = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:ISSBRN;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".INSTRSTAT = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRSTAT;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".PAYBANK = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:PAYBANK;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".EXPDT = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:EXPDT;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".RELCUST = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:RELCUST;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".ACBRN = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:ACBRN;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".ACNO = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:ACNO;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".CHEQUENO = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:CHEQUENO;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".BENFNM = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:BENFNM;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".INSTRNO = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRNO;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".INSTRDATE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRDATE;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".INSTRCCY = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRCCY;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".INSTRAMT = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRAMT;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".EXCHRATE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:EXCHRATE;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".ACCCY = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:ACCCY;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".NARRATIVE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:NARRATIVE;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".MAKERID = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:MAKERID;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".MAKERSTAMP = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:MAKERSTAMP;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".CHECKERID = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:CHECKERID;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".CHECKERSTAMP = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:CHECKERSTAMP;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".CONTSTAT = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:CONTSTAT;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".AUTHSTAT = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:AUTHSTAT;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".MODNO = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:MODNO;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".ONCEAUTH = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:ONCEAUTH;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".TCYTOTCHGAMT = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:TCYTOTCHGAMT;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".ACCTITLE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:ACCTITLE;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".ACTAMT = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:ACTAMT;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".TXNDATE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:TXNDATE;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".ACYAMOUNT = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:ACYAMOUNT;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".OFSACC = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:OFSACC;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".MULCHGCY = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:MULCHGCY;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".OFSBRANCH = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:OFSBRANCH;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details"."Cheque-Details".PAYBRN = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Cheque-Details".*:PAYBRN ;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details"."Cheque-Details".STAT = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Cheque-Details".*:STAT;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details"."Cheque-Details".BENFNAME = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Cheque-Details".*:BENFNAME;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details"."Mis-Details".BRANCH = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:BRANCH;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details"."Mis-Details".RTFLAG = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:RTFLAG;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details"."Mis-Details".FUNDMIS1LBL1 = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS1LBL1;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details"."Mis-Details".COMPMIS3LBL3 = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS3LBL3;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details"."Mis-Details".TXNMIS1LBL1 = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS1LBL1;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details"."Mis-Details".TXNMIS2LBL2 = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS2LBL2;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.WARNING.WCODE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE ;
+		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.WARNING.WDESC = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.WARNING.*:WDESC;
+		SET Environment.OUTSOAP = OutputRoot.SOAP;
+
+		DECLARE outputDomainDataRef REFERENCE TO OutputRoot.SOAP.Body;
+		DECLARE outputDomainName CHARACTER 'SOAP';
+		DECLARE outputPayload CHARACTER getPayLoad(outputDomainName,outputDomainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
+
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(Environment.id,payload1,'CHANNEL_RESP',MessageFlowLabel,OutRef1);
-		SET OutputRoot.HTTPResponseHeader=InputRoot.HTTPResponseHeader;
-		SET OutputRoot.SOAP.Body= InputRoot.SOAP.Body;
-		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO',' ------------Response Received from BackEnd Flow---------------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO','FLEXCUBE_RESP data is: '||payload) INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO','CHANNEL_RESP data is: '||payload1) INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO',' ------------Response Received from Backend Flow---------------') INTO rc;
+		CALL PayloadLogging(Environment.id,outputPayload,'CHANNEL_RESP',MessageFlowLabel,OutRef1);
+
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+		SET OutputRoot.SOAP = Environment.OUTSOAP;
+
+		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO',' ------- FLEXCUBE_RESP -------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO','FLEXCUBE_RESP data is: '||inputPayLoad) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO',' ----------------------------------------------------------------------') INTO rc;
+
+		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO',' -------- CHANNEL_RESP -------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO','CHANNEL_RESP data is: '||outputPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'LiquidateTransaction_Log','INFO','**********************************************************************') INTO rc;	
+
 	END;
 END MODULE;
 -----------------------------------------------------------------------------------------------
