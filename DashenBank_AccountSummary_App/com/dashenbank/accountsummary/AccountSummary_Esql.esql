@@ -50,7 +50,7 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(MSG_ID,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
+		CALL PayloadLogging(MSG_ID,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.reqPayload) INTO rc;
 		----------------------------------------------------
@@ -87,7 +87,7 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		SET OutputRoot.SOAP = NULL;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		MOVE OutRef TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(MSG_ID,Environment.resPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef);
+		CALL PayloadLogging(MSG_ID,Environment.resPayload,'FLEXCUBE_REQ',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.SOAP = Environment.outputData;
@@ -123,7 +123,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(Environment.MSG_ID,Environment.reqPayload,'FLEXCUBE_RES',ApplicationLabel,OutRef);
+		CALL PayloadLogging(Environment.MSG_ID,Environment.reqPayload,'FLEXCUBE_RES',MessageFlowLabel,OutRef);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_RES ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.reqPayload) INTO rc;
 		----------------------------------------------------
@@ -176,7 +176,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		MOVE OutRef TO OutputRoot.XMLNSC;
 		SET OutputRoot.SOAP = NULL;
 
-		CALL PayloadLogging(Environment.MSG_ID,Environment.reqPayload,'CHANNEL_RES',ApplicationLabel,OutRef);
+		CALL PayloadLogging(Environment.MSG_ID,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
