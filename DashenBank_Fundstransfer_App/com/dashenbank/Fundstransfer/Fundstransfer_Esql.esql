@@ -1,10 +1,4 @@
 
-
-
-
-
-
-
 BROKER SCHEMA com.dashenbank.Fundstransfer
 
 PATH com.dashenbank.genericfunctions;
@@ -64,36 +58,36 @@ CREATE COMPUTE MODULE RequestToBackend
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_HEADER.SOURCE = inputHeaderRef.*:SOURCE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_HEADER.UBSCOMP = inputHeaderRef.*:UBSCOMP;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_HEADER.MSGID = inputHeaderRef.*:MSGID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_HEADER.CORRELID = inputHeaderRef.*:CORRELID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_HEADER.USERID = inputHeaderRef.*:USERID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_HEADER.BRANCH = inputHeaderRef.*:BRANCH;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_HEADER.MODULEID = inputHeaderRef.*:MODULEID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_HEADER.SERVICE = inputHeaderRef.*:SERVICE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_HEADER.OPERATION = inputHeaderRef.*:OPERATION;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_HEADER.SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_HEADER.MSGSTAT = inputHeaderRef.*:MSGSTAT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MSGID = inputHeaderRef.*:MSGID;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MODULEID = inputHeaderRef.*:MODULEID;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
 
 
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".XREF = inputBodyref.*:XREF;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".PRD = inputBodyref.*:PRD;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".BRN = inputBodyref.*:BRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".TXNBRN = inputBodyref.*:TXNBRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".TXNACC = inputBodyref.*:TXNACC;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".TXNCCY = inputBodyref.*:TXNCCY;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".TXNAMT = inputBodyref.*:TXNAMT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".TXNTRN = inputBodyref.*:TXNTRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".OFFSETBRN = inputBodyref.*:OFFSETBRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".OFFSETACC = inputBodyref.*:OFFSETACC;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".OFFSETCCY = inputBodyref.*:OFFSETCCY;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".OFFSETAMT = inputBodyref.*:OFFSETAMT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".OFFSETTRN = inputBodyref.*:OFFSETTRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".XRATE = inputBodyref.*:XRATE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".TXNDATE = inputBodyref.*:TXNDATE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".VALDATE = inputBodyref.*:VALDATE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.FCUBS_BODY."Transaction-Details".NARRATIVE = inputBodyref.*:NARRATIVE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:XREF = inputBodyref.*:XREF;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:PRD = inputBodyref.*:PRD;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:BRN = inputBodyref.*:BRN;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNBRN = inputBodyref.*:TXNBRN;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNACC = inputBodyref.*:TXNACC;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNCCY = inputBodyref.*:TXNCCY;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNAMT = inputBodyref.*:TXNAMT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNTRN = inputBodyref.*:TXNTRN;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETBRN = inputBodyref.*:OFFSETBRN;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETACC = inputBodyref.*:OFFSETACC;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETCCY = inputBodyref.*:OFFSETCCY;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETAMT = inputBodyref.*:OFFSETAMT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETTRN = inputBodyref.*:OFFSETTRN;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:XRATE = inputBodyref.*:XRATE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNDATE = inputBodyref.*:TXNDATE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:VALDATE = inputBodyref.*:VALDATE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:NARRATIVE = inputBodyref.*:NARRATIVE;
 
 		SET Environment.outSOAP = OutputRoot.SOAP;
 
@@ -154,87 +148,87 @@ CREATE COMPUTE MODULE ResponseToChannel
 		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
 
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.SOURCE = inputHeaderRef.SOURCE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.UBSCOMP = inputHeaderRef.UBSCOMP;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.CORRELID = inputHeaderRef.CORRELID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.USERID = inputHeaderRef.USERID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.BRANCH = inputHeaderRef.BRANCH;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.MODULEID = inputHeaderRef.MODULEID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.SERVICE = inputHeaderRef.SERVICE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.OPERATION = inputHeaderRef.OPERATION;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.SOURCE_USERID = inputHeaderRef.SOURCE_USERID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.DESTINATION = inputHeaderRef.DESTINATION;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.FUNCTIONID = inputHeaderRef.FUNCTIONID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.ACTION = inputHeaderRef.ACTION;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER.MSGSTAT = inputHeaderRef.MSGSTAT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MODULEID = inputHeaderRef.*:MODULEID;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SOURCE_USERID = inputHeaderRef.*:SOURCE_USERID;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:DESTINATION = inputHeaderRef.*:DESTINATION;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:ACTION = inputHeaderRef.*:ACTION;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
 
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".XREF = inputBodyRef.XREF;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".FCCREF = inputBodyRef.FCCREF;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".PRD = inputBodyRef.PRD;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".BRN = inputBodyRef.BRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".TXNBRN = inputBodyRef.TXNBRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".TXNACC = inputBodyRef.TXNACC;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".TXNCCY = inputBodyRef.TXNCCY;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".TXNAMT = inputBodyRef.TXNAMT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".TXNTRN = inputBodyRef.TXNTRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".OFFSETBRN = inputBodyRef.OFFSETBRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".OFFSETACC = inputBodyRef.OFFSETACC;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".OFFSETCCY = inputBodyRef.OFFSETCCY;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".OFFSETAMT = inputBodyRef.OFFSETAMT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".OFFSETTRN = inputBodyRef.OFFSETTRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".XRATE = inputBodyRef.XRATE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".LCYAMT = inputBodyRef.LCYAMT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".TXNDATE = inputBodyRef.TXNDATE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".VALDATE = inputBodyRef.VALDATE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".RELCUST = inputBodyRef.RELCUST;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".TCYCHGAMT = inputBodyRef.TCYCHGAMT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".TCYTOTCHGAMT = inputBodyRef.TCYTOTCHGAMT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:XREF = inputBodyRef.*:XREF;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:CCREF = inputBodyRef.*:FCCREF;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:PRD = inputBodyRef.*:PRD;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:BRN = inputBodyRef.*:BRN;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:TXNBRN = inputBodyRef.*:TXNBRN;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:TXNACC = inputBodyRef.*:TXNACC;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:TXNCCY = inputBodyRef.*:TXNCCY;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:TXNAMT = inputBodyRef.*:TXNAMT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:TXNTRN = inputBodyRef.*:TXNTRN;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETBRN = inputBodyRef.*:OFFSETBRN;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETACC = inputBodyRef.*:OFFSETACC;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETCCY = inputBodyRef.*:OFFSETCCY;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETAMT = inputBodyRef.*:OFFSETAMT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETTRN = inputBodyRef.*:OFFSETTRN;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:XRATE = inputBodyRef.*:XRATE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:LCYAMT = inputBodyRef.*:LCYAMT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:TXNDATE = inputBodyRef.*:TXNDATE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:VALDATE = inputBodyRef.*:VALDATE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:RELCUST = inputBodyRef.*:RELCUST;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:TCYCHGAMT = inputBodyRef.*:TCYCHGAMT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:TCYTOTCHGAMT = inputBodyRef.*:TCYTOTCHGAMT;
 
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".NARRATIVE = inputBodyRef.NARRATIVE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".TRACKREVERSE = inputBodyRef.TRACKREVERSE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".LCYXRATE = inputBodyRef.LCYXRATE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".MAKERID = inputBodyRef.MAKERID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".MAKERSTAMP = inputBodyRef.MAKERSTAMP;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".CHECKERID = inputBodyRef.CHECKERID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".CHECKERSTAMP = inputBodyRef.CHECKERSTAMP;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".RECSTAT = inputBodyRef.RECSTAT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".AUTHSTAT = inputBodyRef.AUTHSTAT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".LCYCHGAMT = inputBodyRef.LCYCHGAMT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".DRACC = inputBodyRef.DRACC;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".TXNDRCR = inputBodyRef.TXNDRCR;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".BOOKDATE = inputBodyRef.BOOKDATE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".FT = inputBodyRef.FT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".LCYTOTCHGAMT = inputBodyRef.LCYTOTCHGAMT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".DENMCCY1 = inputBodyRef.DENMCCY1;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".DENMAMT1 = inputBodyRef.DENMAMT1;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".DENMAMT2 = inputBodyRef.DENMAMT2;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".ACCTITLE1 = inputBodyRef.ACCTITLE1;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".ACCTITLE2 = inputBodyRef.ACCTITLE2;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".ACTAMT = inputBodyRef.ACTAMT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".CHRACC = inputBodyRef.CHRACC;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details".CUSTNAME = inputBodyRef.CUSTNAME;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Charge-Details".CHGCOMP = inputBodyRef.*:"Charge-Details".*:CHGCOMP;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Charge-Details".CHGAMT = inputBodyRef.*:"Charge-Details".*:CHGAMT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Charge-Details".CHGCCY = inputBodyRef.*:"Charge-Details".*:CHGCCY;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Charge-Details".MISHEAD = inputBodyRef.*:"Charge-Details".*:MISHEAD;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Charge-Details".TXNCODE = inputBodyRef.*:"Charge-Details".*:TXNCODE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Charge-Details".NETTINGIND = inputBodyRef.*:"Charge-Details".*:NETTINGIND;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Charge-Details".CHGGL = inputBodyRef.*:"Charge-Details".*:CHGGL;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Charge-Details".TYPE = inputBodyRef.*:"Charge-Details".*:TYPE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Charge-Details".LCYCHG = inputBodyRef.*:"Charge-Details".*:LCYCHG;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Charge-Details".XRATE = inputBodyRef.*:"Charge-Details".*:XRATE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:NARRATIVE = inputBodyRef.*:NARRATIVE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:TRACKREVERSE = inputBodyRef.*:TRACKREVERSE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:LCYXRATE = inputBodyRef.*:LCYXRATE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:MAKERID = inputBodyRef.*:MAKERID;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:MAKERSTAMP = inputBodyRef.*:MAKERSTAMP;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:CHECKERID = inputBodyRef.*:CHECKERID;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:CHECKERSTAMP = inputBodyRef.*:CHECKERSTAMP;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:RECSTAT = inputBodyRef.*:RECSTAT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:AUTHSTAT = inputBodyRef.*:AUTHSTAT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:LCYCHGAMT = inputBodyRef.*:LCYCHGAMT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:DRACC = inputBodyRef.*:DRACC;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:TXNDRCR = inputBodyRef.*:TXNDRCR;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:BOOKDATE = inputBodyRef.*:BOOKDATE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:FT = inputBodyRef.*:FT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:LCYTOTCHGAMT = inputBodyRef.*:LCYTOTCHGAMT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:DENMCCY1 = inputBodyRef.*:DENMCCY1;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:DENMAMT1 = inputBodyRef.*:DENMAMT1;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:DENMAMT2 = inputBodyRef.*:DENMAMT2;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:ACCTITLE1 = inputBodyRef.*:ACCTITLE1;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:ACCTITLE2 = inputBodyRef.*:ACCTITLE2;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:ACTAMT = inputBodyRef.*:ACTAMT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:CHRACC = inputBodyRef.*:CHRACC;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:CUSTNAME = inputBodyRef.*:CUSTNAME;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Charge-Details".*:CHGCOMP = inputBodyRef.*:"Charge-Details".*:CHGCOMP;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Charge-Details".*:CHGAMT = inputBodyRef.*:"Charge-Details".*:CHGAMT;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Charge-Details".*:CHGCCY = inputBodyRef.*:"Charge-Details".*:CHGCCY;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Charge-Details".*:MISHEAD = inputBodyRef.*:"Charge-Details".*:MISHEAD;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Charge-Details".*:TXNCODE = inputBodyRef.*:"Charge-Details".*:TXNCODE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Charge-Details".*:NETTINGIND = inputBodyRef.*:"Charge-Details".*:NETTINGIND;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Charge-Details".*:CHGGL = inputBodyRef.*:"Charge-Details".*:CHGGL;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Charge-Details".*:TYPE = inputBodyRef.*:"Charge-Details".*:TYPE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Charge-Details".*:LCYCHG = inputBodyRef.*:"Charge-Details".*:LCYCHG;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Charge-Details".*:XRATE = inputBodyRef.*:"Charge-Details".*:XRATE;
 
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Mis-Details".BRANCH = inputBodyRef.*:"Mis-Details".*:BRANCH;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Mis-Details".CUSTNO = inputBodyRef.*:"Mis-Details".*:CUSTNO;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Mis-Details".CCY = inputBodyRef.*:"Mis-Details".*:CCY;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Mis-Details".RTFLAG = inputBodyRef.*:"Mis-Details".*:RTFLAG;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Mis-Details".FUNDMIS1LBL1 = inputBodyRef.*:"Mis-Details".*:FUNDMIS1LBL1;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Mis-Details".COMPMIS3LBL3 = inputBodyRef.*:"Mis-Details".*:COMPMIS3LBL3;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Mis-Details".TXNMIS1LBL1 = inputBodyRef.*:"Mis-Details".*:TXNMIS1LBL1;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY."Transaction-Details"."Mis-Details".TXNMIS2LBL2 = inputBodyRef.*:"Mis-Details".*:TXNMIS2LBL2;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:BRANCH = inputBodyRef.*:"Mis-Details".*:BRANCH;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:CUSTNO = inputBodyRef.*:"Mis-Details".*:CUSTNO;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:CCY = inputBodyRef.*:"Mis-Details".*:CCY;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:RTFLAG = inputBodyRef.*:"Mis-Details".*:RTFLAG;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS1LBL1 = inputBodyRef.*:"Mis-Details".*:FUNDMIS1LBL1;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS3LBL3 = inputBodyRef.*:"Mis-Details".*:COMPMIS3LBL3;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS1LBL1 = inputBodyRef.*:"Mis-Details".*:TXNMIS1LBL1;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS2LBL2 = inputBodyRef.*:"Mis-Details".*:TXNMIS2LBL2;
 
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY.FCUBS_WARNING_RESP.WARNING.WCODE = inputWarningRef.*:WCODE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.FCUBS_BODY.FCUBS_WARNING_RESP.WARNING.WDESC = inputWarningRef.*:WDESC;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE = inputWarningRef.*:WCODE;
+		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC = inputWarningRef.*:WDESC;
 
 		SET Environment.outSOAP = OutputRoot.SOAP;
 
