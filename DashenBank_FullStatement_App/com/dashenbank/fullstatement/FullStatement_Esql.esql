@@ -42,17 +42,7 @@ CREATE COMPUTE MODULE RequestToBackend
 	    SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
         SET Environment.encodeRef = InputRoot.Properties.Encoding;
 	    SET Environment.domainDataRef = InputRoot.SOAP.Body;
-	    SET Environment.domainName = FIELDNAME(InputBody); 
-	    
---	   DECLARE seq_Id INTEGER;
---	   DECLARE transactionStatus1 CHARACTER 'Request Received from END USER';
---	   DECLARE createdOn1 TIMESTAMP CURRENT_TIMESTAMP;
---	   DECLARE serviceName CHARACTER 'FullStatement';
---	   DECLARE operationName CHARACTER 'FullStatement';
---	   SET Environment.SEQ[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
---       SET seq_Id = CAST(Environment.SEQ[1].NEXTVAL AS INTEGER);
---	   PASSTHRU 'INSERT INTO TRANSACTION_LOG VALUES(?,?,?,?,?,?,?)' TO Database.{DSN_NAME} VALUES(seq_Id,msg_Id,serviceName,operationName,transactionStatus1,createdOn1,'ACE USER');
---	   COMMIT;
+	    SET Environment.domainName = FIELDNAME(InputBody);
 
       DECLARE ccidRef INTEGER Environment.ccidRef;
       DECLARE encodeRef INTEGER Environment.encodeRef;
@@ -67,11 +57,7 @@ CREATE COMPUTE MODULE RequestToBackend
 	   CALL writeToLogFile(MessageFlowLabel,'fullstatementLogger','DEBUG','CHANNEL_REQ data is: '||payload) INTO rc;
 	   
 	   SET OutputRoot.SOAP = InputRoot.SOAP;
-       
---       DECLARE transactionStatus2 CHARACTER 'Request Sent to Backend flow';
---	   DECLARE createdBy2 TIMESTAMP CURRENT_TIMESTAMP;
---	   PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(transactionStatus2,createdBy2,msg_Id);
-	   
+   
 	   DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
 	   DECLARE domainName1 CHARACTER 'SOAP';
 	   DECLARE payload1 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);

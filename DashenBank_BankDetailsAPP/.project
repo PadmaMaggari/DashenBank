@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>DashenBank_BankDetailsAPP</name>
+	<name>DashenBank_BankAccountDetails_APP</name>
 	<comment></comment>
 	<projects>
 		<project>Dashen_commonESQL</project>

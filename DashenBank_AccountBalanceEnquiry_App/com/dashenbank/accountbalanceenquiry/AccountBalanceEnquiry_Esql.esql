@@ -1,9 +1,8 @@
 
-
-
 BROKER SCHEMA com.dashenbank.accountbalanceenquiry
 
 PATH com.dashenbank.genericfunctions;
+
 DECLARE ns NAMESPACE 'http://www.example.org/AccBalEnq/';
 DECLARE ns1 NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
 DECLARE ns68 NAMESPACE 'http://www.example.org/AccountBalEnq/';
@@ -23,14 +22,14 @@ CREATE COMPUTE MODULE RequestToFlexCube
 	BEGIN
 		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
 		IF (rc = TRUE) THEN
-			CALL CopyEntireMessage();
+			CALL request_from_channnel();
 		ELSE
 			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR;
 		END IF;
 		RETURN TRUE;
 	END;
 
-	CREATE PROCEDURE CopyEntireMessage() BEGIN
+	CREATE PROCEDURE request_from_channnel() BEGIN
 		DECLARE reqIdentifier CHARACTER InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.ID = reqIdentifier;
 
@@ -96,10 +95,10 @@ END MODULE;
 CREATE COMPUTE MODULE ResponseToChannel
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		CALL CopyEntireMessage();
+		CALL response_from_flexcube();
 		RETURN TRUE;
 	END;
-	CREATE PROCEDURE CopyEntireMessage() BEGIN
+	CREATE PROCEDURE response_from_flexcube() BEGIN
 		-- DECLARE reqIdentifier CHARACTER;
 		-- SET reqIdentifier = CAST(InputRoot.SOAP.Body.ns68:QUERYACCBAL_IOFS_RES.FCUBS_HEADER.MSGID AS CHARACTER);
 		SET Environment.variables.ccidRef1 = InputRoot.Properties.CodedCharSetId;
@@ -183,7 +182,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
 		DECLARE outRefPayload CHARACTER getPayLoad(domainName,OutputRoot.SOAP,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(Environment.ID,outRefPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
+		CALL PayloadLogging(Environment.ID,outRefPayload,'CHANNEL_RESP',ApplicationLabel,OutRef1);
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader= InputRoot.HTTPResponseHeader;
 		SET OutputRoot.SOAP = Environment.outSOAP;
