@@ -1,4 +1,6 @@
 
+
+
 BROKER SCHEMA com.dashenbank.BankAccountDetails
 
 PATH com.dashenbank.genericfunctions;
@@ -25,28 +27,25 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToFlexcube
 	END;
 
 	CREATE PROCEDURE request_from_channnel() BEGIN
-		DECLARE reqIdentifier CHARACTER InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:MSGID;
-		SET Environment.ID = reqIdentifier;
+		DECLARE MSGID CHARACTER InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:MSGID;
+		SET Environment.ID = MSGID;
 
-		SET Environment.variables.ccidRef = InputRoot.Properties.CodedCharSetId;
-		SET Environment.variables.encodeRef = InputRoot.Properties.Encoding;
-		SET Environment.variables.domainDataRef = InputRoot.SOAP;
-		SET Environment.variables.domainName = FIELDNAME(InputBody);
-		-- DECLARE InRef REFERENCE TO InputRoot.SOAP[>];
+		SET Environment.domainDataRef = InputRoot.SOAP;
+		SET Environment.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 
-		DECLARE ccidRef INTEGER Environment.variables.ccidRef;
-		DECLARE encodeRef INTEGER Environment.variables.encodeRef;
+		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
+		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
-		DECLARE domainName CHARACTER Environment.variables.domainName;
-
-		DECLARE inRefPayload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-
+		DECLARE domainName CHARACTER FIELDNAME(InputBody);
+		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		-- SET Environment.REQUEST_PAYLOAD = Environment.reqPayload;
+		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(reqIdentifier,inRefPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
+		CALL PayloadLogging(MSGID,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||inRefPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
 		------ FIELD_TO_FIELD_MAPPING_--------
 
@@ -70,19 +69,19 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToFlexcube
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_BODY.*:"Cust-Account-IO".*:BRN = inputBodyRef.*:BRN;
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_BODY.*:"Cust-Account-IO".*:ACC = inputBodyRef.*:ACC;
 
-		SET Environment.outSOAP = OutputRoot.SOAP;
-
+		SET Environment.outputData = OutputRoot.SOAP;
+		----------------------Response Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-		DECLARE outRefPayload CHARACTER getPayLoad(domainName,OutputRoot.SOAP,encodeRef,ccidRef);
+		DECLARE outRefData REFERENCE TO OutputRoot.XMLNSC;
+		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(reqIdentifier,outRefPayload,'FLEXCUBE_REQ',ApplicationLabel,OutRef1);
+		CALL PayloadLogging(MSGID,Environment.resPayload,'FLEXCUBE_REQ',ApplicationLabel,outRefData);
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPInputHeader = InputRoot.HTTPInputHeader;
-		SET OutputRoot.SOAP = Environment.outSOAP;
+		SET OutputRoot.SOAP = Environment.outputData;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||outRefPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||Environment.resPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
 
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
@@ -98,24 +97,19 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 	END;
 	CREATE PROCEDURE response_from_flexcube() BEGIN
 
-		SET Environment.variables.ccidRef1 = InputRoot.Properties.CodedCharSetId;
-		SET Environment.variables.encodeRef1 = InputRoot.Properties.Encoding;
-		SET Environment.variables.domainDataRef1 = InputRoot.SOAP;
-		SET Environment.variables.domainName1 = FIELDNAME(InputBody);
-
-		DECLARE ccidRef INTEGER Environment.variables.ccidRef1;
-		DECLARE encodeRef INTEGER Environment.variables.encodeRef1;
+		SET Environment.domainDataRef = InputRoot.SOAP;
+		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
+		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
-		DECLARE domainName CHARACTER Environment.variables.domainName1;
-		DECLARE inRefPayload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-
-
+		DECLARE domainName CHARACTER FIELDNAME(InputBody);
+		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(Environment.ID,inRefPayload,'FLEXCUBE_RESP',ApplicationLabel,OutRef);
-
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- FLEXCUBE_RESP -------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RESP data  is: '||inRefPayload) INTO rc;
+		CALL PayloadLogging(Environment.ID,Environment.reqPayload,'FLEXCUBE_RESP',ApplicationLabel,OutRef);
+		
+    	CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- FLEXCUBE_RESP -------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RESP data  is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		---------- FIELD_TO_FIELD_MAPPING ----------
 
@@ -343,7 +337,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET I = I + 1;
 			-- MOVE Inrefsoapbody NEXTSIBLING;
 		END WHILE;
-		
+
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full".*:"Acc-Svcacsig".*:ACBRN1 = inputBodyRef.*:"Cust-Account-Full".*:"Acc-Svcacsig".*:ACBRN1;
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full".*:"Acc-Svcacsig".*:ACTNO = inputBodyRef.*:"Cust-Account-Full".*:"Acc-Svcacsig".*:ACTNO;
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full".*:"Acc-Svcacsig".*:ACDESC = inputBodyRef.*:"Cust-Account-Full".*:"Acc-Svcacsig".*:ACDESC;
@@ -375,19 +369,19 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC;
 
 
-		SET Environment.outSOAP = OutputRoot.SOAP;
+		SET Environment.outputData = OutputRoot.SOAP;
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		DECLARE OutRef1 REFERENCE TO OutputRoot.XMLNSC;
-		DECLARE outRefPayload CHARACTER getPayLoad(domainName,OutputRoot.SOAP,encodeRef,ccidRef);
+		DECLARE outputRef REFERENCE TO OutputRoot.XMLNSC;
+		SET Environment.resPayload = getPayLoad(domainName,OutputRoot.SOAP,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(Environment.ID,outRefPayload,'CHANNEL_RESP',ApplicationLabel,OutRef1);
+		CALL PayloadLogging(Environment.ID,Environment.resPayload,'CHANNEL_RESP',ApplicationLabel,outputRef);
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader= InputRoot.HTTPResponseHeader;
-		SET OutputRoot.SOAP = Environment.outSOAP;
+		SET OutputRoot.SOAP = Environment.outputData;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||outRefPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||Environment.resPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'**********************************************************************') INTO rc;
 
 	END;
