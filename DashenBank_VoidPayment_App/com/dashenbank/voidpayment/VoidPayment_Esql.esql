@@ -30,19 +30,19 @@ CREATE COMPUTE MODULE RequestToFlexCube
 
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
-		DECLARE id CHARACTER InputRoot.SOAP.Body.*:VoidPayment.providerID;
+		DECLARE id CHARACTER InputRoot.SOAP.Body.*:VoidPayment.*:providerID;
 		SET Environment.id = id;
 
-		
+		SET Environment.Variables.Encoding = InputRoot.Properties.Encoding;
+		SET Environment.Variables.CodedCharSetId = InputRoot.Properties.CodedCharSetId;
 		SET Environment.domainDataRef = InputRoot.SOAP;
-		SET Environment.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
+		SET Environment.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		-- SET Environment.REQUEST_PAYLOAD = Environment.reqPayload;
 
 		----------------------------------------------------
 		----------------------Request Logging-------------------------
@@ -55,17 +55,17 @@ CREATE COMPUTE MODULE RequestToFlexCube
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
 		----------------------------------------------------
 		-------------Business Logic-------------------------
-		DECLARE InputRef REFERENCE TO InputRoot.SOAP.Body.*:VoidPayment;
+		DECLARE InputRef REFERENCE TO InputRoot.SOAP.*:Body.*:VoidPayment;
 		
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outDataRef REFERENCE TO OutputRoot.SOAP;
 
-		SET outDataRef.Body.*:VoidPayment.providerID = InputRef.providerID;
-		SET outDataRef.Body.*:VoidPayment.appcode = InputRef.appcode;
-		SET outDataRef.Body.*:VoidPayment.apppassphrase = InputRef.apppassphrase;
-		SET outDataRef.Body.*:VoidPayment.token = InputRef.token;
-		SET outDataRef.Body.*:VoidPayment.licenseNumber = InputRef.licenseNumber;
-		SET outDataRef.Body.*:VoidPayment.ReceiptNo = InputRef.ReceiptNo;
+		SET outDataRef.*:Body.*:VoidPayment.*:providerID = InputRef.*:providerID;
+		SET outDataRef.*:Body.*:VoidPayment.*:appcode = InputRef.*:appcode;
+		SET outDataRef.*:Body.*:VoidPayment.*:apppassphrase = InputRef.*:apppassphrase;
+		SET outDataRef.*:Body.*:VoidPayment.*:token = InputRef.*:token;
+		SET outDataRef.*:Body.*:VoidPayment.*:licenseNumber = InputRef.*:licenseNumber;
+		SET outDataRef.*:Body.*:VoidPayment.*:ReceiptNo = InputRef.*:ReceiptNo;
 		SET Environment.outputData = OutputRoot.SOAP;
 
 
@@ -125,14 +125,14 @@ CREATE COMPUTE MODULE ResponseToChannel
 
 		----------------------------------------------------
 		-------------Business Logic-------------------------
-		DECLARE InputRef REFERENCE TO InputRoot.SOAP.Body.*:VoidPaymentResponse.VoidPaymentResult.VoidPaymentResponse;
+		DECLARE InputRef REFERENCE TO InputRoot.SOAP.*:Body.*:VoidPaymentResponse.*:VoidPaymentResult.*:VoidPaymentResponse;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outDataRef REFERENCE TO OutputRoot.SOAP;
-		SET outDataRef.Body.*:VoidPaymentResponse.VoidPaymentResult.VoidPaymentResponse.Remarks = InputRef.Remarks;
-		SET outDataRef.Body.*:VoidPaymentResponse.VoidPaymentResult.VoidPaymentResponse.Successful = InputRef.Successful;
-		SET outDataRef.Body.*:VoidPaymentResponse.VoidPaymentResult.VoidPaymentResponse.UtilAPIVoidPaymentResponse.ErrorCode = InputRef.UtilAPIVoidPaymentResponse.ErrorCode;
-		SET outDataRef.Body.*:VoidPaymentResponse.VoidPaymentResult.VoidPaymentResponse.UtilAPIVoidPaymentResponse.ErrorMessage = InputRef.UtilAPIVoidPaymentResponse.ErrorMessage;
-		SET outDataRef.Body.*:VoidPaymentResponse.VoidPaymentResult.VoidPaymentResponse.UtilAPIVoidPaymentResponse.IsSaved = InputRef.UtilAPIVoidPaymentResponse.IsSaved;
+		SET outDataRef.*:Body.*:VoidPaymentResponse.*:VoidPaymentResult.*:VoidPaymentResponse.*:Remarks = InputRef.*:Remarks;
+		SET outDataRef.*:Body.*:VoidPaymentResponse.*:VoidPaymentResult.*:VoidPaymentResponse.*:Successful = InputRef.*:Successful;
+		SET outDataRef.*:Body.*:VoidPaymentResponse.*:VoidPaymentResult.*:VoidPaymentResponse.*:UtilAPIVoidPaymentResponse.*:ErrorCode = InputRef.*:UtilAPIVoidPaymentResponse.*:ErrorCode;
+		SET outDataRef.*:Body.*:VoidPaymentResponse.*:VoidPaymentResult.*:VoidPaymentResponse.*:UtilAPIVoidPaymentResponse.*:ErrorMessage = InputRef.*:UtilAPIVoidPaymentResponse.*:ErrorMessage;
+		SET outDataRef.*:Body.*:VoidPaymentResponse.*:VoidPaymentResult.*:VoidPaymentResponse.*:UtilAPIVoidPaymentResponse.*:IsSaved = InputRef.*:UtilAPIVoidPaymentResponse.*:IsSaved;
         SET Environment.outputData = OutputRoot.SOAP;
          
         ----------------------------------------------------
@@ -169,31 +169,38 @@ CREATE COMPUTE MODULE VoidPayment_BuildExceptionResponse
 
 	CREATE PROCEDURE BuildExceptionResponse() BEGIN
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
-		DECLARE inRef REFERENCE TO InputRoot.SOAP;
+		--DECLARE inRef REFERENCE TO InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment;
 		DECLARE outRefer,outRef REFERENCE TO OutputRoot;
-		DECLARE encodeID INTEGER InputRoot.Properties.Encoding;
-		DECLARE ccsID INTEGER InputRoot.Properties.CodedCharSetId;
+		--DECLARE encodeID INTEGER InputRoot.Properties.Encoding;
+		--DECLARE ccsID INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		DECLARE domainDataRef REFERENCE TO InputBody;
-		--DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
-		--DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,encodeID,ccsID);
-		--CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
-		---CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
-		--CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
-		--CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME 'BatchUpload';
-		--CALL BuildExceptionDetails(excpRef,envRef,'BatchUpload');
-		--SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
-		--MOVE domainDataRef TO Environment.XMLNSC;
-		--SET domainName = FIELDNAME(domainDataRef);
-		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,encodeID,ccsID);
+		DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
+		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,Environment.Variables.Encoding,Environment.Variables.CodedCharSetId);
+		CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
+		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
+	    CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
+		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME ApplicationLabel;
+		CALL BuildExceptionDetails(excpRef,envRef,ApplicationLabel);
+		SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
+		MOVE domainDataRef TO Environment.XMLNSC;
+		SET domainName = FIELDNAME(domainDataRef);
+		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,Environment.Variables.Encoding,Environment.Variables.CodedCharSetId);
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'Application Built Exception:'||resPayload) INTO rc;
 		------------Error Logging in DB----------
 		--CALL ConstructErrorDBLog(CURRENT_TIMESTAMP,CREATED_BY,envRef.ErrorType,MessageFlowLabel,ApplicationLabel,ExecutionGroupLabel,
 		---excpPayload,Environment.REQUEST_PAYLOAD,excpRef.excpNumber,envRef.ErrorCode,outRef);
 		-------------------------------------------
-		SET OutputRoot.XMLNSC = InputRoot.XMLNSC;
-		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
+		SET OutputRoot.XMLNSC.ExceptionDetails.Msg_Id = Environment.id;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionType = InputRoot.XMLNSC.ExceptionDetails.excpType;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionNumber = InputRoot.XMLNSC.ExceptionDetails.excpNumber;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionLable = InputRoot.XMLNSC.ExceptionDetails.excpLable;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionDescription = InputRoot.XMLNSC.ExceptionDetails.excpText;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = InputRoot.XMLNSC.ExceptionDetails.actualExcpText;
+		
+		
+		--SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
 		
 	END;
