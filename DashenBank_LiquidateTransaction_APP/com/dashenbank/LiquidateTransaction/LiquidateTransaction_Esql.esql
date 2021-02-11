@@ -193,8 +193,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.WARNING.WCODE = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE ;
 		SET OutputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.WARNING.WDESC = InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.WARNING.*:WDESC;
 		SET Environment.outputData = OutputRoot.SOAP;
-
-	        
+		    
         ----------------------------------------------------
 		----------------------Response Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';

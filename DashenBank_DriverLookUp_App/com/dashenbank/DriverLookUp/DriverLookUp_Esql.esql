@@ -205,11 +205,5 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		--SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;	
 	
-	
-	
-	
-	
-
-
 	END;
 END MODULE;
