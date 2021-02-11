@@ -1,8 +1,6 @@
 BROKER SCHEMA com.dashenbank.RegistrationforDriverAPI
 
 PATH  com.dashenbank.genericfunctions;
-
-
 --DECLARE bloc NAMESPACE 'http://www.example.org/BlockingAmount/';
 DECLARE rc BOOLEAN;
 DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER;
@@ -23,6 +21,7 @@ CREATE COMPUTE MODULE RequestToBackend
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
 		DECLARE id CHARACTER InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.id = id;
+		
 		SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
 		SET Environment.encodeRef = InputRoot.Properties.Encoding;
 		SET Environment.domainDataRef = InputRoot.SOAP.Body;
@@ -35,18 +34,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE outRef REFERENCE TO OutputRoot.XMLNSC;
 		SET OutputRoot.SOAP = InputRoot.SOAP;
-		
-	--	DECLARE id1,SEQ_ID INTEGER;
-	--	DECLARE TRANSACTION_STATUS1 CHARACTER 'Request Received from END USER';
-		--DECLARE createdOn TIMESTAMP CURRENT_TIMESTAMP;
-		--DECLARE createdBy CHARACTER 'ACE USER';
-	--	DECLARE SERVICE_NAME CHARACTER InputRoot.SOAP.Body.RegistrationforDriverAPI_IOPK_REQ.FCUBS_HEADER.SERVICE;
-	--	DECLARE OPERATION_NAME CHARACTER InputRoot.SOAP.Body.RegistrationforDriverAPI_IOPK_REQ.FCUBS_HEADER.OPERATION;
-	--	SET Environment.ID[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
-	--	SET SEQ_ID = CAST(Environment.ID[1].NEXTVAL AS INTEGER);
-	--	PASSTHRU 'INSERT INTO TRANSACTION_LOG (SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(?,?,?,?,?,?,?)' TO Database.{DSN_NAME} VALUES(SEQ_ID,id,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS1,CURRENT_TIMESTAMP,'ACE-USER');
-	--	COMMIT;
-	
+
 		CALL PayloadLogging(id,payLoad,'CHANNEL_REQ',MessageFlowLabel,outRef);
 		CALL writeToLogFile(MessageFlowLabel,'RegistrationforDriverAPI_Log','INFO','..........Request Received from END USER...........') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,'RegistrationforDriverAPI_Log','INFO','CHANNEL_REQ data is: '||payLoad) INTO rc;
@@ -129,15 +117,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		DECLARE domainDataRef REFERENCE TO InputBody;
 		--DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
-		--DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,encodeID,ccsID);
-		--CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
-		---CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
-		--CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
-		--CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME 'FundsTransfer';
-		--CALL BuildExceptionDetails(excpRef,envRef,'FundsTransfer');
-		--SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
-		--MOVE domainDataRef TO Environment.XMLNSC;
-		--SET domainName = FIELDNAME(domainDataRef);
+	
 		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,encodeID,ccsID);
 		CALL writeToLogFile(MessageFlowLabel,'RegistrationforDriverAPI_Log','INFO','Application Built Exception:'||resPayload) INTO rc;
 		------------Error Logging in DB----------
