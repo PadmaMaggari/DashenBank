@@ -2,9 +2,7 @@
 
 BROKER SCHEMA com.dashenbank.accountsummary
 PATH com.dashenbank.genericfunctions;
--- DECLARE ns NAMESPACE 'http://www.example.org/AccountSummary/';
--- DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
--- DECLARE esb NAMESPACE 'http://www.dashenbank.org/ESB_AccountSummaryService/';
+
 DECLARE LOG4J_CONFIG_PATH EXTERNAL CHARACTER '';
 DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER '';
 DECLARE LOGGER_NAME EXTERNAL CHARACTER '';
@@ -36,15 +34,16 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
+		SET Environment.Variables.Encoding = ccidRef;
+		SET Environment.Variables.CodedCharSetId = encodeRef;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		
-		SET Environment.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
+		SET Environment.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		-- SET Environment.REQUEST_PAYLOAD = Environment.reqPayload;
 
 		SET MSG_ID = inRef.*:FCUBS_HEADER.*:MSGID;
-		SET Environment.MSG_ID = MSG_ID;
+		SET Environment.id = MSG_ID;
 
         ----------------------------------------------------
 		----------------------Request Logging-------------------------
@@ -123,7 +122,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(Environment.MSG_ID,Environment.reqPayload,'FLEXCUBE_RES',MessageFlowLabel,OutRef);
+		CALL PayloadLogging(Environment.id,Environment.reqPayload,'FLEXCUBE_RES',MessageFlowLabel,OutRef);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_RES ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.reqPayload) INTO rc;
 		----------------------------------------------------
@@ -133,6 +132,9 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		DECLARE inputBodyRef REFERENCE TO inRef.*:FCUBS_BODY;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputRef REFERENCE TO OutputRoot.SOAP;
+		
+		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
+        SET OutputRoot.SOAP.Header = InputRoot.SOAP.Header;
 		
 		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:ACTION = inputHeaderRef.*:ACTION;
 		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
@@ -176,7 +178,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		MOVE OutRef TO OutputRoot.XMLNSC;
 		SET OutputRoot.SOAP = NULL;
 
-		CALL PayloadLogging(Environment.MSG_ID,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
+		CALL PayloadLogging(Environment.id,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
@@ -188,6 +190,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 
 	END;
 END MODULE;
+
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -196,37 +199,46 @@ END MODULE;
 CREATE COMPUTE MODULE BuildExceptionResponse
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		CALL Build_BusinessErrorResponse();
+		CALL BuildExceptionResponse();
 		RETURN TRUE;
 	END;
 
-	CREATE PROCEDURE Build_BusinessErrorResponse() BEGIN
+
+	CREATE PROCEDURE BuildExceptionResponse() BEGIN
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
-		DECLARE inRef REFERENCE TO InputRoot.XMLNSC;
+		--DECLARE inRef REFERENCE TO InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment;
 		DECLARE outRefer,outRef REFERENCE TO OutputRoot;
-		DECLARE encodeID INTEGER InputRoot.Properties.Encoding;
-		DECLARE ccsID INTEGER InputRoot.Properties.CodedCharSetId;
+		--DECLARE encodeID INTEGER InputRoot.Properties.Encoding;
+		--DECLARE ccsID INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		DECLARE domainDataRef REFERENCE TO InputBody;
-		--DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
-		--DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,encodeID,ccsID);
-		--CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
-		---CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
-		--CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
-		--CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME 'BatchUpload';
-		--CALL BuildExceptionDetails(excpRef,envRef,'BatchUpload');
-		--SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
-		--MOVE domainDataRef TO Environment.XMLNSC;
-		--SET domainName = FIELDNAME(domainDataRef);
-		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,encodeID,ccsID);
+		DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
+		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,Environment.Variables.Encoding,Environment.Variables.CodedCharSetId);
+		CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
+		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
+	    CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
+		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME ApplicationLabel;
+		CALL BuildExceptionDetails(excpRef,envRef,ApplicationLabel);
+		SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
+		MOVE domainDataRef TO Environment.XMLNSC;
+		SET domainName = FIELDNAME(domainDataRef);
+		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,Environment.Variables.Encoding,Environment.Variables.CodedCharSetId);
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'Application Built Exception:'||resPayload) INTO rc;
 		------------Error Logging in DB----------
 		--CALL ConstructErrorDBLog(CURRENT_TIMESTAMP,CREATED_BY,envRef.ErrorType,MessageFlowLabel,ApplicationLabel,ExecutionGroupLabel,
 		---excpPayload,Environment.REQUEST_PAYLOAD,excpRef.excpNumber,envRef.ErrorCode,outRef);
 		-------------------------------------------
-		SET OutputRoot.XMLNSC = InputRoot.XMLNSC;
-		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
+		SET OutputRoot.XMLNSC.ExceptionDetails.Msg_Id = Environment.id;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionType = InputRoot.XMLNSC.ExceptionDetails.excpType;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionNumber = InputRoot.XMLNSC.ExceptionDetails.excpNumber;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionLable = InputRoot.XMLNSC.ExceptionDetails.excpLable;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionDescription = InputRoot.XMLNSC.ExceptionDetails.excpText;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = InputRoot.XMLNSC.ExceptionDetails.actualExcpText;
+		
+		
+		--SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
+		
 	END;
 END MODULE;
