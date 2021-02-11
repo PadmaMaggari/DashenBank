@@ -327,7 +327,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full".*:"Custacc-Stccusbl".*:BRN = inputBodyRef.*:"Cust-Account-Full".*:"Custacc-Stccusbl".*:BRN;
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full".*:"Custacc-Stccusbl".*:ACCNO = inputBodyRef.*:"Cust-Account-Full".*:"Custacc-Stccusbl".*:ACCNO;
-
+      
 		DECLARE Inrefsoapbody REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full".*:UDFDETAILS[>];
 		DECLARE J INTEGER CARDINALITY(inputBodyRef.*:"Cust-Account-Full".*:UDFDETAILS[]);
 		DECLARE I INTEGER 1;
@@ -373,12 +373,13 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
+		
 		CALL PayloadLogging(Environment.id,Environment.resPayload,'CHANNEL_RES',MessageFlowLabel,outputRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 		SET OutputRoot.SOAP = Environment.outputData;
-
+        
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||Environment.resPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'**********************************************************************') INTO rc;
