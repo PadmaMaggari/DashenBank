@@ -26,8 +26,8 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToFlexcube
 	END;
 
 	CREATE PROCEDURE request_from_channnel() BEGIN
-		DECLARE MSGID CHARACTER InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:MSGID;
-		SET Environment.id = MSGID;
+		DECLARE msgId CHARACTER InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:MSGID;
+		SET Environment.id = msgId;
 
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		SET Environment.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
@@ -41,7 +41,7 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToFlexcube
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(MSGID,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
+		CALL PayloadLogging(msgId,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
@@ -74,7 +74,7 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToFlexcube
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(MSGID,Environment.resPayload,'FLEXCUBE_REQ',MessageFlowLabel,outRefData);
+		CALL PayloadLogging(msgId,Environment.resPayload,'FLEXCUBE_REQ',MessageFlowLabel,outRefData);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.SOAP = Environment.outputData;
