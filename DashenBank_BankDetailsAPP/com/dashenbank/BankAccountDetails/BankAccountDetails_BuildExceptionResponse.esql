@@ -1,5 +1,4 @@
 
-
 BROKER SCHEMA com.dashenbank.BankAccountDetails
 
 PATH com.dashenbank.genericfunctions;
@@ -329,13 +328,13 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full".*:"Custacc-Stccusbl".*:BRN = inputBodyRef.*:"Cust-Account-Full".*:"Custacc-Stccusbl".*:BRN;
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full".*:"Custacc-Stccusbl".*:ACCNO = inputBodyRef.*:"Cust-Account-Full".*:"Custacc-Stccusbl".*:ACCNO;
 
-		DECLARE Inrefsoapbody REFERENCE TO inputBodyRef.*:"Cust-Account-Full".*:UDFDETAILS[>];
+		DECLARE Inrefsoapbody REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full".*:UDFDETAILS[>];
 		DECLARE J INTEGER CARDINALITY(inputBodyRef.*:"Cust-Account-Full".*:UDFDETAILS[]);
 		DECLARE I INTEGER 1;
 		WHILE I<=J DO
 			SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full".*:UDFDETAILS[I].*:FLDNAM = Inrefsoapbody.*:FLDNAM;
 			SET I = I + 1;
-			-- MOVE Inrefsoapbody NEXTSIBLING;
+			MOVE Inrefsoapbody NEXTSIBLING;
 		END WHILE;
 
 		SET outputbodyRef.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full".*:"Acc-Svcacsig".*:ACBRN1 = inputBodyRef.*:"Cust-Account-Full".*:"Acc-Svcacsig".*:ACBRN1;
@@ -410,7 +409,7 @@ CREATE COMPUTE MODULE BankAccountDetails_BuildExceptionResponse
 		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,Environment.Variables.Encoding,Environment.Variables.CodedCharSetId);
 		CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
 		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
-	    CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
+		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
 		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME ApplicationLabel;
 		CALL BuildExceptionDetails(excpRef,envRef,ApplicationLabel);
 		SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
@@ -427,11 +426,9 @@ CREATE COMPUTE MODULE BankAccountDetails_BuildExceptionResponse
 		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionNumber = InputRoot.XMLNSC.ExceptionDetails.excpNumber;
 		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionLable = InputRoot.XMLNSC.ExceptionDetails.excpLable;
 		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionDescription = InputRoot.XMLNSC.ExceptionDetails.excpText;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = InputRoot.XMLNSC.ExceptionDetails.actualExcpText;
-		
-		
+		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = InputRoot.XMLNSC.ExceptionDetails.actualExcpText;		
 		--SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
-		
+
 	END;
 END MODULE;
