@@ -135,9 +135,9 @@ CREATE COMPUTE MODULE ResponseToChannel
 			SET I = I + 1;
 		END WHILE;
 
-		SET OutputRoot.SOAP.Body.*:DriverLookupResponse.*:DriverLookupResult.*:DriverLookupResponse.Successful = InputRoot.SOAP.Body.*:DriverLookupResponse.*:DriverLookupResult.*:DriverLookupResponse.Successful;
-		SET OutputRoot.SOAP.Body.*:DriverLookupResponse.*:DriverLookupResult.*:DriverLookupResponse.Remarks = InputRoot.SOAP.Body.*:DriverLookupResponse.*:DriverLookupResult.*:DriverLookupResponse.Remarks;
-		SET OutputRoot.SOAP.Body.*:DriverLookupResponse.*:DriverLookupResult.*:DriverLookupResponse.Token = InputRoot.SOAP.Body.*:DriverLookupResponse.*:DriverLookupResult.*:DriverLookupResponse.Token;
+		SET OutputRoot.SOAP.Body.*:DriverLookupResponse.*:DriverLookupResult.*:DriverLookupResponse.Successful = InputRoot.SOAP.Body.*:DriverLookupResponse.*:DriverLookupResult.*:DriverLookupResponse.*:Successful;
+		SET OutputRoot.SOAP.Body.*:DriverLookupResponse.*:DriverLookupResult.*:DriverLookupResponse.Remarks = InputRoot.SOAP.Body.*:DriverLookupResponse.*:DriverLookupResult.*:DriverLookupResponse.*:Remarks;
+		SET OutputRoot.SOAP.Body.*:DriverLookupResponse.*:DriverLookupResult.*:DriverLookupResponse.Token = InputRoot.SOAP.Body.*:DriverLookupResponse.*:DriverLookupResult.*:DriverLookupResponse.*:Token;
 		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------------------------------------
 		----------------------Response Logging-------------------------
