@@ -1,5 +1,7 @@
 
 
+
+
 BROKER SCHEMA com.dashenbank.accountsummary
 PATH com.dashenbank.genericfunctions;
 
@@ -7,10 +9,9 @@ DECLARE LOG4J_CONFIG_PATH EXTERNAL CHARACTER '';
 DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER '';
 DECLARE LOGGER_NAME EXTERNAL CHARACTER '';
 DECLARE LOG_TYPE EXTERNAL CHARACTER '';
- DECLARE ns1 NAMESPACE 'http://fcubs.ofss.com/service/FCUBSAccService';
- DECLARE ns2 NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
-
 DECLARE BACKEND_URL EXTERNAL CHARACTER '';
+DECLARE ns1 NAMESPACE 'http://fcubs.ofss.com/service/FCUBSAccService';
+DECLARE ns2 NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
 --------Global Variables----------
 DECLARE rc BOOLEAN TRUE;
 DECLARE MSG_ID CHARACTER '';
@@ -28,24 +29,23 @@ CREATE COMPUTE MODULE RequestToFlexcube
 	END;
 
 	CREATE PROCEDURE GenerateReqToFlexcube() BEGIN
-		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_REQ;
+		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_REQ;		
 
-		
+
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
-		SET Environment.Variables.Encoding = ccidRef;
-		SET Environment.Variables.CodedCharSetId = encodeRef;
+		SET Environment.Variables.Encoding = encodeRef;
+		SET Environment.Variables.CodedCharSetId = ccidRef;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
-		
+
 		SET Environment.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 
 		SET MSG_ID = inRef.*:FCUBS_HEADER.*:MSGID;
 		SET Environment.id = MSG_ID;
-
-        ----------------------------------------------------
+		----------------------------------------------------
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
@@ -97,6 +97,7 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
 	END;
 END MODULE;
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -117,7 +118,6 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-
 		----------------------------------------------------
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -132,41 +132,52 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		DECLARE inputBodyRef REFERENCE TO inRef.*:FCUBS_BODY;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputRef REFERENCE TO OutputRoot.SOAP;
-		
-		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
-        SET OutputRoot.SOAP.Header = InputRoot.SOAP.Header;
-		
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:ACTION = inputHeaderRef.*:ACTION;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:DESTINATION = inputHeaderRef.*:DESTINATION;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:ENTITY = inputHeaderRef.*:ENTITY;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:MODULEID = inputHeaderRef.*:MODULEID;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:MSGID = inputHeaderRef.*:MSGID;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:MULTITRIPID = inputHeaderRef.*:MULTITRIPID;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
 
-	--	SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY."ACC-Balance".ACC_BAL = inputBodyRef."ACC-Balance".ACC_BAL;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTACNO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTACNO;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:BRANCH_CODE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:BRANCH_CODE;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CCY = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CCY;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CURRBAL = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CURRBAL;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_TYPE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_TYPE;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTOMER_NAME = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTOMER_NAME;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:AC_DESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:AC_DESC;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_CLASS = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_CLASS;
-		SET outputRef.*:Body.ns1:QUERYACCSUMM_IOFS_RES.ns1:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCLASSDESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCLASSDESC;
-	--	SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY."Stvw-Account-Sumary-IO".CUST_NO = inputBodyRef."Stvw-Account-Sumary-IO".CUST_NO;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:ACTION = inputHeaderRef.*:ACTION;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:DESTINATION = inputHeaderRef.*:DESTINATION;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:ENTITY = inputHeaderRef.*:ENTITY;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:MODULEID = inputHeaderRef.*:MODULEID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:MSGID = inputHeaderRef.*:MSGID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:MULTITRIPID = inputHeaderRef.*:MULTITRIPID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
+		-- SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY."ACC-Balance".ACC_BAL = inputBodyRef."ACC-Balance".ACC_BAL;
+		
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTACNO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTACNO;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:BRANCH_CODE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:BRANCH_CODE;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CCY = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CCY;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CURRBAL = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CURRBAL;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_TYPE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_TYPE;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTOMER_NAME = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTOMER_NAME;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:AC_DESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:AC_DESC;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_CLASS = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_CLASS;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCLASSDESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCLASSDESC;
+		
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTACNO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTACNO;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:BRANCH_CODE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:BRANCH_CODE;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CCY = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CCY;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CURRBAL = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CURRBAL;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_TYPE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_TYPE;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTOMER_NAME = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTOMER_NAME;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:AC_DESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:AC_DESC;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_CLASS = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_CLASS;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCLASSDESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCLASSDESC;
+		
+		-- SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY."Stvw-Account-Sumary-IO".CUST_NO = inputBodyRef."Stvw-Account-Sumary-IO".CUST_NO;
 
 		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------------------------------------
@@ -186,7 +197,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_RES ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.resPayload) INTO rc;
-		
+
 
 	END;
 END MODULE;
@@ -217,7 +228,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,Environment.Variables.Encoding,Environment.Variables.CodedCharSetId);
 		CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
 		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
-	    CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
+		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
 		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME ApplicationLabel;
 		CALL BuildExceptionDetails(excpRef,envRef,ApplicationLabel);
 		SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
@@ -234,11 +245,9 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionNumber = InputRoot.XMLNSC.ExceptionDetails.excpNumber;
 		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionLable = InputRoot.XMLNSC.ExceptionDetails.excpLable;
 		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionDescription = InputRoot.XMLNSC.ExceptionDetails.excpText;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = InputRoot.XMLNSC.ExceptionDetails.actualExcpText;
-		
-		
+		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = InputRoot.XMLNSC.ExceptionDetails.actualExcpText;		
 		--SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
-		
+
 	END;
 END MODULE;
