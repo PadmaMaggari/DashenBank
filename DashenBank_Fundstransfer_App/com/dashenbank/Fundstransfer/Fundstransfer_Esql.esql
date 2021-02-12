@@ -92,7 +92,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(msgId,Environment.resPayload,'FLEXCUBE_REQ',MessageFlowLabel,outRefData);
+		CALL PayloadLogging(msgId,Environment.resPayload,'FLEXCUBE_REQ',ApplicationLabel,outRefData);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.SOAP = Environment.outputData;
@@ -124,7 +124,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		---------------------- Request Logging -------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(Environment.id,Environment.reqPayload,'FLEXCUBE_RES',MessageFlowLabel,OutRef);
+		CALL PayloadLogging(Environment.id,Environment.reqPayload,'FLEXCUBE_RES',ApplicationLabel,OutRef);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- FLEXCUBE_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RESP data is: '||Environment.reqPayload) INTO rc;
@@ -225,7 +225,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(Environment.id,Environment.resPayload,'CHANNEL_RES',MessageFlowLabel,outputRef);
+		CALL PayloadLogging(Environment.id,Environment.resPayload,'CHANNEL_RES',ApplicationLabel,outputRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
