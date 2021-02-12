@@ -30,7 +30,7 @@ CREATE COMPUTE MODULE RequestToFlexCube
 
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
-		DECLARE id CHARACTER InputRoot.SOAP.Body.*:VoidPayment.*:providerID;
+		DECLARE id CHARACTER InputRoot.SOAP.*:Body.*:VoidPayment.*:providerID;
 		SET Environment.id = id;
 
 		SET Environment.Variables.Encoding = InputRoot.Properties.Encoding;
