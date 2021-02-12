@@ -9,29 +9,17 @@
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR_MSG" name="LOG4J_ERROR_MSG" lowerBound="1" defaultValueLiteral="Log4J Initialization Error">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOGGER_NAME" name="LOGGER_NAME" lowerBound="1" defaultValueLiteral="BatchUploadLogger">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="/Backend_Simulator">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_TYPE" name="LOG_TYPE" lowerBound="1" defaultValueLiteral="INFO">
-      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.FLEXCUBE_URL" name="FLEXCUBE_URL">
-      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.IP" name="IP" lowerBound="1" defaultValueLiteral="127.0.0.1">
-      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.PORT" name="PORT" lowerBound="1" defaultValueLiteral="7800">
-      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.baseURL" name="baseURL" defaultValueLiteral="/flexcube/service">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.DSN_NAME" name="DSN_NAME" defaultValueLiteral="DBDSN">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
     <translation xmi:type="utility:TranslatableString" key="BatchUpload_Flow" bundleName="com/dashenbank/batchupload/BatchUpload_Flow" pluginId="DashenBank_BatchUpload_App"/>
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_BatchUpload_App/icons/full/obj16/BatchUpload_Flow.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_BatchUpload_App/icons/full/obj30/BatchUpload_Flow.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="394,173" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/Flexcube/simulator/service" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="394,173" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/Backend_Simulator" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="FlexCubeCall"/>
       </nodes>
       <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="402,33" rotation="BOTTOM_TO_TOP" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
@@ -40,7 +28,7 @@
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="231,172" dataSource="DBDSN" transaction="commit" computeExpression="esql://routine/com.dashenbank.batchupload#RequestToFlexcube.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="RequestToFlexcube"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="75,176" wsdlOperationMode="gateway" wsdlFileName="ESB_BatchUploadService.wsdl" selectedPortType="ESB_BatchUploadService" selectedBinding="ESB_BatchUploadServiceSOAP" selectedPort="ESB_BatchUploadServiceSOAP" useHTTPTransport="true" urlSelector="/batchUpload" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="75,176" wsdlOperationMode="gateway" wsdlFileName="ESB_BatchUploadService.wsdl" selectedPortType="ESB_BatchUploadService" selectedBinding="ESB_BatchUploadServiceSOAP" selectedPort="ESB_BatchUploadServiceSOAP" useHTTPTransport="true" urlSelector="/ESB_BatchUpload" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Service_Request"/>
       </nodes>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="527,297" computeExpression="esql://routine/com.dashenbank.batchupload#BuildExceptionResponse.Main" computeMode="destinationAndMessage">
@@ -72,22 +60,10 @@
         <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_CONFIG_PATH" bundleName="com/dashenbank/batchupload/BatchUpload_Flow" pluginId="DashenBank_BatchUpload_App"/>
         <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_ERROR_MSG">
           <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR_MSG" bundleName="com/dashenbank/batchupload/BatchUpload_Flow" pluginId="DashenBank_BatchUpload_App"/>
-          <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOGGER_NAME">
-            <propertyName xmi:type="utility:TranslatableString" key="Property.LOGGER_NAME" bundleName="com/dashenbank/batchupload/BatchUpload_Flow" pluginId="DashenBank_BatchUpload_App"/>
-            <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG_TYPE">
-              <propertyName xmi:type="utility:TranslatableString" key="Property.LOG_TYPE" bundleName="com/dashenbank/batchupload/BatchUpload_Flow" pluginId="DashenBank_BatchUpload_App"/>
-              <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.FLEXCUBE_URL">
-                <propertyName xmi:type="utility:TranslatableString" key="Property.FLEXCUBE_URL" bundleName="com/dashenbank/batchupload/BatchUpload_Flow" pluginId="DashenBank_BatchUpload_App"/>
-                <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.IP">
-                  <propertyName xmi:type="utility:TranslatableString" key="Property.IP" bundleName="com/dashenbank/batchupload/BatchUpload_Flow" pluginId="DashenBank_BatchUpload_App"/>
-                  <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.PORT">
-                    <propertyName xmi:type="utility:TranslatableString" key="Property.PORT" bundleName="com/dashenbank/batchupload/BatchUpload_Flow" pluginId="DashenBank_BatchUpload_App"/>
-                    <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.baseURL">
-                      <propertyName xmi:type="utility:TranslatableString" key="Property.baseURL" bundleName="com/dashenbank/batchupload/BatchUpload_Flow" pluginId="DashenBank_BatchUpload_App"/>
-                    </propertyDescriptor>
-                  </propertyDescriptor>
-                </propertyDescriptor>
-              </propertyDescriptor>
+          <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.BACKEND_URL">
+            <propertyName xmi:type="utility:TranslatableString" key="Property.BACKEND_URL" bundleName="com/dashenbank/batchupload/BatchUpload_Flow" pluginId="DashenBank_BatchUpload_App"/>
+            <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.DSN_NAME">
+              <propertyName xmi:type="utility:TranslatableString" key="Property.DSN_NAME" bundleName="com/dashenbank/batchupload/BatchUpload_Flow" pluginId="DashenBank_BatchUpload_App"/>
             </propertyDescriptor>
           </propertyDescriptor>
         </propertyDescriptor>
