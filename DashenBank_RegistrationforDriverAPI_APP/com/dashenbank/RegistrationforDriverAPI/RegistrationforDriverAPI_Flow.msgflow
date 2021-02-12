@@ -3,44 +3,47 @@
     xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" nsURI="com/dashenbank/RegistrationforDriverAPI/RegistrationforDriverAPI_Flow.msgflow" nsPrefix="com_dashenbank_RegistrationforDriverAPI_RegistrationforDriverAPI_Flow.msgflow">
   <eClassifiers xmi:type="eflow:FCMComposite" name="FCMComposite_1">
     <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_CONFIG_PATH" name="LOG_CONFIG_PATH" defaultValueLiteral="C:\LOG4J\DashenLog4jConfigurationFile.xml">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_CONFIG_PATH" name="LOG_CONFIG_PATH" defaultValueLiteral="C:/DashenBank/Log4j/broker.xml">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR_MSG" name="LOG4J_ERROR_MSG" defaultValueLiteral="Log4j Initialization Error.">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://localhost:7800/CBS">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://localhost:7800/Backend_Simulat">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.DSN_NAME" name="DSN_NAME" defaultValueLiteral="DBDSN">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOGGER_NAME" name="LOGGER_NAME" defaultValueLiteral="REGISTRATION_FOR_DRIVER_API_LOGGER">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_TYPE" name="LOG_TYPE" defaultValueLiteral="DEBUG">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
     <translation xmi:type="utility:TranslatableString" key="RegistrationforDriverAPI_Flow" bundleName="com/dashenbank/RegistrationforDriverAPI/RegistrationforDriverAPI_Flow" pluginId="DashenBank_RegistrationforDriverAPI_APP"/>
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_RegistrationforDriverAPI_APP/icons/full/obj16/RegistrationforDriverAPI_Flow.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_RegistrationforDriverAPI_APP/icons/full/obj30/RegistrationforDriverAPI_Flow.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="534,111" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.RegistrationforDriverAPI#ResponseToChannel.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="478,109" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.RegistrationforDriverAPI#ResponseToChannel.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel "/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="406,112" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/CBS_BACKEND" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="375,108" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/CBS_BACKEND" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="BackEndSystemCall"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="496,29" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.RegistrationforDriverAPI#BuildExceptionResponse.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="531,185" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.RegistrationforDriverAPI#BuildExceptionResponse.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="BuildBusinessError"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="87,122" wsdlOperationMode="gateway" useHTTPTransport="true" urlSelector="/RegistrationforDriverAPI" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="19,111" wsdlOperationMode="gateway" useHTTPTransport="true" urlSelector="/ESB_RegistrationForDriverAPI" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="RegistrationforDriverAPI_Request"/>
       </nodes>
-      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="482,237" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
+      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="534,16" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
         <translation xmi:type="utility:ConstantString" string="PayloadLogging"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="289,107" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.RegistrationforDriverAPI#RequestToBackend.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="225,107" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.RegistrationforDriverAPI#RequestToBackend.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="660,107">
+      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="599,109">
         <translation xmi:type="utility:ConstantString" string="RegistrationforDriverAPI_Response"/>
       </nodes>
-      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_3" location="237,27">
+      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_3" location="413,235">
         <translation xmi:type="utility:ConstantString" string="ExceptionHandlerSubFlow"/>
       </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
@@ -62,8 +65,11 @@
           <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR_MSG" bundleName="com/dashenbank/RegistrationforDriverAPI/RegistrationforDriverAPI_Flow" pluginId="DashenBank_RegistrationforDriverAPI_APP"/>
           <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.BACKEND_URL">
             <propertyName xmi:type="utility:TranslatableString" key="Property.BACKEND_URL" bundleName="com/dashenbank/RegistrationforDriverAPI/RegistrationforDriverAPI_Flow" pluginId="DashenBank_RegistrationforDriverAPI_APP"/>
-            <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.DSN_NAME">
-              <propertyName xmi:type="utility:TranslatableString" key="Property.DSN_NAME" bundleName="com/dashenbank/RegistrationforDriverAPI/RegistrationforDriverAPI_Flow" pluginId="DashenBank_RegistrationforDriverAPI_APP"/>
+            <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOGGER_NAME">
+              <propertyName xmi:type="utility:TranslatableString" key="Property.LOGGER_NAME" bundleName="com/dashenbank/RegistrationforDriverAPI/RegistrationforDriverAPI_Flow" pluginId="DashenBank_RegistrationforDriverAPI_APP"/>
+              <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG_TYPE">
+                <propertyName xmi:type="utility:TranslatableString" key="Property.LOG_TYPE" bundleName="com/dashenbank/RegistrationforDriverAPI/RegistrationforDriverAPI_Flow" pluginId="DashenBank_RegistrationforDriverAPI_APP"/>
+              </propertyDescriptor>
             </propertyDescriptor>
           </propertyDescriptor>
         </propertyDescriptor>
