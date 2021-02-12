@@ -9,10 +9,10 @@
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR" name="LOG4J_ERROR" defaultValueLiteral="Log4j Initialization Error">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://localhost:7800/NotificationToTaxSystem">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://localhost:7800/Backend_Simulator">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOGGER_NAME" name="LOGGER_NAME" defaultValueLiteral="NOTIFICATION_TO_TAX_SYSTEM_LOGGER">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOGGER_NAME" name="LOGGER_NAME" defaultValueLiteral="NotificationToTaxSystem_log">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_TYPE" name="LOG_TYPE" defaultValueLiteral="DEBUG">
@@ -31,7 +31,8 @@
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="735,248" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.notificationtotaxsystem#NotificationToTax_BuildExceptionResponse.Main">
         <translation xmi:type="utility:ConstantString" string="BuildBusinessError "/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="68,138" wsdlFileName="NotificationToTaxSystem.wsdl" selectedPortType="NotificationToTaxSystem" selectedBinding="NotificationToTaxSystemSOAP" selectedPort="NotificationToTaxSystemSOAP" targetNamespace="http://www.example.org/NotificationToTaxSystem/" useHTTPTransport="true" urlSelector="/DashenBank_NotificationToTaxSystem" allowQueryWSDL="true">
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="68,138" wsdlOperationMode="gateway" wsdlFileName="NotificationToTaxSystem.wsdl" selectedPortType="NotificationToTaxSystem" selectedBinding="NotificationToTaxSystemSOAP" selectedPort="NotificationToTaxSystemSOAP" targetNamespace="http://www.example.org/NotificationToTaxSystem/" useHTTPTransport="true" urlSelector="/ESB_NotificationToTaxSystem" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false"
+          validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Service_Request"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="363,133" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/NotificationToTaxSystem" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">

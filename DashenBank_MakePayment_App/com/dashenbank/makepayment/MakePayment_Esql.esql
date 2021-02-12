@@ -25,7 +25,7 @@ CREATE COMPUTE MODULE RequestToFlexCube
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
 		DECLARE id CHARACTER InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
-SET Environment.id = id;
+		SET Environment.id = id;
 
 		SET Environment.Variables.Encoding = InputRoot.Properties.Encoding;
 		SET Environment.Variables.CodedCharSetId = InputRoot.Properties.CodedCharSetId;
@@ -37,7 +37,6 @@ SET Environment.id = id;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-
 		----------------------------------------------------
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -50,7 +49,7 @@ SET Environment.id = id;
 		----------------------------------------------------
 		-------------Business Logic-------------------------
 		DECLARE InputRef REFERENCE TO InputRoot.SOAP.*:Body.*:MakePayment;
-		
+
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outDataRef REFERENCE TO OutputRoot.SOAP;
 
@@ -65,9 +64,7 @@ SET Environment.id = id;
 		SET OutputRoot.SOAP.Body.*:MakePayment.*:email = InputRoot.SOAP.Body.*:MakePayment.*:email;
 		SET OutputRoot.SOAP.Body.*:MakePayment.*:remarks = InputRoot.SOAP.Body.*:MakePayment.*:remarks;
 		SET Environment.outputData = OutputRoot.SOAP;
-		
-
-        ----------------------------------------------------
+		----------------------------------------------------
 		----------------------Response Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE outRefData REFERENCE TO OutputRoot.XMLNSC;
@@ -75,7 +72,7 @@ SET Environment.id = id;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
 		CALL PayloadLogging(id,Environment.resPayload,'FLEXCUBE_REQ',MessageFlowLabel,outRefData);
-		
+
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.SOAP = Environment.outputData;
 
@@ -103,13 +100,11 @@ CREATE COMPUTE MODULE ResponseToChannel
 	END;
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
 		SET Environment.domainDataRef = InputRoot.SOAP;
-        DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
+		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-
-
 		----------------------------------------------------
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -119,15 +114,13 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- FLEXCUBE_RES -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RES data  is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
-		
 		----------------------------------------------------
 		-------------Business Logic-------------------------
-		
+
 		SET OutputRoot.SOAP.Body.*:MakePaymentResponse.*:MakePaymentResult.*:MakePaymentResponse.*:UtilAPIMakePaymentResponse.*:reference_number = InputRoot.SOAP.Body.*:MakePaymentResponse.*:MakePaymentResult.*:MakePaymentResponse.*:UtilAPIMakePaymentResponse.*:reference_number;
 		SET OutputRoot.SOAP.Body.*:MakePaymentResponse.*:MakePaymentResult.*:MakePaymentResponse.*:Successful = InputRoot.SOAP.Body.*:MakePaymentResponse.*:MakePaymentResult.*:MakePaymentResponse.*:Successful;
 		SET OutputRoot.SOAP.Body.*:MakePaymentResponse.*:MakePaymentResult.*:MakePaymentResponse.*:Remarks = InputRoot.SOAP.Body.*:MakePaymentResponse.*:MakePaymentResult.*:MakePaymentResponse.*:Remarks;
 		SET Environment.outputData = OutputRoot.SOAP;
-		
 		----------------------------------------------------
 		----------------------Response Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -136,7 +129,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
 		CALL PayloadLogging(Environment.id,Environment.resPayload,'CHANNEL_RES',MessageFlowLabel,outputRef);
-		
+
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 		SET OutputRoot.SOAP = Environment.outputData;
@@ -167,7 +160,7 @@ CREATE COMPUTE MODULE MakePayment_BuildExceptionResponse
 		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,Environment.Variables.Encoding,Environment.Variables.CodedCharSetId);
 		CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
 		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
-	    CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
+		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
 		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME ApplicationLabel;
 		CALL BuildExceptionDetails(excpRef,envRef,ApplicationLabel);
 		SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
@@ -184,9 +177,7 @@ CREATE COMPUTE MODULE MakePayment_BuildExceptionResponse
 		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionNumber = InputRoot.XMLNSC.ExceptionDetails.excpNumber;
 		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionLable = InputRoot.XMLNSC.ExceptionDetails.excpLable;
 		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionDescription = InputRoot.XMLNSC.ExceptionDetails.excpText;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = InputRoot.XMLNSC.ExceptionDetails.actualExcpText;
-		
-		
+		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = InputRoot.XMLNSC.ExceptionDetails.actualExcpText;		
 		--SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
 	END;

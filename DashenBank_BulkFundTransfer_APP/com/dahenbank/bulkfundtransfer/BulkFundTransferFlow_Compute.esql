@@ -4,9 +4,10 @@ BROKER SCHEMA com.dahenbank.bulkfundtransfer
 PATH com.dashenbank.genericfunctions;
 DECLARE rc BOOLEAN;
 DECLARE LOG4J_CONFIG_PATH EXTERNAL CHARACTER '' ;
-DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER'';
-DECLARE CBS_URL EXTERNAL CHARACTER '';
-DECLARE DSN_NAME EXTERNAL CHARACTER '';
+DECLARE LOG4J_ERROR EXTERNAL CHARACTER'';
+DECLARE BACKEND_URL EXTERNAL CHARACTER '';
+DECLARE LOGGER_NAME EXTERNAL CHARACTER '';
+DECLARE LOG_TYPE EXTERNAL CHARACTER '';
 
 CREATE COMPUTE MODULE BulkFundTransfer_ESQl
 
@@ -18,69 +19,206 @@ CREATE COMPUTE MODULE BulkFundTransfer_ESQl
 		IF (rc = TRUE) THEN
 			CALL BulkFundTranasferRequest();
 		ELSE
-			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR_MSG;
+			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR;
 		END IF;
 		RETURN TRUE;
 	END;
 
 	CREATE PROCEDURE BulkFundTranasferRequest( )
 	BEGIN
-		DECLARE id CHARACTER InputRoot.SOAP.Body.*.CREATEMJRNLBOOK_IOPK_REQ.FCUBS_HEADER.MSGID;
---		SET id=id;
+		DECLARE id CHARACTER InputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:MSGID;
 		SET Environment.id = id;
-		SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
-		SET Environment.encodeRef = InputRoot.Properties.Encoding;
-		SET Environment.domainName = FIELDNAME(InputBody);
-		SET Environment.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 
---		DECLARE seqId INTEGER 1;
---		DECLARE TRANSACTION_STATUS1 CHARACTER 'Request Received from End User';
---		DECLARE CREATED_ON1 TIMESTAMP CURRENT_TIMESTAMP;
---		DECLARE CREATED_BY1 CHARACTER 'ACE USER';
---		DECLARE OPERATION_NAME CHARACTER InputRoot.SOAP.Body.*.CREATEMJRNLBOOK_IOPK_REQ.FCUBS_HEADER.OPERATION;
---		DECLARE SERVICE_NAME CHARACTER ApplicationLabel;
---		SET Environment.ID[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
---		SET seqId = CAST(Environment.ID[1].NEXTVAL AS INTEGER);		
---
---
---		INSERT INTO Database.{DSN_NAME}.system.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(seqId.NEXTVAL,id,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS1,CREATED_ON1,CREATED_BY1);
---		commit;
-		-- DECLARE sqlQuery CHARACTER;
-		-- DECLARE tableName CHARACTER 'TRANSACTION_LOG';
-		-- SET sqlQuery='INSERT INTO'||tableName||'(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY)values(?,?,?,?,?,?,?)';
-		-- PASSTHRU sqlQuery To Database.{DSN_NAME}values(seqId.NEXTVAL,id,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS1,CREATED_ON1,CREATED_BY1);
-		DECLARE ccidRef INTEGER Environment.ccidRef;
-		DECLARE encodeRef INTEGER Environment.encodeRef;
+		SET Environment.Variables.Encoding = InputRoot.Properties.Encoding;
+		SET Environment.Variables.CodedCharSetId = InputRoot.Properties.CodedCharSetId;
+		SET Environment.domainDataRef = InputRoot.SOAP;
+		SET Environment.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
+
+		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
+		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
-		DECLARE domainName CHARACTER Environment.domainName;
-		DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		DECLARE domainName CHARACTER FIELDNAME(InputBody);
+		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		----------------------------------------------------
+		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(id,payload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
-		CALL writeToLogFile(MessageFlowLabel,'BulkFundtransferLogger','DEBUG','Request data is: '|| payload) INTO rc;
-		--CALL writeToLogFile(MessageFlowLabel,'BulkFundtransferLogger','DEBUG','Request data is: ') INTO rc;
-		SET OutputRoot.SOAP = InputRoot.SOAP;
+		CALL PayloadLogging(id,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
+
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
+		----------------------------------------------------
+		-------------Business Logic-------------------------
+		DECLARE InputRef REFERENCE TO InputRoot.SOAP.*:Body.*:CREATEMJRNLBOOK_IOPK_REQ;
+
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		DECLARE outDataRef REFERENCE TO OutputRoot.SOAP;
+
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:SOURCE = InputRef.*:FCUBS_HEADER.*:SOURCE;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:UBSCOMP = InputRef.*:FCUBS_HEADER.*:UBSCOMP;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:MSGID = InputRef.*:FCUBS_HEADER.*:MSGID;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:CORRELID = InputRef.*:FCUBS_HEADER.*:CORRELID;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:USERID = InputRef.*:FCUBS_HEADER.*:USERID;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:ENTITY = InputRef.*:FCUBS_HEADER.*:ENTITY;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:BRANCH = InputRef.*:FCUBS_HEADER.*:BRANCH;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:MODULEID = InputRef.*:FCUBS_HEADER.*:MODULEID;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:SERVICE = InputRef.*:FCUBS_HEADER.*:SERVICE;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:OPERATION = InputRef.*:FCUBS_HEADER.*:OPERATION;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:SOURCE_OPERATION = InputRef.*:FCUBS_HEADER.*:SOURCE_OPERATION;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:SOURCE_USERID = InputRef.*:FCUBS_HEADER.*:SOURCE_USERID;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:DESTINATION = InputRef.*:FCUBS_HEADER.*:DESTINATION;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:MULTITRIPID = InputRef.*:FCUBS_HEADER.*:MULTITRIPID;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:FUNCTIONID = InputRef.*:FCUBS_HEADER.*:FUNCTIONID;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:ACTION = InputRef.*:FCUBS_HEADER.*:ACTION;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:MSGSTAT = InputRef.*:FCUBS_HEADER.*:MSGSTAT;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:SNAPSHOTID = InputRef.*:FCUBS_HEADER.*:SNAPSHOTID;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:PASSWORD = InputRef.*:FCUBS_HEADER.*:PASSWORD;
+
+		DECLARE K INTEGER 1;
+		DECLARE INREFK REFERENCE TO InputRef.*:FCUBS_HEADER.*:ADDL.*:PARAM[>];
+		WHILE LASTMOVE(INREFK) DO
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:ADDL.*:PARAM[K].*:NAME = INREFK.*:NAME;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:ADDL.*:PARAM[K].*:VALUE = INREFK.*:VALUE;
+			SET K = K + 1;
+			MOVE INREFK NEXTSIBLING;
+		END WHILE;
+
+
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:REFERENCE_NO = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:REFERENCE_NO;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:BATCH_NO = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:BATCH_NO;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:CURR_NO = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:CURR_NO;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:TEMPLATE_CODE = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:TEMPLATE_CODE;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:VALUE_DATE = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:VALUE_DATE;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:BRANCH_CODE = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:BRANCH_CODE;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:CCY = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:CCY;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:FUNDID = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:FUNDID;
+
+
+		DECLARE I INTEGER 1;
+		DECLARE inref REFERENCE TO InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail";
+		WHILE LASTMOVE(inref) DO
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].SERIAL_NO = inref.*:SERIAL_NO;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].USER_REF_NO = inref.*:USER_REF_NO;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].DR_CR = inref.*:DR_CR;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].BRANCH_CODE = inref.*:BRANCH_CODE;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].ACCORGL = inref.*:ACCORGL;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].ACCOUNT = inref.*:ACCOUNT;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].CCY = inref.*:CCY;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].AMOUNT = inref.*:AMOUNT;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].TXN_CODE = inref.*:TXN_CODE;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].INSTRUMENT_NO = inref.*:INSTRUMENT_NO;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].LCY_AMOUNT = inref.*:LCY_AMOUNT;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].ADDL_TEXT = inref.*:ADDL_TEXT;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].CUSTOMER = inref.*:CUSTOMER;
+			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].EXCH_RATE = inref.*:EXCH_RATE;
+			MOVE inref NEXTSIBLING ;
+			SET I = I + 1;
+		END WHILE;
+
+
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:BATCH_NUMBER = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:BATCH_NUMBER;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:DESCRIPTION = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:DESCRIPTION;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:DEBIT = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:DEBIT;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:CREDIT = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:CREDIT;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:BALANCING = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:BALANCING;
+
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:CONREFNO = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:CONREFNO;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRP = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRP;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:RELACC = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:RELACC;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:RELETED_REFERENCE = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:RELETED_REFERENCE;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISHEAD = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISHEAD;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:RATEFLG = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:RATEFLG;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:POOLCD = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:POOLCD;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFINANCE_RATE = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFINANCE_RATE;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFRATETYP = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFRATETYP;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:CALCMETH1 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:CALCMETH1;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFSPREAD = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFSPREAD;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFRATECD = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFRATECD;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD1 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD1;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD2 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD2;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD3 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD3;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD4 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD4;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD5 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD5;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_1 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_1;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_10 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_10;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_2 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_2;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_3 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_3;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_4 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_4;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_5 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_5;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_6 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_6;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_7 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_7;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_8 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_8;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_9 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_9;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRPCOMP = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRPCOMP;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRPTXN = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRPTXN;
+		SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_1 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_1;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_10 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_10;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_2 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_2;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_3 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_3;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_4 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_4;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_5 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_5;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_6 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_6;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_7 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_7;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_8 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_8;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_9 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_9;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_1 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_1;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_10 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_10;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_2 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_2;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_3 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_3;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_4 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_4;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_5 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_5;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_6 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_6;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_7 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_7;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_8 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_8;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_9 = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_9;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRPFUN = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRPFUN;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Txnmisdetails = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Txnmisdetails;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Compmisdetails = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Compmisdetails;
+		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Fundmisdetails = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Fundmisdetails;
+		
+		DECLARE P INTEGER 1;
+		DECLARE INREFB REFERENCE TO InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[>];
+		WHILE LASTMOVE(INREFB) DO
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].BRANCH = INREFB.*:BRANCH;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].PERIOD_CODE = INREFB.*:PERIOD_CODE;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].FIN_YEAR = INREFB.*:FIN_YEAR;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].REFERENCE_NO = INREFB.*:REFERENCE_NO;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].GL_CODE = INREFB.*:GL_CODE;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].REFERENCE_TYPE = INREFB.*:REFERENCE_TYPE;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].TRANSFER_IND = INREFB.*:TRANSFER_IND;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].MIS_CLASS = INREFB.*:MIS_CLASS;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].TXN_DATE = INREFB.*:TXN_DATE;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].OLD_MIS_CODE = INREFB.*:OLD_MIS_CODE;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].NEW_MIS_CODE = INREFB.*:NEW_MIS_CODE;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].CCY = INREFB.*:CCY;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].AMOUNT = INREFB.*:AMOUNT;
+			set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].EX_RATE = INREFB.*:EX_RATE;
+			SET P = P+1;
+			MOVE INREFB NEXTSIBLING;
+		END WHILE;
+		SET Environment.outputData = OutputRoot.SOAP;
+		----------------------------------------------------
+		----------------------Response Logging-------------------------
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		DECLARE outRefData REFERENCE TO OutputRoot.XMLNSC;
+		MOVE domainDataRef TO OutputRoot.SOAP;
+		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		SET OutputRoot.SOAP = NULL;
+		CALL PayloadLogging(id,Environment.resPayload,'FLEXCUBE_REQ',MessageFlowLabel,outRefData);
+
 		SET OutputRoot.Properties = InputRoot.Properties;
-		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = CBS_URL;
+		SET OutputRoot.SOAP = Environment.outputData;
 
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||Environment.resPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
 
---		DECLARE TRANSACTION_STATUS2 CHARACTER 'Request Sent to bankend flow';
---		DECLARE CREATED_ON2 TIMESTAMP CURRENT_TIMESTAMP;
---		PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME}VALUES(TRANSACTION_STATUS2,CREATED_ON2,id);
-
-		DECLARE domainDataRef1 REFERENCE TO OutputRoot.SOAP.Body;
-		DECLARE domainName1 CHARACTER 'SOAP';
-		DECLARE LOG4 CHARACTER getPayLoad(domainName1,domainDataRef1,encodeRef,ccidRef);
-		CALL writeToLogFile(MessageFlowLabel,'BulkFundtransferLogger','','Request data is: '||LOG4) INTO rc;
-
-		CALL writeToLogFile(MessageFlowLabel,'BulkFundtransferLogger','','..........Request Sent to Backendflow...........') INTO rc;
-
-
-
-
-
+		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
 	END;
 END MODULE;
+---**************************************************************************************************----------------------
+
 
 CREATE COMPUTE MODULE BulkFundTransferFlowResponse_ESQL
 	CREATE FUNCTION Main() RETURNS BOOLEAN
@@ -89,54 +227,249 @@ CREATE COMPUTE MODULE BulkFundTransferFlowResponse_ESQL
 		IF (rc = TRUE) THEN
 			CALL BulkFundTransferFlowResponse();
 		ELSE
-			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR_MSG;
+			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR;
 		END IF;
 		RETURN TRUE;
-	END;	
+	END;
 
 
 
 	CREATE PROCEDURE BulkFundTransferFlowResponse() BEGIN
-		DECLARE inRef REFERENCE TO InputRoot.SOAP;
+
+		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
-		DECLARE payload CHARACTER getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		SET Environment.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
+		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		----------------------------------------------------
+		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(Environment.id,payload,'FLEXCUBE_RESP',MessageFlowLabel,OutRef);
+		CALL PayloadLogging(Environment.id,Environment.reqPayload,'FLEXCUBE_RES',MessageFlowLabel,OutRef);
 
---		DECLARE TRANSACTION_STATUS CHARACTER 'Response Received from Backend flow';
---		DECLARE CREATED_ON TIMESTAMP CURRENT_TIMESTAMP;
---
---		PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME}VALUES(TRANSACTION_STATUS,CREATED_ON,Environment.id);
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- FLEXCUBE_RES -------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RES data  is: '||Environment.reqPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
+		----------------------------------------------------
+		-------------Business Logic-------------------------
 
-		CALL writeToLogFile(MessageFlowLabel,'BulkFundTransferFlowResponse','DEBUG',' ------------Response Received from Backend flow---------------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,'BulkFundTransferFlowResponse','DEBUG','Response data is: '||payload) INTO rc;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:UBSCOMP;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:MSGID = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:MSGID;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:CORRELID = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:CORRELID;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:USERID = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:USERID;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:ENTITY = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:ENTITY;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:BRANCH = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:BRANCH;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:MODULEID = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:MODULEID;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:SERVICE = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:SERVICE;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:OPERATION = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:OPERATION;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE_OPERATION = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE_OPERATION;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE_USERID = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE_USERID;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:DESTINATION = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:DESTINATION;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:MULTITRIPID = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:MULTITRIPID;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:FUNCTIONID = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:FUNCTIONID;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:ACTION = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:ACTION;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:MSGSTAT = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:MSGSTAT;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:SNAPSHOTID = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:SNAPSHOTID;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:PASSWORD = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:PASSWORD;
 
-		SET OutputRoot.SOAP=InputRoot.SOAP;
+		DECLARE K INTEGER 1;
+		DECLARE INREFA REFERENCE TO InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:ADDL.*:PARAM[>];
+		WHILE LASTMOVE(INREFA) DO
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:ADDL.*:PARAM[K].*:NAME = INREFA.*:NAME;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_HEADER.*:ADDL.*:PARAM[K].*:VALUE = INREFA.*:VALUE;
+			SET K = K + 1;
+			MOVE INREFA NEXTSIBLING;
+		END WHILE;
 
-		DECLARE CH_TRANSACTION_STATUS CHARACTER 'Response Sent to END USER';
-		DECLARE CH_CREATED_ON TIMESTAMP CURRENT_TIMESTAMP;
 
-		--PASSTHRU 'UPDATE TRANSACTION_LOG SET TRANSACTION_STATUS=?,CREATED_ON=? WHERE MSG_ID=?' TO Database.{DSN_NAME} VALUES(CH_TRANSACTION_STATUS,CH_CREATED_ON,Environment.id);	    
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:REFERENCE_NO = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:REFERENCE_NO;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:BATCH_NO = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:BATCH_NO;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:CURR_NO = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:CURR_NO;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:TEMPLATE_CODE = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:TEMPLATE_CODE;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:VALUE_DATE = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:VALUE_DATE;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:BRANCH_CODE = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:BRANCH_CODE;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:CCY = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:CCY;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:TOTAL_DR = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:TOTAL_DR;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:TOTAL_CR = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:TOTAL_CR;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:MAKER = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:MAKER;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:MAKDTTIME = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:MAKDTTIME;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:CHECHKERID = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:CHECHKERID;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:CHKDTTIME = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:CHKDTTIME;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:AUTHSTAT = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:AUTHSTAT;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:TXNSTAT = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:TXNSTAT;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:FUNDID = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:FUNDID;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:REC_NO = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:REC_NO;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:TOTAL_NO = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:TOTAL_NO;
+
+		DECLARE I INTEGER 1;
+		DECLARE inref REFERENCE TO InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail";
+		WHILE LASTMOVE(inref) DO
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].SERIAL_NO = inref.*:SERIAL_NO;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].USER_REF_NO = inref.*:USER_REF_NO;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].DR_CR = inref.*:DR_CR;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].BRANCH_CODE = inref.*:BRANCH_CODE;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].ACCORGL = inref.*:ACCORGL;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].ACCOUNT = inref.*:ACCOUNT;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].CCY = inref.*:CCY;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].AMOUNT = inref.*:AMOUNT;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].TXN_CODE = inref.*:TXN_CODE;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].INSTRUMENT_NO = inref.*:INSTRUMENT_NO;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].LCY_AMOUNT = inref.*:LCY_AMOUNT;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].ADDL_TEXT = inref.*:ADDL_TEXT;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].ACDESC = inref.*:ACDESC;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].CUSTOMER = inref.*:CUSTOMER;
+			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].EXCH_RATE = inref.*:EXCH_RATE;
+			MOVE inref NEXTSIBLING ;
+			SET I = I + 1;
+		END WHILE;
 
 
-		DECLARE outDataRef REFERENCE TO OutputRoot.XMLNSC;
-		DECLARE outDomainName CHARACTER 'XMLNSC';
-		DECLARE outputData CHARACTER getPayLoad(outDomainName,outDataRef,encodeRef,ccidRef);
-		SET OutputRoot.XMLNSC = NULL;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Batch-Master".*:BATCH_NUMBER = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Batch-Master".*:BATCH_NUMBER;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Batch-Master".*:DESCRIPTION = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Batch-Master".*:DESCRIPTION;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Batch-Master".*:DEBIT = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Batch-Master".*:DEBIT;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Batch-Master".*:CREDIT = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Batch-Master".*:CREDIT;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Batch-Master".*:DR_ENT_TOTAL = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Batch-Master".*:DR_ENT_TOTAL;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Batch-Master".*:CR_ENT_TOTAL = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Batch-Master".*:CR_ENT_TOTAL;
+
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:BATCH_NUMBER = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:BATCH_NUMBER;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:DESCRIPTION = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:DESCRIPTION;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:LAST_OPERATED_BY = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:LAST_OPERATED_BY;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:LAST_AUTHORISED_BY = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:LAST_AUTHORISED_BY;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:MAKERDT = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:MAKERDT;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:CHECKERDT = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:CHECKERDT;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:DEBIT = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:DEBIT;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:CREDIT = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:CREDIT;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:BALANCING = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Devws-Batch-Master".*:BALANCING;
+
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:CONREFNO = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:CONREFNO;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:MISGRP = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:MISGRP;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:RELACC = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:RELACC;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:RELETED_REFERENCE = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:RELETED_REFERENCE;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:MISHEAD = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:MISHEAD;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:RATEFLG = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:RATEFLG;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:POOLCD = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:POOLCD;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:REFINANCE_RATE = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:REFINANCE_RATE;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:REFRATETYP = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:REFRATETYP;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:CALCMETH1 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:CALCMETH1;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:REFSPREAD = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:REFSPREAD;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:REFRATECD = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:REFRATECD;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COSTCD1 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COSTCD1;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COSTCD2 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COSTCD2;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COSTCD3 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COSTCD3;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COSTCD4 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COSTCD4;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COSTCD5 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COSTCD5;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_1 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_1;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_10 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_10;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_2 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_2;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_3 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_3;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_4 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_4;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_5 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_5;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_6 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_6;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_7 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_7;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_8 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_8;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_9 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TXN_MIS_9;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:MISGRPCOMP = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:MISGRPCOMP;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:MISGRPTXN = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:MISGRPTXN;
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_1 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_1;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_10 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_10;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_2 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_2;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_3 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_3;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_4 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_4;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_5 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_5;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_6 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_6;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_7 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_7;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_8 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_8;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_9 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMP_MIS_9;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_1 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_1;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_10 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_10;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_2 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_2;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_3 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_3;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_4 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_4;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_5 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_5;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_6 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_6;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_7 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_7;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_8 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_8;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_9 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUND_MIS_9;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:MISGRPFUN = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:MISGRPFUN;
+
+		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS1 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS1;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS2 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS2;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS3 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS3;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS4 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS4;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS5 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS5;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS6 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS6;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS7 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS7;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS8 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS8;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS9 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS9;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS10 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:TRANMIS10;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS1 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS1;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS2 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS2;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS3 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS3;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS4 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS4;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS5 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS5;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS6 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS6;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS7 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS7;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS8 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS8;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS9 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS9;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS10 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:COMMIS10;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS1 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS1;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS2 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS2;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS3 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS3;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS4 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS4;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS5 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS5;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS6 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS6;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS7 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS7;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS8 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS8;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS9 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS9;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS10 = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:FUNMIS10;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:Txnmisdetails = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:Txnmisdetails;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:Compmisdetails = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:Compmisdetails;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:Fundmisdetails = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:Fundmisdetails;
+		set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:Control = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:Control;
+
+
+		DECLARE P INTEGER 1;
+		DECLARE INREFB REFERENCE TO InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[>];
+		WHILE LASTMOVE(INREFB) DO
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].BRANCH = INREFB.*:BRANCH;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].PERIOD_CODE = INREFB.*:PERIOD_CODE;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].FIN_YEAR = INREFB.*:FIN_YEAR;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].REFERENCE_NO = INREFB.*:REFERENCE_NO;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].GL_CODE = INREFB.*:GL_CODE;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].REFERENCE_TYPE = INREFB.*:REFERENCE_TYPE;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].TRANSFER_IND = INREFB.*:TRANSFER_IND;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].MIS_CLASS = INREFB.*:MIS_CLASS;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].TXN_DATE = INREFB.*:TXN_DATE;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].OLD_MIS_CODE = INREFB.*:OLD_MIS_CODE;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].NEW_MIS_CODE = INREFB.*:NEW_MIS_CODE;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].CCY = INREFB.*:CCY;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].AMOUNT = INREFB.*:AMOUNT;
+			set OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[P].EX_RATE = INREFB.*:EX_RATE;
+			SET P = P+1;
+			MOVE INREFB NEXTSIBLING;
+		END WHILE;
+		SET Environment.outputData = OutputRoot.SOAP;
+		----------------------------------------------------
+		----------------------Response Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		DECLARE OutputRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(Environment.id,outputData,'CHANNEL_RESP',MessageFlowLabel,OutputRef);
-		CALL writeToLogFile(MessageFlowLabel,'BulkFundTransferFlowResponse','DEBUG',' ------------Response Received from Backend flow---------------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,'BulkFundTransferFlowResponse','DEBUG','Response data is: '||outputData) INTO rc;		
+		DECLARE outputRef REFERENCE TO OutputRoot.XMLNSC;
+		MOVE domainDataRef TO OutputRoot.SOAP;
+		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		SET OutputRoot.SOAP = NULL;
+		CALL PayloadLogging(Environment.id,Environment.resPayload,'CHANNEL_RES',MessageFlowLabel,outputRef);
 
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+		SET OutputRoot.SOAP = Environment.outputData;
 
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RES -------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RES data is: '||Environment.resPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'**********************************************************************') INTO rc;
 	END;
 END MODULE;
+---*******************************************************************************************************------
 
 CREATE COMPUTE MODULE BulidBusinessError_ESQL
 	CREATE FUNCTION Main() RETURNS BOOLEAN
@@ -146,33 +479,37 @@ CREATE COMPUTE MODULE BulidBusinessError_ESQL
 	END;
 
 	CREATE PROCEDURE BuildExceptionResponse() BEGIN
-		CALL writeToLogFile(MessageFlowLabel,'Exception_Logger' ,'DEBUG','..............Error Logging Started...........') INTO rc;
-		DECLARE inRef REFERENCE TO InputRoot.XMLNSC;
+		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
+		--DECLARE inRef REFERENCE TO InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment;
 		DECLARE outRefer,outRef REFERENCE TO OutputRoot;
-		DECLARE encodeID INTEGER InputRoot.Properties.Encoding;
-		DECLARE ccsID INTEGER InputRoot.Properties.CodedCharSetId;
+		--DECLARE encodeID INTEGER InputRoot.Properties.Encoding;
+		--DECLARE ccsID INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
-		DECLARE domainDataRef REFERENCE TO InputRoot.XMLNSC;
---		DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
---		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,encodeID,ccsID);
---		DECLARE CREATED_BY CHARACTER 'ACE USER';
---		CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
---		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
---		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
---		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME 'BulkFundTransfer';
---		CALL BuildExceptionDetails(excpRef,envRef,'BulkFundTransfer');
---		SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
---		MOVE domainDataRef TO Environment.XMLNSC;
---		SET domainName = FIELDNAME(domainDataRef);
-		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,encodeID,ccsID);
-		CALL writeToLogFile(MessageFlowLabel, 'Exception_Logger','DEBUG','Application Built Exception:'||resPayload) INTO rc;
+		DECLARE domainDataRef REFERENCE TO InputBody;
+		DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
+		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,Environment.Variables.Encoding,Environment.Variables.CodedCharSetId);
+		CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
+		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
+		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
+		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME ApplicationLabel;
+		CALL BuildExceptionDetails(excpRef,envRef,ApplicationLabel);
+		SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
+		MOVE domainDataRef TO Environment.XMLNSC;
+		SET domainName = FIELDNAME(domainDataRef);
+		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,Environment.Variables.Encoding,Environment.Variables.CodedCharSetId);
+		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'Application Built Exception:'||resPayload) INTO rc;
 		------------Error Logging in DB----------
---		CALL ConstructErrorDBLog(CURRENT_TIMESTAMP,CREATED_BY,envRef.ErrorType,MessageFlowLabel,ApplicationLabel,ExecutionGroupLabel,
---		excpPayload,Environment.REQUEST_PAYLOAD,excpRef.excpNumber,envRef.ErrorCode,outRef);
-		----------------------------------
-		SET OutputRoot.XMLNSC = Environment.XMLNSC;
-		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
-		CALL writeToLogFile(MessageFlowLabel,'Exception_Logger','DEBUG','..............End of Error Logging ...........') INTO rc;
+		--CALL ConstructErrorDBLog(CURRENT_TIMESTAMP,CREATED_BY,envRef.ErrorType,MessageFlowLabel,ApplicationLabel,ExecutionGroupLabel,
+		---excpPayload,Environment.REQUEST_PAYLOAD,excpRef.excpNumber,envRef.ErrorCode,outRef);
+		-------------------------------------------
+		SET OutputRoot.XMLNSC.ExceptionDetails.Msg_Id = Environment.id;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionType = InputRoot.XMLNSC.ExceptionDetails.excpType;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionNumber = InputRoot.XMLNSC.ExceptionDetails.excpNumber;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionLable = InputRoot.XMLNSC.ExceptionDetails.excpLable;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionDescription = InputRoot.XMLNSC.ExceptionDetails.excpText;
+		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = InputRoot.XMLNSC.ExceptionDetails.actualExcpText;
+		--SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
+		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
 	END;
 END MODULE;

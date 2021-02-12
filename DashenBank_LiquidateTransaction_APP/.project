@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>DashenBank_LiquidateTransaction_APP</name>
+	<name>DashenBank_LiquidateTransaction_App</name>
 	<comment></comment>
 	<projects>
 		<project>DashenBank_ExceptionHandlerLib</project>

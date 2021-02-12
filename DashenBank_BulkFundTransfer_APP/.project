@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>DashenBank_BulkFundTransfer_APP</name>
+	<name>DashenBank_BulkFundTransfer_App</name>
 	<comment></comment>
 	<projects>
 		<project>DashenBankExceptionHandling</project>
