@@ -1,6 +1,3 @@
-
-
-
 BROKER SCHEMA com.dashenbank.Fundstransfer
 
 PATH com.dashenbank.genericfunctions;
@@ -44,7 +41,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		----------------------Request Logging-------------------------
+		---------------------- Request Logging -------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
 		CALL PayloadLogging(msgId,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
@@ -52,7 +49,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
-		-------------- Generating request to flexcube -------------
+		----------------- Generating request to flexcube ----------------
 		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER;
 		DECLARE inputBodyref REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details";
 
@@ -71,7 +68,6 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
 
-
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:XREF = inputBodyref.*:XREF;
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:PRD = inputBodyref.*:PRD;
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:BRN = inputBodyref.*:BRN;
@@ -89,9 +85,8 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNDATE = inputBodyref.*:TXNDATE;
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:VALDATE = inputBodyref.*:VALDATE;
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:NARRATIVE = inputBodyref.*:NARRATIVE;
-
 		SET Environment.outputData = OutputRoot.SOAP;
-
+        ---------------------- Response Logging -------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE outRefData REFERENCE TO OutputRoot.XMLNSC;
 		MOVE domainDataRef TO OutputRoot.SOAP;
@@ -101,7 +96,6 @@ CREATE COMPUTE MODULE RequestToBackend
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.SOAP = Environment.outputData;
-
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||Environment.resPayload) INTO rc;
@@ -127,8 +121,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		----------------------------------------------------
-		----------------------Request Logging-------------------------
+		---------------------- Request Logging -------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
 		CALL PayloadLogging(Environment.id,Environment.reqPayload,'FLEXCUBE_RES',MessageFlowLabel,OutRef);
@@ -137,14 +130,12 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RESP data is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		--------------- generating response to channel ---------------
-
 		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER;
 		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details";
 		DECLARE inputWarningRef REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING;
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
-
 
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
@@ -239,7 +230,6 @@ CREATE COMPUTE MODULE ResponseToChannel
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 		SET OutputRoot.SOAP = Environment.outputData;
-
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||Environment.resPayload) INTO rc;
