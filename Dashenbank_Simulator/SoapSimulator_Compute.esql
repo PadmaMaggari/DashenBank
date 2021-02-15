@@ -8,7 +8,6 @@ CREATE COMPUTE MODULE SoapSimulator_Compute
 		RETURN TRUE;
 	END;
 
-	
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
 	DECLARE Service_Name CHARACTER;
@@ -19,7 +18,6 @@ CREATE COMPUTE MODULE SoapSimulator_Compute
 		 DECLARE Response ROW; 
 		SET Response.values[]=PASSTHRU('SELECT RESPONSE FROM  BACKEND_RESPONSE A  WHERE A.SERVICE_NAME=?',Service_Name);
 		CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Response.values.RESPONSE ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
-
 
 	END;
 END MODULE;
