@@ -53,6 +53,8 @@ CREATE COMPUTE MODULE RequestToFlexCube
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
+	
+	
 		----------------------------------------------------
 		-------------Business Logic-------------------------
 		DECLARE InputRef REFERENCE TO InputRoot.SOAP.*:Body.*:VoidPayment;
@@ -122,7 +124,6 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		
 		
-
 		----------------------------------------------------
 		-------------Business Logic-------------------------
 		DECLARE InputRef REFERENCE TO InputRoot.SOAP.*:Body.*:VoidPaymentResponse.*:VoidPaymentResult.*:VoidPaymentResponse;

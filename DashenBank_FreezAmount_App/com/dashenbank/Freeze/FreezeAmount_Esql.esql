@@ -39,6 +39,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		
 		SET Environment.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		
         ----------------------------------------------------
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -46,6 +47,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		CALL PayloadLogging(id,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.reqPayload) INTO rc;
+		
 		----------------------------------------------------
 		-------------Business Logic-------------------------
 		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_HEADER";
@@ -69,6 +71,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:BRANCH = inputBodyRef.*:BRANCH;
 		
 		SET Environment.outputData = OutputRoot.SOAP;
+		
 		----------------------------------------------------
 		----------------------Response Logging-------------------------
 		MOVE domainDataRef TO OutputRoot.SOAP;
@@ -118,6 +121,7 @@ CREATE COMPUTE MODULE RequestToChannel
 		CALL PayloadLogging(Environment.id,Environment.reqPayload,'FLEXCUBE_RES',MessageFlowLabel,OutRef);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_RES ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.reqPayload) INTO rc;
+		
 		----------------------------------------------------
 		-------------Business Logic-------------------------
 

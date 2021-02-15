@@ -43,6 +43,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		
 		----------------------------------------------------
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -51,6 +52,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		CALL PayloadLogging(id,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'..........CHANNEL_REQ.............') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
+		
 		----------------------------------------------------
 		-------------Business Logic-------------------------
 		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_HEADER";
@@ -88,7 +90,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------  FLEXCUBE_REQ  ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||Environment.resPayload) INTO rc;
 		
-		---------------------------------------------------------------
+		
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
 		
 	END;
@@ -117,6 +119,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		
 		----------------------------------------------------
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -125,6 +128,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CALL PayloadLogging(Environment.id,Environment.reqPayload,'FLEXCUBE_RES',MessageFlowLabel,OutRef);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_RES ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.reqPayload) INTO rc;
+		
 		----------------------------------------------------
 		-------------Business Logic-------------------------
 
@@ -166,6 +170,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Unblocking_WARNING_RESP".WARNING.WDESC = inputBodyRef.*:"Unblocking_WARNING_RESP".WARNING.WDESC;
 		
 		SET Environment.outputData = OutputRoot.SOAP;
+		
 		----------------------------------------------------
 		----------------------Response Logging-------------------------
 
