@@ -1,4 +1,6 @@
 
+
+
 BROKER SCHEMA com.dashenbank.genericsubflow
 
 PATH com.dashenbank.genericfunctions;
@@ -23,12 +25,12 @@ DECLARE encodeRef INTEGER;
 DECLARE ccidRef INTEGER;
 
 CREATE COMPUTE MODULE ExceptionHandler_ESQL
-	
+
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		--CALL CopyMessageHeaders();
-		 SET OutputRoot.Properties = InputRoot.Properties;
-		
+		SET OutputRoot.Properties = InputRoot.Properties;
+
 		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
 		IF ( rc = FALSE ) THEN
 			SET Environment.Variables.Log4j.ErrorMsg = LOG4J_INIT_ERROR_MSG;
@@ -51,22 +53,19 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		DECLARE systemsTraceAuditNumber,timeLocalTransaction,dateLocalTransaction,retrievalReferenceNumber CHARACTER '';
 		--set input properties in environment
 		SET Environment.Properties = InputRoot.Properties;
-		
 		/* ============================= THIS IS FOR DBLOGGING ***** I'M CASTING  INPUT.DFDL DATA INTO CHARACTER ========================= */
 		DECLARE tcpipDetails REFERENCE TO InputLocalEnvironment.TCPIP.Input.ConnectionDetails;
 		SET OutputRoot.HTTPResponseHeader.tcpId.Id = CAST(tcpipDetails.Id AS CHARACTER);
 		SET OutputRoot.HTTPResponseHeader.usr.Id = CAST(tcpipDetails.Id AS CHARACTER);
 		SET Environment.tcpip.Id = CAST(tcpipDetails.Id AS CHARACTER);
 		---------HTTP Router Properties----------
-		
-		IF  Environment.Variables.RequestIdentifier = NULL THEN
+
+		IF Environment.Variables.RequestIdentifier = NULL THEN
 			SET Environment.Variables.RequestIdentifier = Environment.RequestIdentifier;
-			END IF;
+		END IF;
 		IF Environment.Variables.RequestIdentifier = NULL AND Environment.RequestIdentifier = NULL THEN
 			SET Environment.Variables.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
-		END IF;
-		
-		
+		END IF;		
 		/* ==================================== DB LOGGING PROPERTIES END ===================================== */
 
 		CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','..............start logging Exception...........') INTO rc;
@@ -177,7 +176,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 					END IF;
 				END IF;
 				CALL LogException(encodeRef,ccidRef);
-				
+
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','..............end of logging Exception...........') INTO rc;
 				--RETURN TRUE;
 				--END IF;
@@ -197,24 +196,27 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 				DECLARE domainName CHARACTER FIELDNAME(OutputRoot.XMLNSC);
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','Error Details Start::::::'||getPayLoad(domainName,dominOutRef,encodeRef,ccidRef) || ':::::Error Details End') INTO rc;
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','..............end of logging Exception...........') INTO rc;
-
-			--	RETURN TRUE;
+				-- RETURN TRUE;
 			ELSE
 				/*
 				if parser exception occurs then log it.
 				*/
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','Parser Exception') INTO rc;
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','..............end of logging Exception...........') INTO rc;
-		--		RETURN TRUE;
+				-- RETURN TRUE;
 			END IF;
 		ELSE
 			--if InputExceptionList is not populated and terminal connected to exception handler library then return true.
 			--it can occur if http node terminal timeout is connected to exception handler library.
 			CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','..............end of logging Exception...........') INTO rc;
-		--	RETURN TRUE;
+			-- RETURN TRUE;
 		END IF;
-		CALL ErrorDBLogging();
-           RETURN TRUE;
+		IF Environment.ExceptionType = 'DatabaseException' THEN
+			SET Environment.Exception = 'Database Exception';
+		ELSE
+			CALL ErrorDBLogging();
+		END IF;
+		RETURN TRUE;
 
 	END;
 	/*
@@ -226,12 +228,13 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		DECLARE exe_Desc CHARACTER;
 		DECLARE outRefer REFERENCE TO OutputRoot;
 		SET OutputRoot.Properties = Environment.Properties;
-		
+
 		CREATE LASTCHILD Of OutputRoot DOMAIN 'XMLNSC';
 		CREATE LASTCHILD Of OutputRoot.XMLNSC NAME 'ExceptionDetails';
 		DECLARE outRef REFERENCE TO OutputRoot.XMLNSC.*;
 		CALL BuildExceptionDetails(excpRef,outRef,'ExceptionDetails');
 		
+        SET Environment.ExceptionType = excpRef.excpType;
 		SET Environment.Variables.UserDefinedErrorCodes = OutputRoot.XMLNSC;
 		SET Environment.responseCode = Environment.Variables.UserDefinedErrorCodes.ExceptionDetails.ErrorCode;
 		SET OutputRoot.XMLNSC.ExceptionDetails = Environment.Variables.ExceptionData;
@@ -239,7 +242,6 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		DECLARE domainName CHARACTER FIELDNAME(OutputRoot.XMLNSC);
 		CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','Error Details Start::::::'||getPayLoad(domainName,dominOutRef,encodeRef,ccidRef) || ':::::Error Details End') INTO rc;
 	END;
-
 	/*
 	revertBackToSystem procedure requires property,domain,responseQueue in environment
 	*/
@@ -344,7 +346,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 	-- PROPAGATE TO TERMINAL 'out1';
 	-- END;
 	--
-	
+
 	CREATE PROCEDURE CopyMessageHeaders() BEGIN
 		DECLARE I INTEGER 1;
 		DECLARE J INTEGER;
@@ -354,7 +356,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 			SET I = I + 1;
 		END WHILE;
 	END;
-	
+
 	CREATE PROCEDURE getExceptionDesc(IN excpRef REFERENCE,IN insertRef REFERENCE,INOUT outRef REFERENCE)
 	BEGIN
 		DECLARE messageText,actualExcpText CHARACTER '';
@@ -365,7 +367,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 				SET outRef.excpType = FIELDNAME(excpRef);
 				SET exceptionName = FIELDNAME(excpRef);
 				SET outRef.excpNumber = excpRef.Number;
-				
+
 				IF Environment.excpLable IS NULL THEN
 					SET Environment.excpLable = excpRef.Label;
 					DECLARE Label CHARACTER;
@@ -374,7 +376,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 					SET Label = SUBSTRING(Label AFTER '.');
 					SET outRef.excpLable = Label;
 				END IF;
-				
+
 				IF stringValidation(excpRef.Text) THEN
 					SET messageText = messageText||','||excpRef.Text;
 				END IF;
@@ -427,10 +429,9 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 			SET Environment.id = Environment.Variables.RequestIdentifier;
 		END IF;
 		DECLARE seq_Id INTEGER 1;
-		
+
 		DECLARE creationDate TIMESTAMP CAST(CURRENT_TIMESTAMP AS TIMESTAMP FORMAT 'IU');
 		CALL insertdb_logging_error(seq_Id,CAST(Environment.id AS CHARACTER),creationDate,Environment.Variables.logdata,Environment.domainFldName,ApplicationLabel,ExecutionGroupLabel,Environment.Variables.actualExcpText,Environment.Variables.excpText,Environment.Variables.timeLocalTransaction,Environment.Variables.dateLocalTransaction,Environment.Variables.retrievalReferenceNumber,CAST(Environment.Variables.excpNumber AS CHARACTER),Environment.responseCode);
 	END;
 
 END MODULE;
-
