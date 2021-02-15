@@ -9,7 +9,7 @@
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR_MSG" name="LOG4J_ERROR_MSG" defaultValueLiteral="Log4j Initialization Error.">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://localhost:7800/Backend_Simulat">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://localhost:7800/Backend_Simulator">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOGGER_NAME" name="LOGGER_NAME" defaultValueLiteral="REGISTRATION_FOR_DRIVER_API_LOGGER">
