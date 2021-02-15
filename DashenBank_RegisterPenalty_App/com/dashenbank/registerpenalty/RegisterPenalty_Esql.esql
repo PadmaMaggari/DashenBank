@@ -1,5 +1,7 @@
 
 
+
+
 BROKER SCHEMA com.dashenbank.registerpenalty
 PATH com.dashenbank.genericfunctions;
 --DECLARE ns NAMESPACE 'https://www.fintech-group.com/services/Finpay';
@@ -71,13 +73,11 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:Event_date = inBodyref.*:Event_date;
 		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:Location = inBodyref.*:Location;
 		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:ActionTaken = inBodyref.*:ActionTaken;
-		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:ActionTaken = inBodyref.*:ActionTaken;
-		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:ActionTaken = inBodyref.*:ActionTaken;
-		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:ActionTaken = inBodyref.*:ActionTaken;
-		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:ActionTaken = inBodyref.*:ActionTaken;
-		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:ActionTaken = inBodyref.*:ActionTaken;     
-
-
+		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:Longitude = inBodyref.*:Longitude;
+		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:Latitude = inBodyref.*:Latitude;
+		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:LocationName = inBodyref.*:LocationName;
+		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:Telephone = inBodyref.*:Telephone;
+		SET outputbodyRef.Body.*:RegisterPenalty.*:RegisterPenaltyRequest.*:Amount = inBodyref.*:Amount;
 		SET Environment.outputData = OutputRoot.SOAP;
 		---------------------- Response Logging -------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -123,9 +123,29 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RESP data is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		--------------- generating response to channel ---------------
-
-		SET OutputRoot.SOAP = InputRoot.SOAP;
-
+		DECLARE inputBodyref REFERENCE TO InputRoot.SOAP.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse;
+		DECLARE inBodyref REFERENCE TO InputRoot.SOAP.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:IsSuspended = inBodyref.*:IsSuspended;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:OffensePoint = inBodyref.*:OffensePoint;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:OffenseAmount = inBodyref.*:OffenseAmount;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:PointPenaltyAmount = inBodyref.*:PointPenaltyAmount;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:LatePaymentPenaltyAmount = inBodyref.*:LatePaymentPenaltyAmount;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:DelayPoints = inBodyref.*:DelayPoints;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:TotalPoints = inBodyref.*:TotalPoints;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:PaymentAmount = inBodyref.*:PaymentAmount;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:IsVoid = inBodyref.*:IsVoid;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:IsPaid = inBodyref.*:IsPaid;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:SuspensionDuration = inBodyref.*:SuspensionDuration;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:SuspensionMonths = inBodyref.*:SuspensionMonths;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:PaymentOrderNo = inBodyref.*:PaymentOrderNo;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:PaymentStatus = inBodyref.*:PaymentStatus;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:DriverID = inBodyref.*:DriverID;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:ErrorCode = inBodyref.*:ErrorCode;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:UtilAPIRegisterPenaltyResponse.*:ErrorMessage = inBodyref.*:ErrorMessage;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:Successful = inputBodyref.*:Successful;
+		SET outputbodyRef.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse.*:Remarks = inputBodyref.*:Remarks;
 		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------Response Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
