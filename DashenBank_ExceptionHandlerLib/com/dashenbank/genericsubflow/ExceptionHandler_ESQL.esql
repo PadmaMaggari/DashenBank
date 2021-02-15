@@ -6,12 +6,9 @@ PATH com.dashenbank.genericfunctions;
 DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER '';
 DECLARE IS_ERROR_RESPONSE_REQUIRED EXTERNAL CHARACTER '';
 DECLARE LOG4J_INIT_ERROR_MSG EXTERNAL CHARACTER '';
---DECLARE EXCEPTIONQ EXTERNAL CHARACTER '';
 DECLARE MAX_RETRY_COUNT EXTERNAL INTEGER 0;
 DECLARE HTTP_TIMEOUT_ERROR_MSG EXTERNAL CHARACTER '';
 DECLARE SOAP_TIMEOUT_ERROR_MSG EXTERNAL CHARACTER'';
---DECLARE ERROR_AUDIT_Q EXTERNAL CHARACTER '';
---DECLARE ALL_CBO_TCP_RES EXTERNAL CHARACTER '';
 DECLARE ALL_CBO_HTTP_RES EXTERNAL CHARACTER '';
 DECLARE NETWKCD EXTERNAL CHARACTER '';
 DECLARE FINCD EXTERNAL CHARACTER '';
@@ -20,21 +17,23 @@ DECLARE REVCD EXTERNAL CHARACTER '';
 DECLARE REVRPTCD EXTERNAL CHARACTER '';
 DECLARE MSGCLASSREV EXTERNAL CHARACTER '';
 DECLARE MSGFUNADV EXTERNAL CHARACTER '';
+
 DECLARE rc BOOLEAN FALSE;
+DECLARE encodeRef INTEGER;
+DECLARE ccidRef INTEGER;
+
 CREATE COMPUTE MODULE ExceptionHandler_ESQL
-	DECLARE encodeRef INTEGER;
-    DECLARE ccidRef INTEGER;
+	
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		--CALL CopyMessageHeaders();
-		-- SET OutputRoot.Properties = InputRoot.Properties;
-		-- SET OutputRoot.MQMD = InputRoot.MQMD;
+		 SET OutputRoot.Properties = InputRoot.Properties;
+		
 		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
 		IF ( rc = FALSE ) THEN
 			SET Environment.Variables.Log4j.ErrorMsg = LOG4J_INIT_ERROR_MSG;
 		END IF;
 		DECLARE exceptiondesc,inputChar,logdata CHARACTER '';
-		DECLARE ccsid INTEGER;
 		DECLARE domainDataRef REFERENCE TO InputRoot;
 		SET Environment.domainDataRef = domainDataRef;
 		DECLARE domainFldName CHARACTER FIELDNAME(InputBody);
@@ -52,7 +51,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		DECLARE systemsTraceAuditNumber,timeLocalTransaction,dateLocalTransaction,retrievalReferenceNumber CHARACTER '';
 		--set input properties in environment
 		SET Environment.Properties = InputRoot.Properties;
-		--SET Environment.MQMD = InputRoot.MQMD;
+		
 		/* ============================= THIS IS FOR DBLOGGING ***** I'M CASTING  INPUT.DFDL DATA INTO CHARACTER ========================= */
 		DECLARE tcpipDetails REFERENCE TO InputLocalEnvironment.TCPIP.Input.ConnectionDetails;
 		SET OutputRoot.HTTPResponseHeader.tcpId.Id = CAST(tcpipDetails.Id AS CHARACTER);
@@ -62,7 +61,8 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		
 		IF  Environment.Variables.RequestIdentifier = NULL THEN
 			SET Environment.Variables.RequestIdentifier = Environment.RequestIdentifier;
-		ELSEIF Environment.Variables.RequestIdentifier = NULL OR Environment.RequestIdentifier IS NULL THEN
+			END IF;
+		IF Environment.Variables.RequestIdentifier = NULL AND Environment.RequestIdentifier = NULL THEN
 			SET Environment.Variables.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		END IF;
 		
@@ -226,7 +226,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		DECLARE exe_Desc CHARACTER;
 		DECLARE outRefer REFERENCE TO OutputRoot;
 		SET OutputRoot.Properties = Environment.Properties;
-		--SET OutputRoot.MQRFH2 = Environment.MQRFH2;
+		
 		CREATE LASTCHILD Of OutputRoot DOMAIN 'XMLNSC';
 		CREATE LASTCHILD Of OutputRoot.XMLNSC NAME 'ExceptionDetails';
 		DECLARE outRef REFERENCE TO OutputRoot.XMLNSC.*;
@@ -344,6 +344,17 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 	-- PROPAGATE TO TERMINAL 'out1';
 	-- END;
 	--
+	
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+	
 	CREATE PROCEDURE getExceptionDesc(IN excpRef REFERENCE,IN insertRef REFERENCE,INOUT outRef REFERENCE)
 	BEGIN
 		DECLARE messageText,actualExcpText CHARACTER '';
@@ -422,3 +433,4 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 	END;
 
 END MODULE;
+
