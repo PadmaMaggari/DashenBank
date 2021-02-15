@@ -1,171 +1,148 @@
 BROKER SCHEMA com.dashenbank.genericfunctions
 DECLARE ns NAMESPACE 'http://www.example.org/Gateway/';
 
+
 CREATE PROCEDURE BuildExceptionDetails(IN excpRef REFERENCE,INOUT outRef REFERENCE,IN serviceName CHARACTER) BEGIN
 	SET outRef.Title = FIELDNAME(excpRef);
 	DECLARE CRLF CHARACTER CAST(X'0D0A' AS CHARACTER CCSID 1208);
-	IF CONTAINS(excpRef.lastExcpText,CRLF) THEN
-		SET excpRef.lastExcpText = SUBSTRING(excpRef.lastExcpText BEFORE CRLF );
+	IF CONTAINS(excpRef.actualExcpText,CRLF) THEN
+		SET excpRef.actualExcpText = SUBSTRING(excpRef.actualExcpText BEFORE CRLF );
 	END IF;
 	CASE
-	WHEN excpRef.excpType = 'FatalException' THEN
-		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB_'||serviceName||'_001';
-		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
-	WHEN excpRef.excpType = 'RecoverableException' THEN
-		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB_'||serviceName||'_002';
-		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
-	WHEN excpRef.excpType = 'ConfigurationException' THEN
-		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB_'||serviceName||'_003';
-		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
-	WHEN excpRef.excpType = 'SecurityException' THEN
-		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB_'||serviceName||'_004';
-		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
-	WHEN excpRef.excpType = 'ParserException' THEN
-		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB_'||serviceName||'_005';
-		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
-	WHEN excpRef.excpType = 'ConversionException' THEN
-		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB_'||serviceName||'_006';
-		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
 	WHEN excpRef.excpType = 'DatabaseException' THEN
 		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB_'||serviceName||'_007';
+		SET outRef.ErrorCode = 'ESB_SERVER_902';
 		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
-	WHEN excpRef.excpType = 'UserException' THEN
-		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB_'||serviceName||'_008';
-		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
-	WHEN excpRef.excpType = 'CastException' THEN
-		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB_'||serviceName||'_009';
-		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
-	WHEN excpRef.excpType = 'MessageException' THEN
-		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB_'||serviceName||'_010';
-		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = 'Exception connection to database: '||excpRef.actualExcpText ;
 	WHEN excpRef.excpType = 'SqlException' THEN
 		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB_'||serviceName||'_011';
+		SET outRef.ErrorCode = 'ESB_SERVER_902';
 		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText ;
+	WHEN excpRef.excpType = 'UserException' THEN
+		SET outRef.Status = 'FAILURE';
+		SET outRef.ErrorCode = serviceName||'_908';
+		SET outRef.ErrorType = excpRef.excpType;
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText ;
+	WHEN excpRef.excpType = 'CastException' THEN
+		SET outRef.Status = 'FAILURE';
+		SET outRef.ErrorCode = 'ESB_SERVER_907';
+		SET outRef.ErrorType = excpRef.excpType;
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText ;
+	WHEN excpRef.excpType = 'MessageException' THEN
+		SET outRef.Status = 'FAILURE';
+		SET outRef.ErrorType = excpRef.excpType;
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		if CONTAINS(excpRef.excpText,'Failed to open queue')  THEN
+		SET outRef.ErrorCode = 'ESB_SERVER_905';
+		SET outRef.ActualDesc = 'Failed to open Queue: '||excpRef.actualExcpText ;
+		ELSE
+		SET outRef.ErrorCode = 'ESB_SERVER_905';	
+		SET outRef.ActualDesc = excpRef.actualExcpText;
+		END IF;
 	WHEN excpRef.excpType = 'SocketException' THEN
 		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB'||serviceName||'_012';
+		SET outRef.ErrorCode = 'ESB_SERVER_903';
 		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
-	WHEN excpRef.excpType = 'SocketTimeoutException' THEN
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText;
+	WHEN excpRef.excpType = 'SocketTimeoutException'  THEN
 		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB'||serviceName||'_013';
+		SET outRef.ErrorCode = 'ESB_SERVER_903';
 		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText ;
+	WHEN excpRef.excpType = 'MessageException' THEN
+		SET outRef.Status = 'FAILURE';
+		SET outRef.ErrorType = excpRef.excpType;
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		if CONTAINS(excpRef.excpText,'Failed to open queue')  THEN
+		SET outRef.ErrorCode = 'ESB_SERVER_905';
+		SET outRef.ActualDesc = 'Failed to open Queue: '||excpRef.actualExcpText ;
+		ELSE
+		SET outRef.ErrorCode = 'ESB_SERVER_905';	
+		SET outRef.ActualDesc = excpRef.actualExcpText ;
+		END IF;
+	WHEN excpRef.excpType = 'ParserException' THEN
+		SET outRef.Status = 'FAILURE';
+		SET outRef.ErrorCode = 'ESB_SERVER_907';
+		SET outRef.ErrorType = excpRef.excpType;
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = 'A Parsing error has occurred while parsing the given message structure'||', error: '||excpRef.actualExcpText;
+	WHEN excpRef.excpType = 'CastException' THEN
+		SET outRef.Status = 'FAILURE';
+		SET outRef.ErrorCode = 'ESB_SERVER_907';
+		SET outRef.ErrorType = excpRef.excpType;
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText ;
+	WHEN excpRef.excpType = 'RecoverableException' THEN
+		SET outRef.Status = 'FAILURE';
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		
+		IF CONTAINS(excpRef.excpText,'Internal Server Error')  THEN
+			SET outRef.ErrorCode = 'ESB_SERVER_906';
+			SET	outRef.ErrorType = 'Internal Server Error';
+			SET outRef.ActualDesc = 'Received an HTTP Error Status Code (5xx or 400) with an empty response body, when a SOAP payload was expected.,HTTP/1.1 500 Internal Server Error';
+			
+		ELSEIF CONTAINS(excpRef.excpText,'CCSID') AND CONTAINS(excpRef.excpText,'NULL') THEN
+			SET outRef.ErrorCode = 'ESB_SERVER_907';
+			SET	outRef.ErrorType = 'CCSID Encoding Values are null';
+			SET outRef.ActualDesc = 'Null values for CCSID, Encoding';
+			
+		ELSE
+			SET outRef.ErrorType = excpRef.excpType;	
+			SET outRef.ErrorCode = 'ESB_SERVER_908';	
+			SET outRef.ActualDesc = excpRef.actualExcpText ;
+		END IF;
+	WHEN excpRef.excpType = 'FatalException' THEN
+		SET outRef.Status = 'FAILURE';
+		SET outRef.ErrorCode = 'ESB_SERVER_909';
+		SET outRef.ErrorType = excpRef.excpType;
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText;
+	WHEN excpRef.excpType = 'ConfigurationException' THEN
+		SET outRef.Status = 'FAILURE';
+		SET outRef.ErrorCode = 'ESB_SERVER_910';
+		SET outRef.ErrorType = excpRef.excpType;
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText;
+	WHEN excpRef.excpType = 'SecurityException' THEN
+		SET outRef.Status = 'FAILURE';
+		SET outRef.ErrorCode = 'ESB_SERVER_911';
+		SET outRef.ErrorType = excpRef.excpType;
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText;
+	WHEN excpRef.excpType = 'ConversionException' THEN
+		SET outRef.Status = 'FAILURE';
+		SET outRef.ErrorCode = 'ESB_SERVER_912';
+		SET outRef.ErrorType = excpRef.excpType;
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText;
+	WHEN excpRef.excpType = 'UserException' THEN
+		SET outRef.Status = 'FAILURE';
+		SET outRef.ErrorCode = 'ESB_SERVER_913';
+		SET outRef.ErrorType = excpRef.excpType;
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText ;
 	WHEN excpRef.excpType = 'UnknownException' THEN
 		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB'||serviceName||'_014';
+		SET outRef.ErrorCode = 'ESB_SERVER_914';
 		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText ;
 	ELSE
 		SET outRef.Status = 'FAILURE';
-		SET outRef.ErrorCode = 'ESB'||serviceName||'_015';
+		SET outRef.ErrorCode = 'ESB_SERVER_915';
 		SET outRef.ErrorType = excpRef.excpType;
-		SET outRef.ErrorReason = excpRef.excpMessage;
-		SET outRef.Description = CAST(excpRef.excpDescription AS CHARACTER);
+		SET outRef.Description = CAST(excpRef.excpText AS CHARACTER);
+		SET outRef.ActualDesc = excpRef.actualExcpText ;
 	END CASE;
 END;
 
-
-CREATE PROCEDURE ConstructErrorDBLog (
-IN CREATED_TIME TIMESTAMP,
-IN CREATED_BY CHARACTER,
-IN ERROR_TYPE CHARACTER,
-IN MSGFLOW_NAME CHARACTER,
-IN APPLICATION_NAME CHARACTER,
-IN SERVER_NAME CHARACTER,
-IN ERROR_DESCRIPTION CHARACTER,
-IN BUSINESS_PAYLOAD CHARACTER,
-IN BIP_ERROR_CODE INTEGER,
-IN CUSTOMISED_ERROR_CODE CHARACTER,
-INOUT outRef REFERENCE)
-BEGIN
-	CREATE LASTCHILD OF outRef AS outRef DOMAIN 'XMLNSC';
-	CREATE LASTCHILD OF outRef AS outRef NAME 'ERROR_LOGS';
-	CREATE LASTCHILD OF outRef NAME 'CREATED_TIME' VALUE CREATED_TIME;
-	CREATE LASTCHILD OF outRef NAME 'CREATED_BY' VALUE CREATED_BY;
-	CREATE LASTCHILD OF outRef NAME 'ERROR_TYPE' VALUE ERROR_TYPE;
-	CREATE LASTCHILD OF outRef NAME 'MSGFLOW_NAME' VALUE MSGFLOW_NAME;
-	CREATE LASTCHILD OF outRef NAME 'APPLICATION_NAME' VALUE APPLICATION_NAME;
-	CREATE LASTCHILD OF outRef NAME 'SERVER_NAME' VALUE SERVER_NAME;
-	CREATE LASTCHILD OF outRef NAME 'ERROR_DESCRIPTION' VALUE ERROR_DESCRIPTION;
-	CREATE LASTCHILD OF outRef NAME 'BUSINESS_PAYLOAD' VALUE BUSINESS_PAYLOAD;
-	CREATE LASTCHILD OF outRef NAME 'BIP_ERROR_CODE' VALUE BIP_ERROR_CODE;
-	CREATE LASTCHILD OF outRef NAME 'CUSTOMISED_ERROR_CODE' VALUE CUSTOMISED_ERROR_CODE;
-	PROPAGATE TO TERMINAL 'out1' DELETE NONE;
-END;
-
-CREATE PROCEDURE INSERT_ERROR_AUDIT_LOGS(
-IN CREATED_TIME TIMESTAMP,
-IN CREATED_BY CHAR,
-IN ERROR_TYPE CHAR,
-IN MSGFLOW_NAME CHAR,
-IN APPLICATION_NAME CHAR,
-IN SERVER_NAME CHAR,
-IN ERROR_DESCRIPTION CHAR,
-IN BUSINESS_PAYLOAD CHAR,
-IN BIP_ERROR_CODE INTEGER,
-IN CUSTOMISED_ERROR_CODE CHAR)
-LANGUAGE DATABASE
-EXTERNAL NAME "INSERT_ERROR_AUDIT_LOGS";
-
---CREATE FUNCTION getPayLoad(IN domainName CHARACTER,IN domainDataRef REFERENCE, IN encodeID INTEGER,IN ccID INTEGER) RETURNS CHARACTER
---BEGIN
---	DECLARE payload CHARACTER '';
---	--CASE
---	--WHEN domainName = 'XMLNSC' OR domainName = 'SOAP' OR domainName = 'BLOB' OR domainName = 'JSON' THEN
---		SET payload = CAST(ASBITSTREAM(domainDataRef CCSID ccID ENCODING encodeID) AS CHARACTER CCSID ccID ENCODING encodeID);
---		/*WHEN domainName = 'DFDL' THEN
---		DECLARE bPayload BLOB ASBITSTREAM(domainDataRef SET '{ISO8583_Lib}' TYPE '{}:ISO8583_1987');
---		SET payload = CAST(bPayload AS CHARACTER);
---		WHEN domainName = 'stewardBank_CSV' THEN
---		SET payload=CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{SB_CSV_Lib}' TYPE '{}:stewardBank_CSV') AS CHARACTER CCSID ccidRef);
---		WHEN domainName = 'StewardBank_EcoCSV' THEN
---		SET payload=CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{SB_EcoCSV_Lib}' TYPE '{}:StewardBank_EcoCSV') AS CHARACTER CCSID ccidRef);
---		WHEN domainName = 'ISO8583WithHeader' THEN
---		SET payload=CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{ISO8583_Lib}' TYPE '{}:ISO8583WithHeader') AS CHARACTER);
---		WHEN domainName = 'ISO8583TCPHeader' THEN
---		SET payload=CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{ISO8583_Lib}' TYPE '{}:ISO8583TCPHeader') AS CHARACTER);
---		WHEN domainName = 'MT103' THEN
---		SET payload=CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{MT103}' TYPE '{}:MT103') AS CHARACTER CCSID ccidRef);*/
---	--END CASE;
---	RETURN payload;
---END;
 
 
 CREATE FUNCTION getPayLoad(IN domainName CHARACTER,IN domainDataRef REFERENCE, IN encodeRef INTEGER,IN ccidRef INTEGER) RETURNS CHARACTER
@@ -187,20 +164,20 @@ BEGIN
 		SET payload=CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{ISO8583_Lib}' TYPE '{}:ISO8583TCPHeader') AS CHARACTER);
 	WHEN domainName = 'MT103' THEN
 		SET payload=CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{MT103}' TYPE '{}:MT103') AS CHARACTER CCSID ccidRef);			
-	WHEN domainName = 'BulkFundTransferReq' THEN 
-		SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{BulkFundTransferOFSMsgModel_Lib}' TYPE '{}:BulkFundTransferReq' ) AS CHARACTER CCSID ccidRef);
-	WHEN domainName = 'BulkFundTransferSuccessRes' THEN 
-		SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{BulkFundTransferOFSMsgModel_Lib}' TYPE '{}:BulkFundTransferSuccessRes' ) AS CHARACTER CCSID ccidRef) ;	
-	WHEN domainName = 'DebitCardRequest' THEN 
-		SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{DebitCardRequestOFSMsgModel_Lib}' TYPE '{}:DebitCardRequest' ) AS CHARACTER CCSID ccidRef);
-	WHEN domainName = 'DebitCardRequestSuccessRes' THEN 
-		SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{DebitCardRequestOFSMsgModel_Lib}' TYPE '{}:DebitCardRequestSuccessRes' ) AS CHARACTER CCSID ccidRef);	
-	WHEN domainName = 'DebitCardReplacement' THEN 
-		SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{DebitCardReplacementOFSMsgModel_Lib}' TYPE '{}:DebitCardReplacement' ) AS CHARACTER CCSID ccidRef);
-	WHEN domainName = 'DebitCardReplacementSuccessRes' THEN 
-		SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{DebitCardReplacementOFSMsgModel_Lib}' TYPE '{}:DebitCardReplacementSuccessRes' ) AS CHARACTER CCSID ccidRef);
-	WHEN domainName = 'DebitCardBlockAndUnBlockReq' THEN
-        SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{DebitCardBlockAndUnblockOFSMsgModel_Lib}' TYPE '{}:DebitCardBlockAndUnBlockReq' ) AS CHARACTER CCSID ccidRef);	
+--	WHEN domainName = 'BulkFundTransferReq' THEN 
+--		SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{BulkFundTransferOFSMsgModel_Lib}' TYPE '{}:BulkFundTransferReq' ) AS CHARACTER CCSID ccidRef);
+--	WHEN domainName = 'BulkFundTransferSuccessRes' THEN 
+--		SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{BulkFundTransferOFSMsgModel_Lib}' TYPE '{}:BulkFundTransferSuccessRes' ) AS CHARACTER CCSID ccidRef) ;	
+--	WHEN domainName = 'DebitCardRequest' THEN 
+--		SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{DebitCardRequestOFSMsgModel_Lib}' TYPE '{}:DebitCardRequest' ) AS CHARACTER CCSID ccidRef);
+--	WHEN domainName = 'DebitCardRequestSuccessRes' THEN 
+--		SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{DebitCardRequestOFSMsgModel_Lib}' TYPE '{}:DebitCardRequestSuccessRes' ) AS CHARACTER CCSID ccidRef);	
+--	WHEN domainName = 'DebitCardReplacement' THEN 
+--		SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{DebitCardReplacementOFSMsgModel_Lib}' TYPE '{}:DebitCardReplacement' ) AS CHARACTER CCSID ccidRef);
+--	WHEN domainName = 'DebitCardReplacementSuccessRes' THEN 
+--		SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{DebitCardReplacementOFSMsgModel_Lib}' TYPE '{}:DebitCardReplacementSuccessRes' ) AS CHARACTER CCSID ccidRef);
+--	WHEN domainName = 'DebitCardBlockAndUnBlockReq' THEN
+--        SET payload = CAST(ASBITSTREAM(domainDataRef ENCODING encodeRef CCSID ccidRef SET '{DebitCardBlockAndUnblockOFSMsgModel_Lib}' TYPE '{}:DebitCardBlockAndUnBlockReq' ) AS CHARACTER CCSID ccidRef);	
 	END CASE;
 	RETURN payload;
 END;
@@ -231,29 +208,29 @@ BEGIN
 	SET OutRef = NULL;
 END;
 
-CREATE PROCEDURE SOAP_TO_XML(IN SOAPref REFERENCE,INOUT XMLref REFERENCE,INOUT REQ_IDENTIFIER CHARACTER)
-BEGIN
-	SET XMLref.REQ_IDENTIFIER = REQ_IDENTIFIER;
-	SET XMLref.AccNo = SOAPref.AccNo;
-	SET XMLref.CustomerName = SOAPref.CustomerName;
-	SET XMLref.Email = SOAPref.Email;
-	SET XMLref.Address = SOAPref.Address;
-	SET XMLref.Mobileno = SOAPref.Mobileno;
-	SET XMLref.Currency = SOAPref.Currency;
-END;
+--CREATE PROCEDURE SOAP_TO_XML(IN SOAPref REFERENCE,INOUT XMLref REFERENCE,INOUT REQ_IDENTIFIER CHARACTER)
+--BEGIN
+--	SET XMLref.REQ_IDENTIFIER = REQ_IDENTIFIER;
+--	SET XMLref.AccNo = SOAPref.AccNo;
+--	SET XMLref.CustomerName = SOAPref.CustomerName;
+--	SET XMLref.Email = SOAPref.Email;
+--	SET XMLref.Address = SOAPref.Address;
+--	SET XMLref.Mobileno = SOAPref.Mobileno;
+--	SET XMLref.Currency = SOAPref.Currency;
+--END;
 
-CREATE PROCEDURE XML_TO_SOAP(INOUT OUT_ref REFERENCE,IN XML_ref REFERENCE)
-BEGIN
-	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.AccNo = XML_ref.AccNo;
-	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.CustomerName = XML_ref.CustomerName;
-	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.Email = XML_ref.Email;
-	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.Address = XML_ref.Address;
-	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.Mobileno = XML_ref.Mobileno;
-	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.Currency = XML_ref.Currency;
-	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.Amount = XML_ref.Amount;
-	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.ResponseCode = XML_ref.ResponseCode;
-	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.ResponseStatus = XML_ref.ResponseStatus;
-END;
+--CREATE PROCEDURE XML_TO_SOAP(INOUT OUT_ref REFERENCE,IN XML_ref REFERENCE)
+--BEGIN
+--	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.AccNo = XML_ref.AccNo;
+--	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.CustomerName = XML_ref.CustomerName;
+--	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.Email = XML_ref.Email;
+--	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.Address = XML_ref.Address;
+--	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.Mobileno = XML_ref.Mobileno;
+--	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.Currency = XML_ref.Currency;
+--	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.Amount = XML_ref.Amount;
+--	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.ResponseCode = XML_ref.ResponseCode;
+--	SET OUT_ref.body.ns:AccountBalanceEnquiryResponse.ResponseStatus = XML_ref.ResponseStatus;
+--END;
 /*
 CREATE PROCEDURE remove127(IN removeRefPointer REFERENCE)
 BEGIN
@@ -1754,6 +1731,7 @@ BEGIN
 	SET outRef.USER_DEFINE_ERROR_CODE=USER_DEFINE_ERROR_CODE;
 
 END;
+
 
 CREATE PROCEDURE insertdb_logging_error (IN SEQ_ID INTEGER,IN MSG_ID CHARACTER,IN LOGGING_TIME TIMESTAMP,IN MESSAGE_DATA CHARACTER,IN MESSAGE_TYPE CHARACTER,IN APPLICATION_NAME CHARACTER,IN SERVER_NAME CHARACTER,IN ERROR_TEXT CHARACTER,IN ERROR_DESCRIPTION CHARACTER,IN TIME_LOCAL_TRANSACTION CHARACTER,IN DATE_LOCAL_TRANSACTION CHARACTER,IN RETRIEVAL_REFERENCE_NUMBER CHARACTER,IN SERVER_ERROR_CODE CHARACTER,IN USER_DEFINE_ERROR_CODE CHARACTER)
 LANGUAGE DATABASE
