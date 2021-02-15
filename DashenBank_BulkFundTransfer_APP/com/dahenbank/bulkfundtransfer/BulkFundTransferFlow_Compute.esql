@@ -1,5 +1,7 @@
 
 
+
+
 BROKER SCHEMA com.dahenbank.bulkfundtransfer
 PATH com.dashenbank.genericfunctions;
 DECLARE rc BOOLEAN;
@@ -97,7 +99,8 @@ CREATE COMPUTE MODULE BulkFundTransfer_ESQl
 
 		DECLARE I INTEGER 1;
 		DECLARE inref REFERENCE TO InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail";
-		WHILE LASTMOVE(inref) DO
+		DECLARE J INTEGER CARDINALITY(InputRoot.SOAP.*:Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[]);
+		WHILE I<=J DO
 			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].SERIAL_NO = inref.*:SERIAL_NO;
 			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].USER_REF_NO = inref.*:USER_REF_NO;
 			SET OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[I].DR_CR = inref.*:DR_CR;
@@ -176,7 +179,7 @@ CREATE COMPUTE MODULE BulkFundTransfer_ESQl
 		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Txnmisdetails = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Txnmisdetails;
 		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Compmisdetails = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Compmisdetails;
 		set OutputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Fundmisdetails = InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Fundmisdetails;
-		
+
 		DECLARE P INTEGER 1;
 		DECLARE INREFB REFERENCE TO InputRef.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[>];
 		WHILE LASTMOVE(INREFB) DO
@@ -302,9 +305,8 @@ CREATE COMPUTE MODULE BulkFundTransferFlowResponse_ESQL
 		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:FUNDID = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:FUNDID;
 		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:REC_NO = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:REC_NO;
 		SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:TOTAL_NO = InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:TOTAL_NO;
-
-		DECLARE I INTEGER 1;
-		DECLARE inref REFERENCE TO InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail";
+		 DECLARE I INTEGER 1;
+		DECLARE inref REFERENCE TO InputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[>];
 		WHILE LASTMOVE(inref) DO
 			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].SERIAL_NO = inref.*:SERIAL_NO;
 			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].USER_REF_NO = inref.*:USER_REF_NO;
@@ -321,8 +323,8 @@ CREATE COMPUTE MODULE BulkFundTransferFlowResponse_ESQL
 			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].ACDESC = inref.*:ACDESC;
 			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].CUSTOMER = inref.*:CUSTOMER;
 			SET OutputRoot.SOAP.Body.*:Authorization_FSFS_REQ.*:FCUBS_BODY.*:"Detbs-Jrnl-Txn-Master-Full".*:"Detbs-Jrnl-Txn-Detail"[I].EXCH_RATE = inref.*:EXCH_RATE;
-			MOVE inref NEXTSIBLING ;
 			SET I = I + 1;
+			MOVE inref NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;
 
 
