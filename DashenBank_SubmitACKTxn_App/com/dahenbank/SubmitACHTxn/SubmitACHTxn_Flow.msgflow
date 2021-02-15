@@ -9,17 +9,20 @@
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR_MSG" name="LOG4J_ERROR_MSG" lowerBound="1" defaultValueLiteral="Log4j Initialization Error">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.CBS_URL" name="CBS_URL" lowerBound="1" defaultValueLiteral="http://localhost:7800/Fluxcube_call">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" lowerBound="1" defaultValueLiteral="http://localhost:7800/Backend_Simulator">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.DSN_NAME" name="DSN_NAME" lowerBound="1" defaultValueLiteral="DBDSN">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOGGER_NAME" name="LOGGER_NAME" lowerBound="1" defaultValueLiteral="SUBMIT_ACH_LOGGER">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <translation xmi:type="utility:TranslatableString" key="SubmitACHTxn_Flow" bundleName="com/dahenbank/SubmitACHTxn/SubmitACHTxn_Flow" pluginId="DashenBank_SubmitACKTxn_App"/>
-    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_SubmitACKTxn_App/icons/full/obj16/SubmitACHTxn_Flow.gif"/>
-    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_SubmitACKTxn_App/icons/full/obj30/SubmitACHTxn_Flow.gif"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_TYPE" name="LOG_TYPE" defaultValueLiteral="DEBUG">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" key="SubmitACHTxn_Flow" bundleName="com/dahenbank/SubmitACHTxn/SubmitACHTxn_Flow" pluginId="DashenBank_SubmitACHTxn_App"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_SubmitACHTxn_App/icons/full/obj16/SubmitACHTxn_Flow.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_SubmitACHTxn_App/icons/full/obj30/SubmitACHTxn_Flow.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="83,125" wsdlOperationMode="gateway" useHTTPTransport="true" urlSelector="/SubmitACHTxn" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="83,125" wsdlOperationMode="gateway" useHTTPTransport="true" urlSelector="/ESB_SubmitACHTxn" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Service_Request"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="578,124">
@@ -28,10 +31,10 @@
       <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="311,125" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/Fluxcube_call" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="BackEndSystemCall"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="200,122" dataSource="DBDSN" computeExpression="esql://routine/com.dahenbank.SubmitACHTxn#SubmitACHTxn_Esql.Main" computeMode="destinationAndMessage">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="200,122" dataSource="DBDSN" computeExpression="esql://routine/com.dahenbank.SubmitACHTxn#RequestToFlexCube.Main" computeMode="destinationAndMessage">
         <translation xmi:type="utility:ConstantString" string="RequestToTaxSystem"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="453,124" computeExpression="esql://routine/com.dahenbank.SubmitACHTxn#SubmitACHResponse_ESQL.Main" computeMode="destinationAndMessage">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="453,124" computeExpression="esql://routine/com.dahenbank.SubmitACHTxn#ResponseToChannel.Main" computeMode="destinationAndMessage">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel"/>
       </nodes>
       <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="318,-6" rotation="BOTTOM_TO_TOP" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
@@ -57,13 +60,16 @@
     </composition>
     <propertyOrganizer>
       <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_CONFIG_PATH">
-        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_CONFIG_PATH" bundleName="com/dahenbank/SubmitACHTxn/SubmitACHTxn_Flow" pluginId="DashenBank_SubmitACKTxn_App"/>
+        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_CONFIG_PATH" bundleName="com/dahenbank/SubmitACHTxn/SubmitACHTxn_Flow" pluginId="DashenBank_SubmitACHTxn_App"/>
         <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_ERROR_MSG">
-          <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR_MSG" bundleName="com/dahenbank/SubmitACHTxn/SubmitACHTxn_Flow" pluginId="DashenBank_SubmitACKTxn_App"/>
-          <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.CBS_URL">
-            <propertyName xmi:type="utility:TranslatableString" key="Property.CBS_URL" bundleName="com/dahenbank/SubmitACHTxn/SubmitACHTxn_Flow" pluginId="DashenBank_SubmitACKTxn_App"/>
-            <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.DSN_NAME">
-              <propertyName xmi:type="utility:TranslatableString" key="Property.DSN_NAME" bundleName="com/dahenbank/SubmitACHTxn/SubmitACHTxn_Flow" pluginId="DashenBank_SubmitACKTxn_App"/>
+          <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR_MSG" bundleName="com/dahenbank/SubmitACHTxn/SubmitACHTxn_Flow" pluginId="DashenBank_SubmitACHTxn_App"/>
+          <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.BACKEND_URL">
+            <propertyName xmi:type="utility:TranslatableString" key="Property.BACKEND_URL" bundleName="com/dahenbank/SubmitACHTxn/SubmitACHTxn_Flow" pluginId="DashenBank_SubmitACHTxn_App"/>
+            <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOGGER_NAME">
+              <propertyName xmi:type="utility:TranslatableString" key="Property.LOGGER_NAME" bundleName="com/dahenbank/SubmitACHTxn/SubmitACHTxn_Flow" pluginId="DashenBank_SubmitACHTxn_App"/>
+              <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG_TYPE">
+                <propertyName xmi:type="utility:TranslatableString" key="Property.LOG_TYPE" bundleName="com/dahenbank/SubmitACHTxn/SubmitACHTxn_Flow" pluginId="DashenBank_SubmitACHTxn_App"/>
+              </propertyDescriptor>
             </propertyDescriptor>
           </propertyDescriptor>
         </propertyDescriptor>
