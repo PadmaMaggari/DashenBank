@@ -22,7 +22,7 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_SubmitPayment_App/icons/full/obj16/SubmitPayment_Flow.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_SubmitPayment_App/icons/full/obj30/SubmitPayment_Flow.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="450,125" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.submitpaymet#ResponseToChannel.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="450,125" computeExpression="esql://routine/com.dashenbank.submitpaymet#ResponseToChannel.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel"/>
       </nodes>
       <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="511,22" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
@@ -34,7 +34,7 @@
       <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="614,127">
         <translation xmi:type="utility:ConstantString" string="SubmitPayment_Response"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="195,124" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.submitpaymet#RequestToBackend.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="195,124" computeExpression="esql://routine/com.dashenbank.submitpaymet#RequestToBackend.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="326,126" wsdlOperationMode="gateway" wsdlFileName="Gateway.wsdl" selectedPortType="InternalTransfer" selectedBinding="InternalTransfer" selectedOperation="InternalTransfer" selectedPort="InternalTransfer" useHTTPTransport="true" webServiceURL="http://localhost:7800/CBS_IFT" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
