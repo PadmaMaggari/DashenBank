@@ -22,16 +22,16 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_AccountSummary_App/icons/full/obj16/AccountSummary_Flow.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_AccountSummary_App/icons/full/obj30/AccountSummary_Flow.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="526,175" computeExpression="esql://routine/com.dashenbank.accountsummary#BuildExceptionResponse.Main" computeMode="destinationAndMessage">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="526,175" computeExpression="esql://routine/com.dashenbank.accountsummary#BuildExceptionResponse.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="BuildBusinessError"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="185,110" dataSource="DBDSN" transaction="commit" computeExpression="esql://routine/com.dashenbank.accountsummary#RequestToFlexcube.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="185,110" computeExpression="esql://routine/com.dashenbank.accountsummary#RequestToFlexcube.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="45,113" wsdlOperationMode="gateway" wsdlFileName="ESB_BatchUploadService.wsdl" selectedPortType="ESB_BatchUploadService" selectedBinding="ESB_BatchUploadServiceSOAP" selectedPort="ESB_BatchUploadServiceSOAP" useHTTPTransport="true" urlSelector="/ESB_AccountSummary" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Service_Request"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="427,119" dataSource="DBDSN" transaction="commit" computeExpression="esql://routine/com.dashenbank.accountsummary#ResponseToFrontEnd.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="427,119" computeExpression="esql://routine/com.dashenbank.accountsummary#ResponseToFrontEnd.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="628,119">

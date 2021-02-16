@@ -22,10 +22,10 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_VoidPayment_App/icons/full/obj16/VoidPayment_Flow.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_VoidPayment_App/icons/full/obj30/VoidPayment_Flow.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="169,116" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.voidpayment#RequestToFlexCube.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="169,116" computeExpression="esql://routine/com.dashenbank.voidpayment#RequestToFlexCube.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="475,125" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.voidpayment#ResponseToChannel.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="475,125" computeExpression="esql://routine/com.dashenbank.voidpayment#ResponseToChannel.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel"/>
       </nodes>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="542,191" computeExpression="esql://routine/com.dashenbank.voidpayment#VoidPayment_BuildExceptionResponse.Main" computeMode="all">
