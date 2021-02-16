@@ -201,6 +201,10 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 				/*
 				if parser exception occurs then log it.
 				*/
+				
+		     SET Environment.ParserException.Errorcode = 'ESB_SERVER_907';
+		        
+		       
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','Parser Exception') INTO rc;
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','..............end of logging Exception...........') INTO rc;
 				-- RETURN TRUE;
@@ -429,6 +433,10 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 			SET Environment.id = Environment.Variables.RequestIdentifier;
 		END IF;
 		DECLARE seq_Id INTEGER 1;
+		
+		IF Environment.responseCode IS NULL THEN
+		SET Environment.responseCode = Environment.ParserException.Errorcode;	
+		END IF;
 
 		DECLARE creationDate TIMESTAMP CAST(CURRENT_TIMESTAMP AS TIMESTAMP FORMAT 'IU');
 		CALL insertdb_logging_error(seq_Id,CAST(Environment.id AS CHARACTER),creationDate,Environment.Variables.logdata,Environment.domainFldName,ApplicationLabel,ExecutionGroupLabel,Environment.Variables.actualExcpText,Environment.Variables.excpText,Environment.Variables.timeLocalTransaction,Environment.Variables.dateLocalTransaction,Environment.Variables.retrievalReferenceNumber,CAST(Environment.Variables.excpNumber AS CHARACTER),Environment.responseCode);
