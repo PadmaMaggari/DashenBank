@@ -1,6 +1,12 @@
 
 
 
+
+
+
+
+
+
 BROKER SCHEMA com.dashenbank.genericsubflow
 
 PATH com.dashenbank.genericfunctions;
@@ -65,7 +71,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		END IF;
 		IF Environment.Variables.RequestIdentifier IS NULL AND Environment.RequestIdentifier IS NULL THEN
 			SET Environment.Variables.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
-		END IF;		
+		END IF;
 		/* ==================================== DB LOGGING PROPERTIES END ===================================== */
 
 		CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','..............start logging Exception...........') INTO rc;
@@ -197,14 +203,14 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','Error Details Start::::::'||getPayLoad(domainName,dominOutRef,encodeRef,ccidRef) || ':::::Error Details End') INTO rc;
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','..............end of logging Exception...........') INTO rc;
 				-- RETURN TRUE;
+
 			ELSE
 				/*
 				if parser exception occurs then log it.
 				*/
-				
-		     SET Environment.ParserException.Errorcode = 'ESB_SERVER_907';
-		        
-		       
+
+				SET Environment.ParserException.Errorcode = 'ESB_SERVER_907';
+
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','Parser Exception') INTO rc;
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','..............end of logging Exception...........') INTO rc;
 				-- RETURN TRUE;
@@ -237,8 +243,8 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		CREATE LASTCHILD Of OutputRoot.XMLNSC NAME 'ExceptionDetails';
 		DECLARE outRef REFERENCE TO OutputRoot.XMLNSC.*;
 		CALL BuildExceptionDetails(excpRef,outRef,'ExceptionDetails');
-		
-        SET Environment.ExceptionType = excpRef.excpType;
+
+		SET Environment.ExceptionType = excpRef.excpType;
 		SET Environment.Variables.UserDefinedErrorCodes = OutputRoot.XMLNSC;
 		SET Environment.responseCode = Environment.Variables.UserDefinedErrorCodes.ExceptionDetails.ErrorCode;
 		SET OutputRoot.XMLNSC.ExceptionDetails = Environment.Variables.ExceptionData;
@@ -433,9 +439,9 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 			SET Environment.id = Environment.Variables.RequestIdentifier;
 		END IF;
 		DECLARE seq_Id INTEGER 1;
-		
+
 		IF Environment.responseCode IS NULL THEN
-		SET Environment.responseCode = Environment.ParserException.Errorcode;	
+			SET Environment.responseCode = Environment.ParserException.Errorcode;
 		END IF;
 
 		DECLARE creationDate TIMESTAMP CAST(CURRENT_TIMESTAMP AS TIMESTAMP FORMAT 'IU');
