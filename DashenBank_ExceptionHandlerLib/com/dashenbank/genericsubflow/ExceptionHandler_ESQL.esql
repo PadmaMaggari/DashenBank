@@ -60,10 +60,10 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		SET Environment.tcpip.Id = CAST(tcpipDetails.Id AS CHARACTER);
 		---------HTTP Router Properties----------
 
-		IF Environment.Variables.RequestIdentifier = NULL THEN
+		IF Environment.Variables.RequestIdentifier IS NULL THEN
 			SET Environment.Variables.RequestIdentifier = Environment.RequestIdentifier;
 		END IF;
-		IF Environment.Variables.RequestIdentifier = NULL AND Environment.RequestIdentifier = NULL THEN
+		IF Environment.Variables.RequestIdentifier IS NULL AND Environment.RequestIdentifier IS NULL THEN
 			SET Environment.Variables.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		END IF;		
 		/* ==================================== DB LOGGING PROPERTIES END ===================================== */
