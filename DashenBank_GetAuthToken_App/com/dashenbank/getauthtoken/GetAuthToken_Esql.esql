@@ -1,7 +1,4 @@
 
-
-
-
 BROKER SCHEMA com.dashenbank.getauthtoken
 PATH com.dashenbank.genericfunctions;
 DECLARE ns NAMESPACE 'http://www.example.org/GetAuthToken/';

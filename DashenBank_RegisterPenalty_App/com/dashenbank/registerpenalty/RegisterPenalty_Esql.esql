@@ -1,7 +1,4 @@
 
-
-
-
 BROKER SCHEMA com.dashenbank.registerpenalty
 PATH com.dashenbank.genericfunctions;
 --DECLARE ns NAMESPACE 'https://www.fintech-group.com/services/Finpay';
