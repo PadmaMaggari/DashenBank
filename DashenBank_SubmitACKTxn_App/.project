@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>DashenBank_SubmitACKTxn_App</name>
+	<name>DashenBank_SubmitACHTxn_App</name>
 	<comment></comment>
 	<projects>
 		<project>DashenBank_ExceptionHandlerLib</project>

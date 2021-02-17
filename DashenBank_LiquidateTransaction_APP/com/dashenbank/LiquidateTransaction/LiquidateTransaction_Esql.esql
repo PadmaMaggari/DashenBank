@@ -8,7 +8,7 @@ PATH com.dashenbank.genericfunctions;
 DECLARE rc BOOLEAN;
 DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER;
 DECLARE LOG4J_ERROR EXTERNAL CHARACTER;
-DECLARE BACKEND_URL EXTERNAL CHARACTER;
+DECLARE BACKEND_URL EXTERNAL CHARACTER '';
 DECLARE LOGGER_NAME EXTERNAL CHARACTER '';
 DECLARE LOG_TYPE EXTERNAL CHARACTER '';
 
@@ -89,6 +89,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
 
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
+		
 	END;
 END MODULE;
 ---------------------------------------------------------------------------------------------------------------------

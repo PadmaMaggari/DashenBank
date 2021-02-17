@@ -9,7 +9,7 @@
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR" name="LOG4J_ERROR" defaultValueLiteral="Log4j Initialization Error.">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://localhost:7800/Backend_Simulator">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://192.168.2.39:7800/Backend_Simulator">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOGGER_NAME" name="LOGGER_NAME" defaultValueLiteral="LiquidateTransaction_Log">
@@ -18,9 +18,9 @@
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_TYPE" name="LOG_TYPE" defaultValueLiteral="DEBUG">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <translation xmi:type="utility:TranslatableString" key="LiquidateTransaction_Flow" bundleName="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow" pluginId="DashenBank_LiquidateTransaction_APP"/>
-    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_LiquidateTransaction_APP/icons/full/obj16/LiquidateTransaction_Flow.gif"/>
-    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_LiquidateTransaction_APP/icons/full/obj30/LiquidateTransaction_Flow.gif"/>
+    <translation xmi:type="utility:TranslatableString" key="LiquidateTransaction_Flow" bundleName="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow" pluginId="DashenBank_LiquidateTransaction_App"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_LiquidateTransaction_App/icons/full/obj16/LiquidateTransaction_Flow.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_LiquidateTransaction_App/icons/full/obj30/LiquidateTransaction_Flow.gif"/>
     <composition>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="479,111" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.LiquidateTransaction#ResponseToChannel.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel "/>
@@ -34,7 +34,7 @@
       <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="65,107" wsdlOperationMode="gateway" useHTTPTransport="true" urlSelector="/ESB_LiquidateTransaction" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="LiquidateTransaction_Request"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="351,112" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/Backend_Simulator" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="351,112" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://192.168.2.63:7800/Backend_Simulator" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="BackEndSystemCall"/>
       </nodes>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="234,107" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.LiquidateTransaction#RequestToBackend.Main" computeMode="all">
@@ -60,15 +60,15 @@
     </composition>
     <propertyOrganizer>
       <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG_CONFIG_PATH">
-        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG_CONFIG_PATH" bundleName="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow" pluginId="DashenBank_LiquidateTransaction_APP"/>
+        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG_CONFIG_PATH" bundleName="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow" pluginId="DashenBank_LiquidateTransaction_App"/>
         <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_ERROR">
-          <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR" bundleName="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow" pluginId="DashenBank_LiquidateTransaction_APP"/>
+          <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR" bundleName="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow" pluginId="DashenBank_LiquidateTransaction_App"/>
           <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.BACKEND_URL">
-            <propertyName xmi:type="utility:TranslatableString" key="Property.BACKEND_URL" bundleName="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow" pluginId="DashenBank_LiquidateTransaction_APP"/>
+            <propertyName xmi:type="utility:TranslatableString" key="Property.BACKEND_URL" bundleName="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow" pluginId="DashenBank_LiquidateTransaction_App"/>
             <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOGGER_NAME">
-              <propertyName xmi:type="utility:TranslatableString" key="Property.LOGGER_NAME" bundleName="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow" pluginId="DashenBank_LiquidateTransaction_APP"/>
+              <propertyName xmi:type="utility:TranslatableString" key="Property.LOGGER_NAME" bundleName="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow" pluginId="DashenBank_LiquidateTransaction_App"/>
               <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG_TYPE">
-                <propertyName xmi:type="utility:TranslatableString" key="Property.LOG_TYPE" bundleName="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow" pluginId="DashenBank_LiquidateTransaction_APP"/>
+                <propertyName xmi:type="utility:TranslatableString" key="Property.LOG_TYPE" bundleName="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow" pluginId="DashenBank_LiquidateTransaction_App"/>
               </propertyDescriptor>
             </propertyDescriptor>
           </propertyDescriptor>
