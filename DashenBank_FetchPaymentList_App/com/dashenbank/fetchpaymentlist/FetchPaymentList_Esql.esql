@@ -119,7 +119,7 @@ CREATE COMPUTE MODULE FetchPayment_Flow_Compute1
 		DECLARE I INTEGER 1;
 		DECLARE name CHARACTER;
 		WHILE I<=j DO
-			
+
 			SET name = FIELDVALUE(InputRoot.SOAP.Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.(XMLNSC.Attribute)nil);
 			SET OutputRoot.SOAP.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[I].(SOAP.Attribute)*:nil = name;
 

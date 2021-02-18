@@ -1,112 +1,114 @@
 
 
-BROKER SCHEMA com.dashenbank.billstatus
+
+
+
+
+BROKER SCHEMA com.dashenbank.fetchpenalty
+
+
 PATH com.dashenbank.genericfunctions;
 
-
-DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER '';
-DECLARE LOG4J_ERROR EXTERNAL CHARACTER '';
-DECLARE BACKEND_URL EXTERNAL CHARACTER '';
-DECLARE LOGGER_NAME EXTERNAL CHARACTER '';
-DECLARE LOG_TYPE EXTERNAL CHARACTER '';
-
+DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER;
+DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER;
+DECLARE BACKEND_URL EXTERNAL CHARACTER;
+DECLARE LOGGER_NAME EXTERNAL CHARACTER;
+DECLARE LOG_TYPE EXTERNAL CHARACTER;
 --------------Global variables------------
 DECLARE rc BOOLEAN TRUE;
 
-CREATE COMPUTE MODULE RequestToFlexCube
-	DECLARE rc BOOLEAN;
+CREATE COMPUTE MODULE RequestToBackend
+
 	CREATE FUNCTION Main() RETURNS BOOLEAN
+
 	BEGIN
 		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
 		IF (rc = TRUE) THEN
-			CALL CopyEntireMessage();
+			CALL RequestToBackend();
 		ELSE
-			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR;
+			SET OutputRoot.SOAP.*:Body.Log.Message = LOG4J_ERROR_MSG;
 		END IF;
+
 		RETURN TRUE;
 	END;
+	CREATE PROCEDURE RequestToBackend( )
+	BEGIN
 
-	CREATE PROCEDURE CopyEntireMessage() BEGIN
-		DECLARE id CHARACTER InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
-		SET Environment.id = id;
+		SET Environment.id = InputRoot.SOAP.*:Body.*:FetchPenaltyList.*:providerID;
+		SET Environment.ccidRef = InputRoot.Properties.CodedCharSetId;
+		SET Environment.encodeRef = InputRoot.Properties.Encoding;
+		SET Environment.domainDataRef = InputRoot.SOAP.Body;
+		SET Environment.domainName = FIELDNAME(InputBody);
 
-		SET Environment.Variables.Encoding = InputRoot.Properties.Encoding;
-		SET Environment.Variables.CodedCharSetId = InputRoot.Properties.CodedCharSetId;
-		SET Environment.domainDataRef = InputRoot.SOAP;
-		SET Environment.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
+		DECLARE ccidRef INTEGER Environment.ccidRef;
+		DECLARE encodeRef INTEGER Environment.encodeRef;
+		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP.Body;
+		DECLARE domainName CHARACTER Environment.domainName;
 
-		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
-		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
-		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
-		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		
 		----------------------------------------------------
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(id,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
+		CALL PayloadLogging(Environment.id,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
-		
 		----------------------------------------------------
 		-------------Business Logic-------------------------
-		DECLARE InputRef REFERENCE TO InputRoot.SOAP.*:Body.*:CheckStatus;
-		
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-		DECLARE outDataRef REFERENCE TO OutputRoot.SOAP;
-		SET OutputRoot.SOAP.*:Body.*:CheckStatus.*:billID = InputRoot.SOAP.*:Body.*:CheckStatus.*:billID;
-		SET OutputRoot.SOAP.*:Body.*:CheckStatus.*:billerID = CAST(id AS CHARACTER);
-		SET OutputRoot.SOAP.*:Body.*:CheckStatus.*:appcode = InputRoot.SOAP.*:Body.*:CheckStatus.*:appcode;
-		SET OutputRoot.SOAP.*:Body.*:CheckStatus.*:apppassphrase = InputRoot.SOAP.*:Body.*:CheckStatus.*:apppassphrase;
+		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
+
+		DECLARE InputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:FetchPenaltyList;
+
+		SET outputbodyRef.*:Body.*:FetchPenaltyList.*:providerID= InputBodyRef.*:providerID;
+		SET outputbodyRef.*:Body.*:FetchPenaltyList.*:appcode= InputBodyRef.*:appcode;
+		SET outputbodyRef.*:Body.*:FetchPenaltyList.*:apppassphrase= InputBodyRef.*:apppassphrase;
+		SET outputbodyRef.*:Body.*:FetchPenaltyList.*:token= InputBodyRef.*:token;
+		SET outputbodyRef.*:Body.*:FetchPenaltyList.*:licenseNumber= InputBodyRef.*:licenseNumber;
+		SET outputbodyRef.*:Body.*:FetchPenaltyList.*:dtFrom= InputBodyRef.*:dtFrom;
+		SET outputbodyRef.*:Body.*:FetchPenaltyList.*:dtTo= InputBodyRef.*:dtTo;
+		SET outputbodyRef.*:Body.*:FetchPenaltyList.*:paymentstatus= InputBodyRef.*:paymentstatus;
+
 		SET Environment.outputData = OutputRoot.SOAP;
-        ----------------------------------------------------
+		----------------------------------------------------
 		----------------------Response Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE outRefData REFERENCE TO OutputRoot.XMLNSC;
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(id,Environment.resPayload,'FLEXCUBE_REQ',MessageFlowLabel,outRefData);
-		
+		CALL PayloadLogging(Environment.id,Environment.resPayload,'FLEXCUBE_REQ',MessageFlowLabel,outRefData);
+
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.SOAP = Environment.outputData;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||Environment.resPayload) INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
+
 
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
 	END;
+
 END MODULE;
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+CREATE COMPUTE MODULE ResponseToFrontend
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-CREATE COMPUTE MODULE ResponseToChannel
-	CREATE FUNCTION Main() RETURNS BOOLEAN
+	CREATE FUNCTION Main () RETURNS BOOLEAN
 	BEGIN
-		CALL initLog4j(LOG_CONFIG_PATH ) INTO rc;
-		IF (rc = TRUE) THEN
-			CALL CopyEntireMessage();
-		ELSE
-			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR;
-		END IF;
-		RETURN TRUE;
+
+		CALL ResponseToChannel();
 	END;
 
-
-	CREATE PROCEDURE CopyEntireMessage() BEGIN
+	CREATE PROCEDURE ResponseToChannel( )
+	BEGIN
 		SET Environment.domainDataRef = InputRoot.SOAP;
-        DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
+		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-
-
 		----------------------------------------------------
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -115,26 +117,24 @@ CREATE COMPUTE MODULE ResponseToChannel
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- FLEXCUBE_RES -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RES data  is: '||Environment.reqPayload) INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
-		
-		
 		----------------------------------------------------
 		-------------Business Logic-------------------------
-		DECLARE InputRef REFERENCE TO InputRoot.SOAP.*:Body.*:CheckStatusResponse.*:CheckStatusResult.*:CheckStatusResponse;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-		DECLARE outDataRef REFERENCE TO OutputRoot.SOAP;
-		
-        SET OutputRoot.SOAP.*:Body.*:CheckStatusResponse.*:CheckStatusResult.*:CheckStatusResponse.*:UtilAPICheckStatusResponse.*:CBSPosted = InputRef.*:UtilAPICheckStatusResponse.*:CBSPosted;
-		SET OutputRoot.SOAP.*:Body.*:CheckStatusResponse.*:CheckStatusResult.*:CheckStatusResponse.*:UtilAPICheckStatusResponse.*:ACHCreated = InputRef.*:UtilAPICheckStatusResponse.*:ACHCreated;
-		SET OutputRoot.SOAP.*:Body.*:CheckStatusResponse.*:CheckStatusResult.*:CheckStatusResponse.*:UtilAPICheckStatusResponse.*:ACHAccepted = InputRef.*:UtilAPICheckStatusResponse.*:ACHAccepted;
-		SET OutputRoot.SOAP.*:Body.*:CheckStatusResponse.*:CheckStatusResult.*:CheckStatusResponse.*:UtilAPICheckStatusResponse.*:ACHRejected = InputRef.*:UtilAPICheckStatusResponse.*:ACHRejected;
-		SET OutputRoot.SOAP.*:Body.*:CheckStatusResponse.*:CheckStatusResult.*:CheckStatusResponse.*:UtilAPICheckStatusResponse.*:Notified = InputRef.*:UtilAPICheckStatusResponse.*:Notified;
-		SET OutputRoot.SOAP.*:Body.*:CheckStatusResponse.*:CheckStatusResult.*:CheckStatusResponse.*:Successful = InputRef.*:Successful;
-		SET OutputRoot.SOAP.*:Body.*:CheckStatusResponse.*:CheckStatusResult.*:CheckStatusResponse.*:Remarks = InputRef.*:Remarks;
-        
-        SET Environment.outputData = OutputRoot.SOAP;
-         
-        ----------------------------------------------------
+		DECLARE OutputBodyRef REFERENCE TO OutputRoot.SOAP;
+		DECLARE iRef REFERENCE TO InputRoot.SOAP.*:Body.*:FetchPenaltyListResponse.*:FetchPenaltyListResult.*:FetchPenaltyListResponse.*:UtilAPIFetchPenaltyListResponse.*:UtilAPIFetchPenaltyListResponse;
+		DECLARE inputdataRef REFERENCE TO InputRoot.SOAP.*:Body.*:FetchPenaltyListResponse.*:FetchPenaltyListResult.*;
+		DECLARE j INTEGER CARDINALITY(InputRoot.SOAP.*:Body.*:FetchPenaltyListResponse.*:FetchPenaltyListResult.*:FetchPenaltyListResponse.*:UtilAPIFetchPenaltyListResponse.*:UtilAPIFetchPenaltyListResponse[]);
+		DECLARE I INTEGER 1;
+		WHILE I<=j DO
+			SET OutputBodyRef.*:Body.*:FetchPenaltyListResponse.*:FetchPenaltyListResult.*:FetchPenaltyListResponse.*:UtilAPIFetchPenaltyListResponse.UtilAPIFetchPenaltyListResponse[I].(XMLNSC.Attribute)*:nil = FIELDVALUE(InputRoot.SOAP.*:Body.*:FetchPenaltyListResponse.*:FetchPenaltyListResult.*:FetchPenaltyListResponse.*:UtilAPIFetchPenaltyListResponse.*:UtilAPIFetchPenaltyListResponse.(XMLNSC.Attribute)nil);
+			SET I = I+1;
+			MOVE iRef NEXTSIBLING;
+		END WHILE;
+		SET OutputBodyRef.*:Body.*:FetchPenaltyListResponse.*:FetchPenaltyListResult.*:FetchPenaltyListResponse.*:Successful = inputdataRef.*:Successful;
+		SET OutputBodyRef.*:Body.*:FetchPenaltyListResponse.*:FetchPenaltyListResult.*:FetchPenaltyListResponse.*:Remarks = inputdataRef.*:Remarks;
+
+		SET Environment.outputData = OutputRoot.SOAP;
+		----------------------------------------------------
 		----------------------Response Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE outputRef REFERENCE TO OutputRoot.XMLNSC;
@@ -142,17 +142,16 @@ CREATE COMPUTE MODULE ResponseToChannel
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
 		CALL PayloadLogging(Environment.id,Environment.resPayload,'CHANNEL_RES',MessageFlowLabel,outputRef);
-		
+
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 		SET OutputRoot.SOAP = Environment.outputData;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RES -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RES data is: '||Environment.resPayload) INTO rc;
-		
+
 	END;
 END MODULE;
-
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -165,7 +164,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 	END;
 
 	CREATE PROCEDURE BuildExceptionResponse() BEGIN
-	CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
 		--DECLARE inRef REFERENCE TO InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment;
 		DECLARE outRefer,outRef REFERENCE TO OutputRoot;
@@ -177,7 +176,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,Environment.Variables.Encoding,Environment.Variables.CodedCharSetId);
 		CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
 		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
-	    CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
+		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
 		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME ApplicationLabel;
 		CALL BuildExceptionDetails(excpRef,envRef,ApplicationLabel);
 		SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
@@ -194,9 +193,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionNumber = InputRoot.XMLNSC.ExceptionDetails.excpNumber;
 		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionLable = InputRoot.XMLNSC.ExceptionDetails.excpLable;
 		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionDescription = InputRoot.XMLNSC.ExceptionDetails.excpText;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = InputRoot.XMLNSC.ExceptionDetails.actualExcpText;
-		
-		
+		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = InputRoot.XMLNSC.ExceptionDetails.actualExcpText;		
 		--SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
 	END;
