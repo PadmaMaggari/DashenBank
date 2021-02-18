@@ -1,18 +1,17 @@
 
 
-
-
 BROKER SCHEMA com.dashenbank.fetchpaymentlist
 
 
 PATH com.dashenbank.genericfunctions;
 
 
-DECLARE LOG4J_CONFIG_PATH EXTERNAL CHARACTER '';
-DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER '';
-DECLARE LOGGER_NAME EXTERNAL CHARACTER '';
-DECLARE LOG_TYPE EXTERNAL CHARACTER '';
-DECLARE BACKEND_URL EXTERNAL CHARACTER '';
+DECLARE LOG4J_CONFIG_PATH EXTERNAL CHARACTER;
+DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER;
+DECLARE LOGGER_NAME EXTERNAL CHARACTER;
+DECLARE LOG_TYPE EXTERNAL CHARACTER;
+DECLARE BACKEND_URL EXTERNAL CHARACTER;
+DECLARE xsi NAMESPACE 'https://www.fintech-group.com/services/Finpay';
 --------Global Variables----------
 DECLARE rc BOOLEAN TRUE;
 
@@ -115,30 +114,20 @@ CREATE COMPUTE MODULE FetchPayment_Flow_Compute1
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputRef REFERENCE TO OutputRoot.SOAP;
 
---		DECLARE iRef REFERENCE TO inRef.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse;
---		DECLARE j INTEGER CARDINALITY(InputRoot.SOAP.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[]);
---		DECLARE I INTEGER 1;
---		WHILE I<=j DO
---			-- <root id="12345">
---			-- <id>ABCDE</id>
---			--</root>
---			--
---			--SET value = FIELDVALUE(InputRoot.XMLNSC.root.(XMLNSC.Attribute)id)
---			--The result is that value is set to '12345'.
---			--
---			--CREATE LASTCHILD OF OutputRoot.XMLNSC Type XMLNSC.Folder Name 'root';
---			--SET OutputRoot.XMLNSC.root.(XMLNSC.Attribute)id
---			-- SET outputRef.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[I].(XMLNSC.Attribute)nil = FIELDVALUE(inRef.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.(XMLNSC.Attribute)nil);
---
-	--		SET outputRef.Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[I].(XMLNSC.Attribute)nil = 
---			FIELDVALUE(InputRoot.SOAP.Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[I]);
---
---			SET I = I+1;
---			MOVE iRef NEXTSIBLING;
---
---		END WHILE;
-        
-        SET outputRef.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse = inRef.*:UtilAPIFetchPaymentListResponse;
+		DECLARE iRef REFERENCE TO inRef.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse;
+		DECLARE j INTEGER CARDINALITY(InputRoot.SOAP.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[]);
+		DECLARE I INTEGER 1;
+		DECLARE name CHARACTER;
+		WHILE I<=j DO
+			
+			SET name = FIELDVALUE(InputRoot.SOAP.Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.(XMLNSC.Attribute)nil);
+			SET OutputRoot.SOAP.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[I].(SOAP.Attribute)*:nil = name;
+
+			SET I = I+1;
+			MOVE iRef NEXTSIBLING;
+
+		END WHILE;
+		--- SET outputRef.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse = inRef.*:UtilAPIFetchPaymentListResponse;
 		SET outputRef.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:Successful = inRef.*:Successful;
 		SET outputRef.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:Remarks = inRef.*:Remarks;
 
