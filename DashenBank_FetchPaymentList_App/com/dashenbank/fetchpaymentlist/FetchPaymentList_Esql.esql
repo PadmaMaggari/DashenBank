@@ -115,28 +115,30 @@ CREATE COMPUTE MODULE FetchPayment_Flow_Compute1
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputRef REFERENCE TO OutputRoot.SOAP;
 
-		DECLARE iRef REFERENCE TO inRef.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse;
-		DECLARE j INTEGER CARDINALITY(InputRoot.SOAP.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[]);
-		DECLARE I INTEGER 1;
-		WHILE I<=j DO
-			-- <root id="12345">
-			-- <id>ABCDE</id>
-			--</root>
-			--
-			--SET value = FIELDVALUE(InputRoot.XMLNSC.root.(XMLNSC.Attribute)id)
-			--The result is that value is set to '12345'.
-			--
-			--CREATE LASTCHILD OF OutputRoot.XMLNSC Type XMLNSC.Folder Name 'root';
-			--SET OutputRoot.XMLNSC.root.(XMLNSC.Attribute)id
-			-- SET outputRef.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[I].(XMLNSC.Attribute)nil = FIELDVALUE(inRef.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.(XMLNSC.Attribute)nil);
-
-			SET outputRef.Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[I].(XMLNSC.Attribute)nil = 
-			FIELDVALUE(InputRoot.SOAP.Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[I]);
-
-			SET I = I+1;
-			MOVE iRef NEXTSIBLING;
-
-		END WHILE;
+--		DECLARE iRef REFERENCE TO inRef.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse;
+--		DECLARE j INTEGER CARDINALITY(InputRoot.SOAP.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[]);
+--		DECLARE I INTEGER 1;
+--		WHILE I<=j DO
+--			-- <root id="12345">
+--			-- <id>ABCDE</id>
+--			--</root>
+--			--
+--			--SET value = FIELDVALUE(InputRoot.XMLNSC.root.(XMLNSC.Attribute)id)
+--			--The result is that value is set to '12345'.
+--			--
+--			--CREATE LASTCHILD OF OutputRoot.XMLNSC Type XMLNSC.Folder Name 'root';
+--			--SET OutputRoot.XMLNSC.root.(XMLNSC.Attribute)id
+--			-- SET outputRef.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[I].(XMLNSC.Attribute)nil = FIELDVALUE(inRef.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.(XMLNSC.Attribute)nil);
+--
+	--		SET outputRef.Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[I].(XMLNSC.Attribute)nil = 
+--			FIELDVALUE(InputRoot.SOAP.Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse[I]);
+--
+--			SET I = I+1;
+--			MOVE iRef NEXTSIBLING;
+--
+--		END WHILE;
+        
+        SET outputRef.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:UtilAPIFetchPaymentListResponse = inRef.*:UtilAPIFetchPaymentListResponse;
 		SET outputRef.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:Successful = inRef.*:Successful;
 		SET outputRef.*:Body.*:FetchPaymentListByDriverIDResponse.*:FetchPaymentListByDriverIDResult.*:FetchPaymentListResponse.*:Remarks = inRef.*:Remarks;
 
