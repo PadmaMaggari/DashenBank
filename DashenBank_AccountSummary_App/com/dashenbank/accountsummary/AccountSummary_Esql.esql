@@ -30,7 +30,8 @@ CREATE COMPUTE MODULE RequestToFlexcube
 
 	CREATE PROCEDURE GenerateReqToFlexcube() BEGIN
 		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_REQ;		
-
+		DECLARE EnRef REFERENCE TO Environment.Variables;
+		CREATE LASTCHILD OF Environment AS EnRef NAME 'Variables';
 
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
@@ -60,22 +61,22 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputRef REFERENCE TO OutputRoot.SOAP;
 
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:ACTION = inputHeaderRef.*:ACTION;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:DESTINATION = inputHeaderRef.*:DESTINATION;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:ENTITY = inputHeaderRef.*:ENTITY;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MODULEID = inputHeaderRef.*:MODULEID;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MSGID = inputHeaderRef.*:MSGID;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MULTITRIPID = inputHeaderRef.*:MULTITRIPID;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:ACTION 		= inputHeaderRef.*:ACTION;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:BRANCH 		= inputHeaderRef.*:BRANCH;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:CORRELID 		= inputHeaderRef.*:CORRELID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:DESTINATION 	= inputHeaderRef.*:DESTINATION;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:ENTITY 		= inputHeaderRef.*:ENTITY;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:FUNCTIONID 	= inputHeaderRef.*:FUNCTIONID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MODULEID 		= inputHeaderRef.*:MODULEID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MSGID 		= inputHeaderRef.*:MSGID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MSGSTAT 		= inputHeaderRef.*:MSGSTAT;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MULTITRIPID 	= inputHeaderRef.*:MULTITRIPID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:OPERATION 	= inputHeaderRef.*:OPERATION;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:SERVICE 		= inputHeaderRef.*:SERVICE;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:SOURCE 		= inputHeaderRef.*:SOURCE;
 		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
-		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:UBSCOMP 		= inputHeaderRef.*:UBSCOMP;
+		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:USERID 		= inputHeaderRef.*:USERID;
 
 		SET outputRef.*:Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_BODY.*:"Stvw-Account-Sumary-IO".*:CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO;
 
