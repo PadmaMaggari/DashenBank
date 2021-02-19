@@ -1,6 +1,8 @@
 
 
 
+
+
 BROKER SCHEMA com.dashenbank.accountsummary
 PATH com.dashenbank.genericfunctions;
 
@@ -25,10 +27,8 @@ CREATE COMPUTE MODULE RequestToFlexcube
 	END;
 
 	CREATE PROCEDURE GenerateReqToBackend() BEGIN
-		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_REQ;
 		DECLARE envRef REFERENCE TO Environment.Variables;
 		CREATE LASTCHILD OF Environment AS envRef NAME 'Variables';
-
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
@@ -36,10 +36,10 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		SET envRef.CodedCharSetId = ccidRef;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
-
 		SET envRef.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 
+		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_REQ;
 		SET envRef.id = inRef.*:FCUBS_HEADER.*:MSGID;
 		----------------------------------------------------
 		----------------------Request Logging-------------------------
