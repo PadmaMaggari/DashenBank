@@ -7,6 +7,10 @@
 
 
 
+
+
+
+
 BROKER SCHEMA com.dashenbank.genericsubflow
 
 PATH com.dashenbank.genericfunctions;
@@ -25,35 +29,40 @@ DECLARE REVCD EXTERNAL CHARACTER '';
 DECLARE REVRPTCD EXTERNAL CHARACTER '';
 DECLARE MSGCLASSREV EXTERNAL CHARACTER '';
 DECLARE MSGFUNADV EXTERNAL CHARACTER '';
-
+--------Global Variables----------
 DECLARE rc BOOLEAN FALSE;
 DECLARE encodeRef INTEGER;
 DECLARE ccidRef INTEGER;
 
+
 CREATE COMPUTE MODULE ExceptionHandler_ESQL
+	DECLARE envRef REFERENCE TO Environment.Variables;
 
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		--CALL CopyMessageHeaders();
 		SET OutputRoot.Properties = InputRoot.Properties;
 
+		CREATE LASTCHILD OF Environment AS envRef NAME 'Variables';
+
 		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
 		IF ( rc = FALSE ) THEN
-			SET Environment.Variables.Log4j.ErrorMsg = LOG4J_INIT_ERROR_MSG;
+			SET envRef.Log4j.ErrorMsg = LOG4J_INIT_ERROR_MSG;
 		END IF;
+
 		DECLARE exceptiondesc,inputChar,logdata CHARACTER '';
 		DECLARE domainDataRef REFERENCE TO InputRoot;
 		SET Environment.domainDataRef = domainDataRef;
 		DECLARE domainFldName CHARACTER FIELDNAME(InputBody);
 		SET Environment.domainFldName = domainFldName;
-		IF Environment.Variables.Encoding IS NULL OR Environment.Variables.CodedCharSetId IS NULL THEN
+		IF envRef.Encoding IS NULL OR envRef.CodedCharSetId IS NULL THEN
 			SET ccidRef = InputRoot.Properties.CodedCharSetId;
 			SET encodeRef = InputRoot.Properties.Encoding;
-			SET Environment.Variables.Encoding = encodeRef;
-			SET Environment.Variables.CodedCharSetId = ccidRef;
+			SET envRef.Encoding = encodeRef;
+			SET envRef.CodedCharSetId = ccidRef;
 		ELSE
-			SET ccidRef = Environment.Variables.CodedCharSetId;
-			SET encodeRef = Environment.Variables.Encoding;
+			SET ccidRef = envRef.CodedCharSetId;
+			SET encodeRef = envRef.Encoding;
 		END IF;
 
 		DECLARE systemsTraceAuditNumber,timeLocalTransaction,dateLocalTransaction,retrievalReferenceNumber CHARACTER '';
@@ -66,15 +75,15 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		SET Environment.tcpip.Id = CAST(tcpipDetails.Id AS CHARACTER);
 		---------HTTP Router Properties----------
 
-		IF Environment.Variables.RequestIdentifier IS NULL THEN
-			SET Environment.Variables.RequestIdentifier = Environment.RequestIdentifier;
+		IF envRef.RequestIdentifier IS NULL THEN
+			SET envRef.RequestIdentifier = Environment.RequestIdentifier;
 		END IF;
-		IF Environment.Variables.RequestIdentifier IS NULL AND Environment.RequestIdentifier IS NULL THEN
-			SET Environment.Variables.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
+		IF envRef.RequestIdentifier IS NULL AND Environment.RequestIdentifier IS NULL THEN
+			SET envRef.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		END IF;
 		/* ==================================== DB LOGGING PROPERTIES END ===================================== */
 
-		CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','..............start logging Exception...........') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,'ErrorLogger','ERROR','..............start logging Exception...........') INTO rc;
 		CREATE LASTCHILD Of OutputRoot DOMAIN 'XMLNSC';
 		CREATE LASTCHILD Of OutputRoot.XMLNSC NAME 'ExceptionDetails';
 		DECLARE outRef REFERENCE TO OutputRoot.XMLNSC.ExceptionDetails;
@@ -84,12 +93,12 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		--get exception in xml format
 		CALL getExceptionDesc(excpRef,insertRef,outRef);
 		--set exception details in environment
-		SET Environment.Variables.ExceptionData = OutputRoot.XMLNSC.ExceptionDetails; --Here changed to get the exact exception information
-		SET Environment.Variables.excpNumber= OutputRoot.XMLNSC.ExceptionDetails.excpNumber;
-		SET Environment.Variables.excpText = OutputRoot.XMLNSC.ExceptionDetails.excpText;
-		SET Environment.Variables.actualExcpText = OutputRoot.XMLNSC.ExceptionDetails.actualExcpText;
-		SET Environment.Variables.excpType = OutputRoot.XMLNSC.ExceptionDetails.excpType;
-		DECLARE exceptionTxt CHARACTER Environment.Variables.ExceptionData.excpText;
+		SET envRef.ExceptionData = OutputRoot.XMLNSC.ExceptionDetails; --Here changed to get the exact exception information
+		SET envRef.excpNumber= OutputRoot.XMLNSC.ExceptionDetails.excpNumber;
+		SET envRef.excpText = OutputRoot.XMLNSC.ExceptionDetails.excpText;
+		SET envRef.actualExcpText = OutputRoot.XMLNSC.ExceptionDetails.actualExcpText;
+		SET envRef.excpType = OutputRoot.XMLNSC.ExceptionDetails.excpType;
+		DECLARE exceptionTxt CHARACTER envRef.ExceptionData.excpText;
 
 		IF CONTAINS(exceptionTxt,'ParserException') THEN
 			SET inputChar = 'unable to parse the data';
@@ -108,7 +117,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 				SET inputChar=getPayLoad(FIELDNAME(InputBody),domainDataRef.BLOB,encodeRef,ccidRef);
 			WHEN domainFldName='DFDL' AND EXISTS(InputRoot.DFDL.*[]) THEN
 				DECLARE inputRef REFERENCE TO InputRoot.DFDL;
-				SET Environment.Variables.DFDL = inputRef;
+				SET envRef.DFDL = inputRef;
 				/*========================== DFDL ======================*/
 				-- CASE
 				-- WHEN FIELDNAME(inputRef.ISO8583TCPHeader) IS NOT NULL AND EXISTS(InputRoot.DFDL.*[]) THEN
@@ -129,24 +138,25 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 				-- SET inputChar = getPayLoad(FIELDNAME(InputBody),inputRef,encodeRef,ccidRef);
 				-- SET Environment.reqMsg = inputChar;
 				-- END CASE;
+
 			WHEN (domainFldName = 'JSON' AND EXISTS(InputRoot.JSON.*[])) THEN
 				SET inputChar = getPayLoad(FIELDNAME(InputBody),domainDataRef.JSON,encodeRef,ccidRef);
 			END CASE;
 		END IF;
 		--set systemsTraceAuditNumber,dateLocalTransaction,timeLocalTransaction,retrievalReferenceNumber to environment
-		SET Environment.Variables.systemsTraceAuditNumber = systemsTraceAuditNumber;
-		SET Environment.Variables.timeLocalTransaction = timeLocalTransaction;
-		SET Environment.Variables.dateLocalTransaction = dateLocalTransaction;
-		SET Environment.Variables.retrievalReferenceNumber = retrievalReferenceNumber;
-		SET Environment.OutgoingRouterErrorCodes.OutGoingRouter.ErrorCode = CAST(Environment.Variables.excpNumber AS CHARACTER);
+		SET envRef.systemsTraceAuditNumber = systemsTraceAuditNumber;
+		SET envRef.timeLocalTransaction = timeLocalTransaction;
+		SET envRef.dateLocalTransaction = dateLocalTransaction;
+		SET envRef.retrievalReferenceNumber = retrievalReferenceNumber;
+		SET Environment.OutgoingRouterErrorCodes.OutGoingRouter.ErrorCode = CAST(envRef.excpNumber AS CHARACTER);
 
 		IF inputChar IS NOT NULL THEN
 		ELSE
 			SET inputChar = COALESCE(inputChar,'emptydata or unable to parse the data');
 		END IF;
-		DECLARE CR CHARACTER CAST(CAST('X''0A''' AS BLOB) AS CHARACTER CCSID Environment.Variables.CodedCharSetId);
+		DECLARE CR CHARACTER CAST(CAST('X''0A''' AS BLOB) AS CHARACTER CCSID envRef.CodedCharSetId);
 		SET logdata = exceptionTxt||CR||'INPUT_ORIGINAL_MESSAGE:START'||CR||inputChar||CR||'INPUT_ORIGINAL_MESSAGE:STOP' ;
-		SET Environment.Variables.logdata = logdata;
+		SET envRef.logdata = logdata;
 		CALL writeToLogFile(MessageFlowLabel,'ErrorLogger','ERROR',exceptionTxt) into rc;
 		CALL writeToLogFile(MessageFlowLabel,'ErrorLogger','ERROR',logdata) into rc;
 		--start editing(If T24 is down or unavailable send error response to front end in ISO with ResponseCode(06))
@@ -157,26 +167,26 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 				CONTAINS(exceptionTxt,'your session has been killed') OR
 				CONTAINS(exceptionTxt,'SocketException') OR CONTAINS(exceptionTxt,'Unexpected Network Error')) AND CONTAINS(flowName,'OutgoingRouterFlow')= FALSE THEN
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','Connection refused or Connection Dead or your session has been killed or Socket Expection or Unexpected Network Error') INTO rc;
-				--IF Environment.Variables.RequestIdentifier IS NULL OR FIELDVALUE( Environment.Variables.RequestIdentifier) IS NULL THEN
-				--IF Environment.Variables.Counter IS NULL THEN
-				--SET Environment.Variables.Counter = 1;
+				--IF envRef.RequestIdentifier IS NULL OR FIELDVALUE( envRef.RequestIdentifier) IS NULL THEN
+				--IF envRef.Counter IS NULL THEN
+				--SET envRef.Counter = 1;
 				--END IF;
 				--ELSE
-				--IF Environment.Variables.Counter IS NULL THEN
-				--SET Environment.Variables.Counter = 1;
+				--IF envRef.Counter IS NULL THEN
+				--SET envRef.Counter = 1;
 				--END IF;
 				--END IF;
-				--IF Environment.Variables.Counter <= MAX_RETRY_COUNT THEN
+				--IF envRef.Counter <= MAX_RETRY_COUNT THEN
 				--SET OutputRoot = NULL;
 				--CALL CopyMessageHeaders();
 				--SET OutputRoot = InputRoot;
-				--SET Environment.Variables.Counter = Environment.Variables.Counter + 1;
-				--CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','connection exception retry count:'||CAST(Environment.Variables.Counter AS CHARACTER)) INTO rc;
+				--SET envRef.Counter = envRef.Counter + 1;
+				--CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','connection exception retry count:'||CAST(envRef.Counter AS CHARACTER)) INTO rc;
 				--RETURN TRUE;
 				--ELSE
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','connection exception retry count reached send response') INTO rc;
 				SET OutputRoot = NULL;
-				IF FIELDNAME(Environment.Variables.RequestIdentifier) IS NULL OR FIELDVALUE(Environment.Variables.RequestIdentifier) = '' THEN
+				IF FIELDNAME(envRef.RequestIdentifier) IS NULL OR FIELDVALUE(envRef.RequestIdentifier) = '' THEN
 					IF domainFldName='DFDL' AND EXISTS(InputRoot.DFDL.*[]) THEN
 						--CALL revertBackToSystem(ccidRef,encodeRef);
 					END IF;
@@ -193,7 +203,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 				CONTAINS(exceptionTxt,'Unexpected Network Error')) = FALSE THEN
 				CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','Exception Occured') INTO rc;
 				SET OutputRoot = NULL;
-				IF domainFldName='DFDL' AND EXISTS(InputRoot.DFDL.*[]) AND CONTAINS(flowName,'OutgoingRouterFlow') = FALSE AND FIELDVALUE(Environment.Variables.RequestIdentifier) IS NULL THEN
+				IF domainFldName='DFDL' AND EXISTS(InputRoot.DFDL.*[]) AND CONTAINS(flowName,'OutgoingRouterFlow') = FALSE AND FIELDVALUE(envRef.RequestIdentifier) IS NULL THEN
 					--CALL revertBackToSystem(ccidRef,encodeRef);
 				END IF;
 				CALL LogException(encodeRef,ccidRef);
@@ -221,8 +231,9 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 			CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','..............end of logging Exception...........') INTO rc;
 			-- RETURN TRUE;
 		END IF;
+
 		IF Environment.ExceptionType = 'DatabaseException' THEN
-			SET Environment.Exception = 'Database Exception';
+			SET Environment.ExceptionName = 'Database Exception';
 		ELSE
 			CALL ErrorDBLogging();
 		END IF;
@@ -234,7 +245,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 	*/
 	CREATE PROCEDURE LogException(IN encodeRef INTEGER,IN ccidRef INTEGER) BEGIN
 		CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','Capturing Connection refused or Connection Dead or your session has been killed or Unexpected Network Error in Exception Q') INTO rc;
-		DECLARE excpRef REFERENCE TO Environment.Variables.ExceptionData;
+		DECLARE excpRef REFERENCE TO envRef.ExceptionData;
 		DECLARE exe_Desc CHARACTER;
 		DECLARE outRefer REFERENCE TO OutputRoot;
 		SET OutputRoot.Properties = Environment.Properties;
@@ -245,9 +256,9 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		CALL BuildExceptionDetails(excpRef,outRef,'ExceptionDetails');
 
 		SET Environment.ExceptionType = excpRef.excpType;
-		SET Environment.Variables.UserDefinedErrorCodes = OutputRoot.XMLNSC;
-		SET Environment.responseCode = Environment.Variables.UserDefinedErrorCodes.ExceptionDetails.ErrorCode;
-		SET OutputRoot.XMLNSC.ExceptionDetails = Environment.Variables.ExceptionData;
+		SET envRef.UserDefinedErrorCodes = OutputRoot.XMLNSC;
+		SET Environment.responseCode = envRef.UserDefinedErrorCodes.ExceptionDetails.ErrorCode;
+		SET OutputRoot.XMLNSC.ExceptionDetails = envRef.ExceptionData;
 		DECLARE dominOutRef REFERENCE TO OutputRoot.XMLNSC;
 		DECLARE domainName CHARACTER FIELDNAME(OutputRoot.XMLNSC);
 		CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','Error Details Start::::::'||getPayLoad(domainName,dominOutRef,encodeRef,ccidRef) || ':::::Error Details End') INTO rc;
@@ -260,7 +271,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 	-- /* details like tcpip id and systemTraceNumber and dateLocalTransaction and retrievalRefarenceNumber */
 	-- CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
 	-- IF ( rc = FALSE ) THEN
-	-- SET Environment.Variables.Log4j.ErrorMsg = LOG4J_INIT_ERROR_MSG;
+	-- SET envRef.Log4j.ErrorMsg = LOG4J_INIT_ERROR_MSG;
 	-- END IF;
 	-- CALL writeToLogFile(MessageFlowLabel, 'ErrorLogger', 'ERROR','Revert back to front end') INTO rc;
 	-- DECLARE inputRef REFERENCE TO InputRoot.DFDL;
@@ -421,6 +432,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 			SET outRef.excpText = SOAP_TIMEOUT_ERROR_MSG ||CAST(timoutField.SOAP.Input.Timeout.OriginalClientWaitTime AS CHARACTER)||' seconds).';
 		END IF;
 	END;
+
 	CREATE PROCEDURE stringValidation (IN text CHARACTER)
 	RETURNS BOOLEAN
 	BEGIN
@@ -434,9 +446,10 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 			RETURN FALSE;
 		END IF;
 	END;
+
 	CREATE PROCEDURE ErrorDBLogging() BEGIN
-		IF Environment.id IS NULL THEN
-			SET Environment.id = Environment.Variables.RequestIdentifier;
+		IF envRef.id IS NULL THEN
+			SET envRef.id = envRef.RequestIdentifier;
 		END IF;
 		DECLARE seq_Id INTEGER 1;
 
@@ -445,7 +458,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		END IF;
 
 		DECLARE creationDate TIMESTAMP CAST(CURRENT_TIMESTAMP AS TIMESTAMP FORMAT 'IU');
-		CALL insertdb_logging_error(seq_Id,CAST(Environment.id AS CHARACTER),creationDate,Environment.Variables.logdata,Environment.domainFldName,ApplicationLabel,ExecutionGroupLabel,Environment.Variables.actualExcpText,Environment.Variables.excpText,Environment.Variables.timeLocalTransaction,Environment.Variables.dateLocalTransaction,Environment.Variables.retrievalReferenceNumber,CAST(Environment.Variables.excpNumber AS CHARACTER),Environment.responseCode);
+		CALL insertdb_logging_error(seq_Id,CAST(envRef.id AS CHARACTER),creationDate,envRef.logdata,Environment.domainFldName,ApplicationLabel,ExecutionGroupLabel,envRef.actualExcpText,envRef.excpText,envRef.timeLocalTransaction,envRef.dateLocalTransaction,envRef.retrievalReferenceNumber,CAST(envRef.excpNumber AS CHARACTER),Environment.responseCode);
 	END;
 
 END MODULE;
