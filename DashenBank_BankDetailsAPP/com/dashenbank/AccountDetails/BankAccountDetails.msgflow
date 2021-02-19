@@ -3,7 +3,7 @@
     xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" nsURI="com/dashenbank/AccountDetails/BankAccountDetails.msgflow" nsPrefix="com_dashenbank_AccountDetails_BankAccountDetails.msgflow">
   <eClassifiers xmi:type="eflow:FCMComposite" name="FCMComposite_1">
     <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_PATH" name="LOG4J_PATH" defaultValueLiteral="C:/DashenBank/Log4j/broker.xml">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_CONFIG_PATH" name="LOG_CONFIG_PATH" defaultValueLiteral="C:/DashenBank/Log4j/broker.xml">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR" name="LOG4J_ERROR" defaultValueLiteral="Log4J Initialization Error">
@@ -32,13 +32,13 @@
         <translation xmi:type="utility:ConstantString" string="PayloadLogging"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_32" location="325,119" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/backend" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
-        <translation xmi:type="utility:ConstantString" string="FluxCudeCall"/>
+        <translation xmi:type="utility:ConstantString" string="BackendCall"/>
       </nodes>
       <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_1" location="384,231">
         <translation xmi:type="utility:ConstantString" string="ExceptionHandlerSubFlow"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="182,117" computeExpression="esql://routine/com.dashenbank.BankAccountDetails#BankAccountDetails_RequestToFlexcube.Main" computeMode="all">
-        <translation xmi:type="utility:ConstantString" string="RequestToFlexCube"/>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="182,117" computeExpression="esql://routine/com.dashenbank.BankAccountDetails#BankAccountDetails_RequestToBackend.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
       </nodes>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="398,118" computeExpression="esql://routine/com.dashenbank.BankAccountDetails#BankAccountDetails_ResponseToChannel.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel"/>
@@ -61,8 +61,8 @@
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_15" targetNode="FCMComposite_1_1" sourceNode="FCMComposite_1_32" sourceTerminalName="OutTerminal.fault" targetTerminalName="InTerminal.Input"/>
     </composition>
     <propertyOrganizer>
-      <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_PATH">
-        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_PATH" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_APP"/>
+      <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG_CONFIG_PATH">
+        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG_CONFIG_PATH" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_APP"/>
         <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_ERROR">
           <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_APP"/>
           <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.BACKEND_URL">

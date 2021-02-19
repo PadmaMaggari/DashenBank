@@ -13,7 +13,7 @@ DECLARE LOG_TYPE EXTERNAL CHARACTER;
 --------Global Variables----------
 DECLARE rc BOOLEAN FALSE;
 
-CREATE COMPUTE MODULE RequestToFlexcube
+CREATE COMPUTE MODULE RequestToBackend
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
@@ -79,11 +79,11 @@ END MODULE;
 CREATE COMPUTE MODULE ResponseToFrontEnd
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		CALL response_from_flexcube();
+		CALL response_from_Backend();
 		RETURN TRUE;
 	END;
 
-	CREATE PROCEDURE response_from_flexcube() BEGIN
+	CREATE PROCEDURE response_from_Backend() BEGIN
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;

@@ -34,8 +34,8 @@
       <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="29,120" wsdlOperationMode="gateway" wsdlFileName="AccountBalEnq.wsdl" selectedPortType="AccountBalEnq" selectedBinding="AccountBalEnqSOAP" selectedPort="AccountBalEnqSOAP" targetNamespace="http://www.example.org/AccountBalEnq/" useHTTPTransport="true" urlSelector="/ESB_AccountBalanceEnquiry" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Service_Request"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="151,117" computeExpression="esql://routine/com.dashenbank.accountbalanceenquiry#RequestToFlexCube.Main" computeMode="all">
-        <translation xmi:type="utility:ConstantString" string="RequestToFlexcube"/>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_11" location="151,117" computeExpression="esql://routine/com.dashenbank.accountbalanceenquiry#RequestToBackend.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
       </nodes>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_13" location="382,118" computeExpression="esql://routine/com.dashenbank.accountbalanceenquiry#ResponseToChannel.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel"/>

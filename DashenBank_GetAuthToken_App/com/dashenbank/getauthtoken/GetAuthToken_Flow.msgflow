@@ -31,8 +31,8 @@
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="494,214" computeExpression="esql://routine/com.dashenbank.getauthtoken#BuildExceptionResponse.Main" computeMode="destinationAndMessage">
         <translation xmi:type="utility:ConstantString" string="BuildBusinessError"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="153,138" transaction="commit" computeExpression="esql://routine/com.dashenbank.getauthtoken#RequestToFlexcube.Main" computeMode="all">
-        <translation xmi:type="utility:ConstantString" string="RequestToFlexcube"/>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="153,138" transaction="commit" computeExpression="esql://routine/com.dashenbank.getauthtoken#RequestToBackend.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="609,140">
         <translation xmi:type="utility:ConstantString" string="Service_Reply"/>
@@ -44,7 +44,7 @@
         <translation xmi:type="utility:ConstantString" string="PayloadLogging"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="298,139" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/Flexcube/simulator/service" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
-        <translation xmi:type="utility:ConstantString" string="FlexCubeCall"/>
+        <translation xmi:type="utility:ConstantString" string="BackendCall"/>
       </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
