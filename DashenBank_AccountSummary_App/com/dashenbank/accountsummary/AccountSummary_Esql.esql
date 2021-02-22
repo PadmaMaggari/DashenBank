@@ -1,9 +1,5 @@
 
 
-
-
-
-
 BROKER SCHEMA com.dashenbank.accountsummary
 PATH com.dashenbank.genericfunctions;
 
@@ -201,7 +197,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 
 
 	CREATE PROCEDURE BuildExceptionResponse() BEGIN
-		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
 		--DECLARE inRef REFERENCE TO InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment.Variables;
 		DECLARE enRef REFERENCE TO Environment;
@@ -222,17 +218,21 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		SET domainName = FIELDNAME(domainDataRef);
 		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,envRef.Encoding,envRef.CodedCharSetId);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Application Built Exception:'||resPayload) INTO rc;
-		DECLARE inputRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
 
-		SET OutputRoot.XMLNSC.ExceptionDetails.Msg_Id = envRef.id;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionType = inputRef.excpType;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionNumber = inputRef.excpNumber;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionLable = inputRef.excpLable;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionDescription = inputRef.excpText;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = inputRef.actualExcpText;
+		DECLARE inputRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		CREATE LASTCHILD OF OutputRoot.XMLNSC NAME 'ExceptionDetails';
+		DECLARE outExcpRef REFERENCE TO OutputRoot.XMLNSC.ExceptionDetails;
+		SET outExcpRef.Msg_Id = envRef.id;
+		SET outExcpRef.ExceptionType = inputRef.excpType;
+		SET outExcpRef.ExceptionNumber = inputRef.excpNumber;
+		SET outExcpRef.ExceptionLable = inputRef.excpLable;
+		SET outExcpRef.ExceptionDescription = inputRef.excpText;
+		SET outExcpRef.ActualExceptionText = inputRef.actualExcpText;
 
 		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = envRef.RequestIdentifier;
-		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
+
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
 
 	END;
 END MODULE;
