@@ -1,7 +1,6 @@
 
 
 
-
 BROKER SCHEMA com.dashenbank.accountsummary
 PATH com.dashenbank.genericfunctions;
 
@@ -108,7 +107,6 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment.Variables;
-		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_RES;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
@@ -124,6 +122,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.reqPayload) INTO rc;
 		----------------------------------------------------
 		-------------Business Logic-------------------------
+		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_RES;
 		DECLARE inputHeaderRef REFERENCE TO inRef.*:FCUBS_HEADER;
 		DECLARE inputBodyRef REFERENCE TO inRef.*:FCUBS_BODY;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
@@ -208,9 +207,9 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
 		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,envRef.Encoding,envRef.CodedCharSetId);
 		CREATE LASTCHILD OF Environment AS enRef DOMAIN 'XMLNSC';
-		-- CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Envelope';
-		-- CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Body';
-		-- CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'esb' NAME ApplicationLabel;
+		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Envelope';
+		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Body';
+		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'esb' NAME ApplicationLabel;
 		CALL BuildExceptionDetails(excpRef,enRef,ApplicationLabel);
 		SET envRef.UserDefinedException = Environment.XMLNSC;
 		MOVE domainDataRef TO Environment.XMLNSC;
