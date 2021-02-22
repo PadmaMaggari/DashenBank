@@ -208,9 +208,9 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
 		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,envRef.Encoding,envRef.CodedCharSetId);
 		CREATE LASTCHILD OF Environment AS enRef DOMAIN 'XMLNSC';
-		-- CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Envelope';
-		-- CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Body';
-		-- CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'esb' NAME ApplicationLabel;
+		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Envelope';
+		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Body';
+		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'esb' NAME ApplicationLabel;
 		CALL BuildExceptionDetails(excpRef,enRef,ApplicationLabel);
 		SET envRef.UserDefinedException = Environment.XMLNSC;
 		MOVE domainDataRef TO Environment.XMLNSC;
