@@ -36,7 +36,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET envRef.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:LIQUIDATETRANSACTION_FSFS_REQ;
-		SET envRef.id = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
+		SET envRef.id = CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);--blob vastundi payloadlogging lo error vastundi
 		----------------------------------------------------
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
