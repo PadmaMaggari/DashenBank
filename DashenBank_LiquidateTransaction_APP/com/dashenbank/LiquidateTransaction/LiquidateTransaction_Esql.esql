@@ -250,6 +250,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		SET outExcpRef.ExceptionLable = inputRef.excpLable;
 		SET outExcpRef.ExceptionDescription = inputRef.excpText;
 		SET outExcpRef.ActualExceptionText = inputRef.actualExcpText;
+
 		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = envRef.RequestIdentifier;
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
 	END;
