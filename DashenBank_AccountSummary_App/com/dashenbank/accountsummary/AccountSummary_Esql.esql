@@ -1,6 +1,7 @@
 
 
 
+
 BROKER SCHEMA com.dashenbank.accountsummary
 PATH com.dashenbank.genericfunctions;
 
@@ -194,7 +195,6 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		RETURN TRUE;
 	END;
 
-
 	CREATE PROCEDURE BuildExceptionResponse() BEGIN
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
 		--DECLARE inRef REFERENCE TO InputRoot.SOAP;
@@ -208,9 +208,9 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
 		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,envRef.Encoding,envRef.CodedCharSetId);
 		CREATE LASTCHILD OF Environment AS enRef DOMAIN 'XMLNSC';
-		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Envelope';
-		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Body';
-		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'esb' NAME ApplicationLabel;
+		-- CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Envelope';
+		-- CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Body';
+		-- CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'esb' NAME ApplicationLabel;
 		CALL BuildExceptionDetails(excpRef,enRef,ApplicationLabel);
 		SET envRef.UserDefinedException = Environment.XMLNSC;
 		MOVE domainDataRef TO Environment.XMLNSC;
@@ -227,9 +227,8 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		SET outExcpRef.ExceptionLable = inputRef.excpLable;
 		SET outExcpRef.ExceptionDescription = inputRef.excpText;
 		SET outExcpRef.ActualExceptionText = inputRef.actualExcpText;
+
 		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = envRef.RequestIdentifier;
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
-
 	END;
-
 END MODULE;
