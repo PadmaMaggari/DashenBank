@@ -89,10 +89,10 @@ END MODULE;
 CREATE COMPUTE MODULE ResponseToChannel
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		CALL response_from_flexcube();
+		CALL response_from_Backend();
 		RETURN TRUE;
 	END;
-	CREATE PROCEDURE response_from_flexcube() BEGIN
+	CREATE PROCEDURE response_from_Backend() BEGIN
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;

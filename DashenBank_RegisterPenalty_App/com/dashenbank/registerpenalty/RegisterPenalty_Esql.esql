@@ -45,7 +45,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
-		----------------- Generating request to flexcube ----------------
+		----------------- Generating request to Backend ----------------
 		DECLARE inputBodyref REFERENCE TO InputRoot.SOAP.Body.*:RegisterPenalty;
 		DECLARE inBodyref REFERENCE TO InputRoot.SOAP.Body.*:RegisterPenalty.*:RegisterPenaltyRequest;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
@@ -82,13 +82,13 @@ CREATE COMPUTE MODULE RequestToBackend
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(msgId,Environment.resPayload,'FLEXCUBE_REQ',ApplicationLabel,outRefData);
+		CALL PayloadLogging(msgId,Environment.resPayload,'BACKEND_REQ',ApplicationLabel,outRefData);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.SOAP = Environment.outputData;
 
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||Environment.resPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_REQ ------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_REQ data is: '||Environment.resPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------------------------------------------------------------------------') INTO rc;
 
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
@@ -100,11 +100,11 @@ CREATE COMPUTE MODULE ResponseToChannel
 
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		CALL response_from_flexcube();
+		CALL response_from_Backend();
 		RETURN TRUE;
 	END;
 
-	CREATE PROCEDURE response_from_flexcube() BEGIN
+	CREATE PROCEDURE response_from_Backend() BEGIN
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
@@ -114,10 +114,10 @@ CREATE COMPUTE MODULE ResponseToChannel
 		---------------------- Request Logging -------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(Environment.id,Environment.reqPayload,'FLEXCUBE_RES',ApplicationLabel,OutRef);
+		CALL PayloadLogging(Environment.id,Environment.reqPayload,'BACKEND_RESP',ApplicationLabel,OutRef);
 
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- FLEXCUBE_RESP -------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RESP data is: '||Environment.reqPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- BACKEND_RESP -------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RESP data is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		--------------- generating response to channel ---------------
 		DECLARE inputBodyref REFERENCE TO InputRoot.SOAP.Body.*:RegisterPenaltyResponse.*:RegisterPenaltyResult.*:RegisterPenaltyResponse;
@@ -150,7 +150,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(Environment.id,Environment.resPayload,'CHANNEL_RES',ApplicationLabel,outputRef);
+		CALL PayloadLogging(Environment.id,Environment.resPayload,'CHANNEL_RESP',ApplicationLabel,outputRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
