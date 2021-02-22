@@ -1,21 +1,23 @@
 
+
+
 DECLARE soapenv NAMESPACE'';
 DECLARE ns1 NAMESPACE'';
 CREATE COMPUTE MODULE SoapSimulator_Compute
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		 CALL CopyEntireMessage();
+		CALL CopyEntireMessage();
 		RETURN TRUE;
 	END;
 
 
 	CREATE PROCEDURE CopyEntireMessage() BEGIN
-	DECLARE Service_Name CHARACTER;
-		SET Service_Name =  InputRoot.SOAP.Context.operation;
+		DECLARE Service_Name CHARACTER;
+		SET Service_Name = InputRoot.SOAP.Context.operation;
 		DECLARE InRef REFERENCE TO InputRoot.SOAP.Body;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
-		 DECLARE Response ROW; 
+		DECLARE Response ROW;
 		SET Response.values[]=PASSTHRU('SELECT RESPONSE FROM  BACKEND_RESPONSE A  WHERE A.SERVICE_NAME=?',Service_Name);
 		CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Response.values.RESPONSE ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
 
