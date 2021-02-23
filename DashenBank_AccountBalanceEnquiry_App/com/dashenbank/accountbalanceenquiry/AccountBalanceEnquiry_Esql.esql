@@ -1,3 +1,5 @@
+
+
 BROKER SCHEMA com.dashenbank.accountbalanceenquiry
 PATH com.dashenbank.genericfunctions;
 
@@ -90,12 +92,12 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_BODY.*:"AC-Balance".*:ACC_BAL.*:CUST_AC_NO = inputBodyRef.*:CUST_AC_NO;
 		SET Environment.outputData = OutputRoot.SOAP;
 		---------------------- Response Logging -------------------------
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		DECLARE outRefData REFERENCE TO OutputRoot.XMLNSC;
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',ApplicationLabel,outRefData);
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		MOVE OutRef TO OutputRoot.XMLNSC;
+		CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.SOAP = Environment.outputData;
@@ -161,12 +163,13 @@ CREATE COMPUTE MODULE ResponseToChannel
 		SET outputbodyRef.Body.*:QUERYACCBAL_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR.*:EDESC = inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR.*:EDESC;
 		SET Environment.outputData = OutputRoot.SOAP;
 		---------------------- Response Logging -------------------------
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		DECLARE outputRef REFERENCE TO OutputRoot.XMLNSC;
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		MOVE OutRef TO OutputRoot.XMLNSC;
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(envRef.id,Environment.resPayload,'CHANNEL_RES',ApplicationLabel,outputRef);
+
+		CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
