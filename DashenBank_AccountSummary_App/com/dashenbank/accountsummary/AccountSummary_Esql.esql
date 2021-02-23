@@ -1,6 +1,5 @@
 
 
-
 BROKER SCHEMA com.dashenbank.accountsummary
 PATH com.dashenbank.genericfunctions;
 
@@ -39,8 +38,6 @@ CREATE COMPUTE MODULE RequestToFlexcube
 
 		SET envRef.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		
-		
 		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_REQ;
 		SET envRef.id = inRef.*:FCUBS_HEADER.*:MSGID;
 		----------------------------------------------------

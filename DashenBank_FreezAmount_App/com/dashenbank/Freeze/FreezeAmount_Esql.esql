@@ -1,57 +1,58 @@
 
+
+
 BROKER SCHEMA com.dashenbank.Freeze
-
 PATH com.dashenbank.genericfunctions;
--- DECLARE ns NAMESPACE 'http://www.example.org/BlockingAmount/';
 
-DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER;
+DECLARE LOG4J_CONFIG_PATH EXTERNAL CHARACTER;
 DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER;
 DECLARE LOGGER_NAME EXTERNAL CHARACTER;
 DECLARE LOG_TYPE EXTERNAL CHARACTER;
 DECLARE BACKEND_URL EXTERNAL CHARACTER;
-
--------Global Variables----------
-DECLARE rc BOOLEAN;
+--------Global Variables----------
+DECLARE rc BOOLEAN TRUE;
 
 CREATE COMPUTE MODULE RequestToBackend
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
-		IF (rc = TRUE) THEN
-			CALL CopyEntireMessage();
+		CALL initLog4j(LOG4J_CONFIG_PATH) INTO rc;
+		IF ( rc = TRUE ) THEN
+			CALL GenerateReqToBackend();
 		ELSE
-			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR_MSG;
+			SET Environment.Variables.Log4j.ErrorMsg = LOG4J_ERROR_MSG;
 		END IF;
 		RETURN TRUE;
 	END;
 
-	CREATE PROCEDURE CopyEntireMessage() BEGIN
-		DECLARE id CHARACTER InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
-		SET Environment.id = id;
+	CREATE PROCEDURE GenerateReqToBackend() BEGIN
 		SET Environment.domainDataRef = InputRoot.SOAP;
-		
+		DECLARE envRef REFERENCE TO Environment.Variables;
+		CREATE LASTCHILD OF Environment AS envRef NAME 'Variables';
+
+		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
-		SET Environment.Variables.Encoding = encodeRef;
-		SET Environment.Variables.CodedCharSetId = ccidRef;
+		SET envRef.Encoding = encodeRef;
+		SET envRef.CodedCharSetId = ccidRef;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
-		
-		SET Environment.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
+
+		SET envRef.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		
-        ----------------------------------------------------
+
+		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:"BlockAmuont_Service";
+		SET envRef.id = CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
+		----------------------------------------------------
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(id,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
+		CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.reqPayload) INTO rc;
-		
 		----------------------------------------------------
 		-------------Business Logic-------------------------
-		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_HEADER";
-		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full";
+		DECLARE inputHeaderRef REFERENCE TO inRef.*:"BlockAmuont_HEADER";
+		DECLARE inputBodyRef REFERENCE TO inRef.*:"BlockAmuont_BODY".*:"Amount-Blocks-Full";
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputRef REFERENCE TO OutputRoot.SOAP;
 
@@ -62,16 +63,15 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_HEADER".*:SERVICE = inputHeaderRef.*:SERVICE;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_HEADER".*:OPERATION = inputHeaderRef.*:OPERATION;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_HEADER".*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
-		
+
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:ACC = inputBodyRef.*:ACC;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:AMTBLKNO = inputBodyRef.*:AMTBLKNO;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:AMT = inputBodyRef.*:AMT;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:ABLKTYPE = inputBodyRef.*:ABLKTYPE;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:HOLDDESC = inputBodyRef.*:HOLDDESC;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:BRANCH = inputBodyRef.*:BRANCH;
-		
+
 		SET Environment.outputData = OutputRoot.SOAP;
-		
 		----------------------------------------------------
 		----------------------Response Logging-------------------------
 		MOVE domainDataRef TO OutputRoot.SOAP;
@@ -79,19 +79,17 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET OutputRoot.SOAP = NULL;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		MOVE OutRef TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(id,Environment.resPayload,'FLEXCUBE_REQ',MessageFlowLabel,OutRef);
+		CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.SOAP = Environment.outputData;
 
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------  FLEXCUBE_REQ  ------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.resPayload) INTO rc;
-		
+
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
 	END;
 END MODULE;
-
-
 ------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -99,37 +97,34 @@ CREATE COMPUTE MODULE RequestToChannel
 
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		CALL CopyEntireMessage();
+		CALL GenerateResToFrontend();
 		RETURN TRUE;
 	END;
 
-	CREATE PROCEDURE CopyEntireMessage() BEGIN
-
+	CREATE PROCEDURE GenerateResToFrontend() BEGIN
 		SET Environment.domainDataRef = InputRoot.SOAP;
-		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:"BlockAmuont_Service";
+		DECLARE envRef REFERENCE TO Environment.Variables;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-
 		----------------------------------------------------
 		----------------------Request Logging-------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(Environment.id,Environment.reqPayload,'FLEXCUBE_RES',MessageFlowLabel,OutRef);
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_RES ------') INTO rc;
+		CALL PayloadLogging(envRef.id,Environment.reqPayload,'BACKEND_RES',MessageFlowLabel,OutRef);
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_RES ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.reqPayload) INTO rc;
-		
 		----------------------------------------------------
 		-------------Business Logic-------------------------
-
+		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:"BlockAmuont_Service";
 		DECLARE inputHeaderRef REFERENCE TO inRef.*:"BlockAmuont_HEADER";
 		DECLARE inputBodyRef REFERENCE TO inRef.*:"BlockAmuont_BODY";
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputRef REFERENCE TO OutputRoot.SOAP;
-		
+
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_HEADER".*:SOURCE = inputHeaderRef.*:SOURCE;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_HEADER".*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_HEADER".*:MSGID = inputHeaderRef.*:MSGID;
@@ -143,18 +138,18 @@ CREATE COMPUTE MODULE RequestToChannel
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_HEADER".*:FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_HEADER".*:ACTION = inputHeaderRef.*:ACTION;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_HEADER".*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
-		
-		
+
+
 		DECLARE Inrefsoapbody REFERENCE TO InputRoot.SOAP.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"BlockAmuont_WARNING_RESP".*:WARNING[>];
-        DECLARE J INTEGER CARDINALITY(InputRoot.SOAP.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"BlockAmuont_WARNING_RESP".*:WARNING[]);
-        DECLARE I INTEGER 1;
-          WHILE I<=J DO
-       SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"BlockAmuont_WARNING_RESP".*:WARNING[I].*:WCODE = Inrefsoapbody.*:WCODE;
-		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"BlockAmuont_WARNING_RESP".*:WARNING[I].*:WDESC = Inrefsoapbody.*:WDESC;
-       SET I = I + 1;
-        MOVE Inrefsoapbody NEXTSIBLING;
-       END WHILE;
-        
+		DECLARE J INTEGER CARDINALITY(InputRoot.SOAP.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"BlockAmuont_WARNING_RESP".*:WARNING[]);
+		DECLARE I INTEGER 1;
+		WHILE I<=J DO
+			SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"BlockAmuont_WARNING_RESP".*:WARNING[I].*:WCODE = Inrefsoapbody.*:WCODE;
+			SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"BlockAmuont_WARNING_RESP".*:WARNING[I].*:WDESC = Inrefsoapbody.*:WDESC;
+			SET I = I + 1;
+			MOVE Inrefsoapbody NEXTSIBLING;
+		END WHILE;
+
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:CUST_NO = inputBodyRef.*:"Amount-Blocks-Full".*:CUST_NO;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:AMTBLKNO = inputBodyRef.*:"Amount-Blocks-Full".*:AMTBLKNO;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:AMT = inputBodyRef.*:"Amount-Blocks-Full".*:AMT;
@@ -162,7 +157,7 @@ CREATE COMPUTE MODULE RequestToChannel
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:EFFDATE = inputBodyRef.*:"Amount-Blocks-Full".*:EFFDATE;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:BRANCH = inputBodyRef.*:"Amount-Blocks-Full".*:BRANCH;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:VERIFY_AVL_BAL = inputBodyRef.*:"Amount-Blocks-Full".*:VERIFY_AVL_BAL;
-        SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:SOURCE_CODE = inputBodyRef.*:"Amount-Blocks-Full".*:SOURCE_CODE;
+		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:SOURCE_CODE = inputBodyRef.*:"Amount-Blocks-Full".*:SOURCE_CODE;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:MAKER = inputBodyRef.*:"Amount-Blocks-Full".*:MAKER;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:MAKERSTAMP = inputBodyRef.*:"Amount-Blocks-Full".*:MAKERSTAMP;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:CHECKER = inputBodyRef.*:"Amount-Blocks-Full".*:CHECKER;
@@ -170,8 +165,8 @@ CREATE COMPUTE MODULE RequestToChannel
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:MODNO = inputBodyRef.*:"Amount-Blocks-Full".*:MODNO;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:TXNSTAT = inputBodyRef.*:"Amount-Blocks-Full".*:TXNSTAT;
 		SET outputRef.*:Body.*:"BlockAmuont_Service".*:"BlockAmuont_BODY".*:"Amount-Blocks-Full".*:AUTHSTAT = inputBodyRef.*:"Amount-Blocks-Full".*:AUTHSTAT;
-		
-		
+
+
 		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------------------------------------
 		----------------------Response Logging-------------------------
@@ -182,7 +177,7 @@ CREATE COMPUTE MODULE RequestToChannel
 		MOVE OutRef TO OutputRoot.XMLNSC;
 		SET OutputRoot.SOAP = NULL;
 
-		CALL PayloadLogging(Environment.id,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
+		CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
@@ -190,12 +185,11 @@ CREATE COMPUTE MODULE RequestToChannel
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_RES ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.resPayload) INTO rc;
-		
 
+		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = envRef.RequestIdentifier;
 
 	END;
 END MODULE;
-
 ------------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE COMPUTE MODULE BuildExceptionResponse
@@ -206,40 +200,39 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 	END;
 
 	CREATE PROCEDURE BuildExceptionResponse() BEGIN
-		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
 		--DECLARE inRef REFERENCE TO InputRoot.SOAP;
-		DECLARE envRef REFERENCE TO Environment;
+		DECLARE envRef REFERENCE TO Environment.Variables;
+		DECLARE enRef REFERENCE TO Environment;
 		DECLARE outRefer,outRef REFERENCE TO OutputRoot;
 		--DECLARE encodeID INTEGER InputRoot.Properties.Encoding;
 		--DECLARE ccsID INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		DECLARE domainDataRef REFERENCE TO InputBody;
 		DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
-		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,Environment.Variables.Encoding,Environment.Variables.CodedCharSetId);
-		CREATE LASTCHILD OF Environment AS envRef DOMAIN 'XMLNSC';
-		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Envelope';
-	    CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'soapenv' NAME 'Body';
-		CREATE LASTCHILD OF envRef AS envRef NAMESPACE 'esb' NAME ApplicationLabel;
-		CALL BuildExceptionDetails(excpRef,envRef,ApplicationLabel);
-		SET Environment.Variables.UserDefinedException = Environment.XMLNSC;
+		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,envRef.Encoding,envRef.CodedCharSetId);
+		CREATE LASTCHILD OF Environment AS enRef DOMAIN 'XMLNSC';
+		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Envelope';
+		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Body';
+		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'esb' NAME ApplicationLabel;
+		CALL BuildExceptionDetails(excpRef,enRef,ApplicationLabel);
+		SET envRef.UserDefinedException = Environment.XMLNSC;
 		MOVE domainDataRef TO Environment.XMLNSC;
 		SET domainName = FIELDNAME(domainDataRef);
-		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,Environment.Variables.Encoding,Environment.Variables.CodedCharSetId);
-		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'Application Built Exception:'||resPayload) INTO rc;
-		------------Error Logging in DB----------
-		--CALL ConstructErrorDBLog(CURRENT_TIMESTAMP,CREATED_BY,envRef.ErrorType,MessageFlowLabel,ApplicationLabel,ExecutionGroupLabel,
-		---excpPayload,Environment.REQUEST_PAYLOAD,excpRef.excpNumber,envRef.ErrorCode,outRef);
-		-------------------------------------------
-		SET OutputRoot.XMLNSC.ExceptionDetails.Msg_Id = Environment.id;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionType = InputRoot.XMLNSC.ExceptionDetails.excpType;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionNumber = InputRoot.XMLNSC.ExceptionDetails.excpNumber;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionLable = InputRoot.XMLNSC.ExceptionDetails.excpLable;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ExceptionDescription = InputRoot.XMLNSC.ExceptionDetails.excpText;
-		SET OutputRoot.XMLNSC.ExceptionDetails.ActualExceptionText = InputRoot.XMLNSC.ExceptionDetails.actualExcpText;
-		
-		
-		--SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = Environment.Variables.RequestIdentifier;
+		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,envRef.Encoding,envRef.CodedCharSetId);
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Application Built Exception:'||resPayload) INTO rc;
+		DECLARE inputRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		CREATE LASTCHILD OF OutputRoot.XMLNSC NAME 'ExceptionDetails';
+		DECLARE outExcpRef REFERENCE TO OutputRoot.XMLNSC.ExceptionDetails;
+		SET outExcpRef.Msg_Id = envRef.id;
+		SET outExcpRef.ExceptionType = inputRef.excpType;
+		SET outExcpRef.ExceptionNumber = inputRef.excpNumber;
+		SET outExcpRef.ExceptionLable = inputRef.excpLable;
+		SET outExcpRef.ExceptionDescription = inputRef.excpText;
+		SET outExcpRef.ActualExceptionText = inputRef.actualExcpText;
+
+		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = envRef.RequestIdentifier;
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
-		
 	END;
 END MODULE;
