@@ -3,6 +3,8 @@
 	<name>DashenBank_FundTransfer(NBE)_App</name>
 	<comment></comment>
 	<projects>
+		<project>DashenBank_ExceptionHandlerLib</project>
+		<project>DashenBank_GenericFunctionsLib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

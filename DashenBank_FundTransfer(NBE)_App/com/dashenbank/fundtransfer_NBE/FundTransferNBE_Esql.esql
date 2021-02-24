@@ -1,25 +1,295 @@
 BROKER SCHEMA com.dashenbank.fundtransfer_NBE
 
+PATH com.dashenbank.genericfunctions;
 
-CREATE COMPUTE MODULE FundTransferNBE_Esql
+DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER;
+DECLARE LOG4J_ERROR EXTERNAL CHARACTER;
+DECLARE BACKEND_URL EXTERNAL CHARACTER ;
+DECLARE LOGGER_NAME EXTERNAL CHARACTER ;
+DECLARE LOG_TYPE EXTERNAL CHARACTER ;
+--------Global Variables----------
+DECLARE rc BOOLEAN;
+
+
+CREATE COMPUTE MODULE RequestToBackend
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		-- CALL CopyMessageHeaders();
-		-- CALL CopyEntireMessage();
+		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
+		IF (rc = TRUE) THEN
+			CALL GenerateReqToBackend();
+		ELSE
+			SET Environment.Variables.Log4j.ErrorMsg  = LOG4J_ERROR;
+		END IF;
 		RETURN TRUE;
 	END;
 
-	CREATE PROCEDURE CopyMessageHeaders() BEGIN
-		DECLARE I INTEGER 1;
-		DECLARE J INTEGER;
-		SET J = CARDINALITY(InputRoot.*[]);
-		WHILE I < J DO
-			SET OutputRoot.*[I] = InputRoot.*[I];
-			SET I = I + 1;
-		END WHILE;
+	
+	CREATE PROCEDURE GenerateReqToBackend() BEGIN
+		SET Environment.domainDataRef = InputRoot.SOAP;
+		DECLARE envRef REFERENCE TO Environment.Variables;
+		CREATE LASTCHILD OF Environment AS envRef NAME 'Variables';
+
+		SET Environment.domainDataRef = InputRoot.SOAP;
+		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
+		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
+		SET envRef.Encoding = encodeRef;
+		SET envRef.CodedCharSetId = ccidRef;
+		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
+		DECLARE domainName CHARACTER FIELDNAME(InputBody);
+
+		SET envRef.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
+		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:CREATETRANSACTION_FSFS_REQ;
+		SET envRef.id = inRef.*:FCUBS_HEADER.*:MSGID;
+		----------------------------------------------------
+		----------------------Request Logging-------------------------
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+		CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.reqPayload) INTO rc;
+		----------------------------------------------------
+		-------------Business Logic-------------------------
+		
+		
+		DECLARE inputHeaderRef REFERENCE TO inRef.*:FCUBS_HEADER;
+		DECLARE inputBodyRef REFERENCE TO inRef.*:FCUBS_BODY;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		DECLARE outDataRef REFERENCE TO OutputRoot.SOAP ;
+
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MSGID = inputHeaderRef.*:MSGID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MODULEID = inputHeaderRef.*:MODULEID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
+		
+		
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:XREF = inputBodyRef.*:"Transaction-Details".*:XREF;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:SCODE = inputBodyRef.*:"Transaction-Details".*:SCODE;
+		
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:PRODUCT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:PRODUCT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:REMACCOUNT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:REMACCOUNT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:INSTRNO = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:INSTRNO;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:INSTRCCY = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:INSTRCCY;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:INSTRAMT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:INSTRAMT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:TXNDATE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:TXNDATE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:VALDATE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:VALDATE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ROUTINGNO = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ROUTINGNO;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:BENACCOUNT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:BENACCOUNT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ENDPOINT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ENDPOINT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:REMBRANCH = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:REMBRANCH;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:REMARKS = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:REMARKS;
+				
+		SET Environment.outputData = OutputRoot.SOAP;
+
+		----------------------------------------------------
+		----------------------Response Logging-------------------------
+		MOVE domainDataRef TO OutputRoot.SOAP;
+		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		SET OutputRoot.SOAP = NULL;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		MOVE OutRef TO OutputRoot.XMLNSC;
+		CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
+
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.SOAP = Environment.outputData;
+
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_REQ ------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.resPayload) INTO rc;
+
+		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
+		
+		END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE ResponseToFrontEnd
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL GenerateResToFrontend();
+		RETURN TRUE;
+	END;
+	CREATE PROCEDURE GenerateResToFrontend() BEGIN
+		
+		SET Environment.domainDataRef = InputRoot.SOAP;
+		DECLARE envRef REFERENCE TO Environment.Variables;
+		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
+		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
+		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
+		DECLARE domainName CHARACTER FIELDNAME(InputBody);
+
+		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		----------------------------------------------------
+		----------------------Request Logging-------------------------
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+		CALL PayloadLogging(envRef.id,Environment.reqPayload,'BACKEND_RES',MessageFlowLabel,OutRef);
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_RES ------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.reqPayload) INTO rc;
+		----------------------------------------------------
+		-------------Business Logic-------------------------
+		DECLARE inRef REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_RES;
+		DECLARE inputHeaderRef REFERENCE TO inRef.*:FCUBS_HEADER;
+		DECLARE inputBodyRef REFERENCE TO inRef.*:FCUBS_BODY;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		DECLARE outDataRef REFERENCE TO OutputRoot.SOAP;
+		
+
+
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MSGID = inputHeaderRef.*:MSGID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MODULEID = inputHeaderRef.*:MODULEID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:DESTINATION = inputHeaderRef.*:DESTINATION;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MULTITRIPID = inputHeaderRef.*:MULTITRIPID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:ACTION = inputHeaderRef.*:ACTION;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
+
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:XREF = inputBodyRef.*:"Transaction-Details".*:XREF;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:SCODE = inputBodyRef.*:"Transaction-Details".*:SCODE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:STATUS = inputBodyRef.*:"Transaction-Details".*:STATUS;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:BATCHTOTAMT = inputBodyRef.*:"Transaction-Details".*:BATCHTOTAMT;
+		
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:PRODUCT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:PRODUCT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:FCCREF = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:FCCREF;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ESN = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ESN;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:REMACCOUNT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:REMACCOUNT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:INSTRNO = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:INSTRNO;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:INSTRCCY = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:INSTRCCY;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:INSTRAMT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:INSTRAMT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:TXNDATE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:TXNDATE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:VALDATE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:VALDATE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ROUTINGNO = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ROUTINGNO;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ENTRYNO = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ENTRYNO;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:REGCC = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:REGCC;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:SPLCHQ = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:SPLCHQ;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:TXNBRN = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:TXNBRN;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:BENACCOUNT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:BENACCOUNT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:TXNCCY = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:TXNCCY;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ENDPOINT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ENDPOINT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ACCCY = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ACCCY;
+		
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ACCCYAMT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ACCCYAMT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ROUTBNKCOD = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ROUTBNKCOD;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ROUTBRNCOD = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ROUTBRNCOD;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ROUTSECTCOD = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ROUTSECTCOD;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:REMCUST = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:REMCUST;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ACCBRN = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ACCBRN;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:REMBRANCH = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:REMBRANCH;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:BENBRANCH = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:BENBRANCH;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ROUTBNKNAM = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ROUTBNKNAM;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ROUTBRNNAM = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ROUTBRNNAM;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ROUTSECTDISC = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ROUTSECTDISC;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:LCYTOTCHGAMT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:LCYTOTCHGAMT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:XRATE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:XRATE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:DIRECTION = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:DIRECTION;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:DIN = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:DIN;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:DINDATE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:DINDATE;
+		
+		
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:CUSTDATE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:CUSTDATE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:MODULE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:MODULE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:MODREFNO = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:MODREFNO;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:CUSTID = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:CUSTID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ACCTITLE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ACCTITLE;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:CUSTNAME = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:CUSTNAME;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:REMARKS = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:REMARKS;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ACTAMT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ACTAMT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:MAKERID = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:MAKERID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:MAKERSTAMP = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:MAKERSTAMP;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:CHECKERID = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:CHECKERID;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:CHECKERSTAMP = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:CHECKERSTAMP;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:RECORDSTAT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:RECORDSTAT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:AUTHSTAT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:AUTHSTAT;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:STATUS = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:STATUS;
+
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:BRANCH = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:BRANCH;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:CUSTNO = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:CUSTNO;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:CCY = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:CCY;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:RTFLAG = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:RTFLAG;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:FUNDMIS1LBL1 = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:FUNDMIS1LBL1;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:COMPMIS3LBL3 = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:COMPMIS3LBL3;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:TXNMIS1LBL1 = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:TXNMIS1LBL1;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:TXNMIS2LBL2 = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:TXNMIS2LBL2;
+		
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE ;
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC;
+		
+		SET Environment.outputData = OutputRoot.SOAP;
+		----------------------------------------------------
+		----------------------Response Logging-------------------------
+
+		MOVE domainDataRef TO OutputRoot.SOAP;
+		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		MOVE OutRef TO OutputRoot.XMLNSC;
+		SET OutputRoot.SOAP = NULL;
+
+		CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
+
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+		SET OutputRoot.SOAP = Environment.outputData;
+
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_RES ------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.resPayload) INTO rc;
+
+		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = envRef.RequestIdentifier;
+	END;
+END MODULE;
+
+CREATE COMPUTE MODULE BuildExceptionResponse
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL BuildExceptionResponse();
+		RETURN TRUE;
 	END;
 
-	CREATE PROCEDURE CopyEntireMessage() BEGIN
-		SET OutputRoot = InputRoot;
+	CREATE PROCEDURE BuildExceptionResponse() BEGIN
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
+		--DECLARE inRef REFERENCE TO InputRoot.SOAP;
+		DECLARE envRef REFERENCE TO Environment.Variables;
+		DECLARE enRef REFERENCE TO Environment;
+		DECLARE outRefer,outRef REFERENCE TO OutputRoot;
+		--DECLARE encodeID INTEGER InputRoot.Properties.Encoding;
+		--DECLARE ccsID INTEGER InputRoot.Properties.CodedCharSetId;
+		DECLARE domainName CHARACTER FIELDNAME(InputBody);
+		DECLARE domainDataRef REFERENCE TO InputBody;
+		DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
+		DECLARE excpPayload CHARACTER getPayLoad(domainName,domainDataRef,envRef.Encoding,envRef.CodedCharSetId);
+		CREATE LASTCHILD OF Environment AS enRef DOMAIN 'XMLNSC';
+		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Envelope';
+		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'soapenv' NAME 'Body';
+		CREATE LASTCHILD OF enRef AS enRef NAMESPACE 'esb' NAME ApplicationLabel;
+		CALL BuildExceptionDetails(excpRef,enRef,ApplicationLabel);
+		SET envRef.UserDefinedException = Environment.XMLNSC;
+		MOVE domainDataRef TO Environment.XMLNSC;
+		SET domainName = FIELDNAME(domainDataRef);
+		DECLARE resPayload CHAR getPayLoad(domainName,domainDataRef,envRef.Encoding,envRef.CodedCharSetId);
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Application Built Exception:'||resPayload) INTO rc;
+		DECLARE inputRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		CREATE LASTCHILD OF OutputRoot.XMLNSC NAME 'ExceptionDetails';
+		DECLARE outExcpRef REFERENCE TO OutputRoot.XMLNSC.ExceptionDetails;
+		SET outExcpRef.Msg_Id = envRef.id;
+		SET outExcpRef.ExceptionType = inputRef.excpType;
+		SET outExcpRef.ExceptionNumber = inputRef.excpNumber;
+		SET outExcpRef.ExceptionLable = inputRef.excpLable;
+		SET outExcpRef.ExceptionDescription = inputRef.excpText;
+		SET outExcpRef.ActualExceptionText = inputRef.actualExcpText;
+
+		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = envRef.RequestIdentifier;
+		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
 	END;
 END MODULE;
