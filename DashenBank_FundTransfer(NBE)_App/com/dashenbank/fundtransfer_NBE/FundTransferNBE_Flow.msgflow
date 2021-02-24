@@ -22,29 +22,29 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_FundTransfer(NBE)_App/icons/full/obj16/FundTransferNBE_Flow.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_FundTransfer(NBE)_App/icons/full/obj30/FundTransferNBE_Flow.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_10" location="289,110" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/CBS" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_10" location="290,110" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/CBS" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="BackendService_Call"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_12" location="46,135" wsdlOperationMode="gateway" wsdlFileName="ESB_BatchUploadService.wsdl" selectedPortType="ESB_BatchUploadService" selectedBinding="ESB_BatchUploadServiceSOAP" selectedPort="ESB_BatchUploadServiceSOAP" useHTTPTransport="true" urlSelector="/ESB_FundTransferNBE" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_12" location="41,103" wsdlOperationMode="gateway" wsdlFileName="ESB_BatchUploadService.wsdl" selectedPortType="ESB_BatchUploadService" selectedBinding="ESB_BatchUploadServiceSOAP" selectedPort="ESB_BatchUploadServiceSOAP" useHTTPTransport="true" urlSelector="/ESB_FundTransferNBE" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Service_Request"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_15" location="544,125">
+      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_15" location="553,101">
         <translation xmi:type="utility:ConstantString" string="Service_Reply"/>
       </nodes>
-      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_16" location="428,9" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
+      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_16" location="288,3" rotation="BOTTOM_TO_TOP" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
         <translation xmi:type="utility:ConstantString" string="PayloadLogging"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="189,129" computeExpression="esql://routine/com.dashenbank.fundtransfer_NBE#RequestToBackend.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="184,97" computeExpression="esql://routine/com.dashenbank.fundtransfer_NBE#RequestToBackend.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="389,129" computeExpression="esql://routine/com.dashenbank.fundtransfer_NBE#ResponseToFrontEnd.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="384,97" computeExpression="esql://routine/com.dashenbank.fundtransfer_NBE#ResponseToFrontEnd.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="435,217" computeExpression="esql://routine/com.dashenbank.fundtransfer_NBE#BuildExceptionResponse.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="469,154" computeExpression="esql://routine/com.dashenbank.fundtransfer_NBE#BuildExceptionResponse.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="BuildBusinessError"/>
       </nodes>
-      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_5" location="292,259">
-        <translation xmi:type="utility:ConstantString" string="ExceptionHandlerSubFlow"/>
+      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_5" location="355,189">
+        <translation xmi:type="utility:ConstantString" string="ExceptionHandler"/>
       </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_15" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_3" targetNode="FCMComposite_1_2" sourceNode="FCMComposite_1_10" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>

@@ -28,7 +28,7 @@
       <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="596,122">
         <translation xmi:type="utility:ConstantString" string="Service_Reply"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="434,120" computeExpression="esql://routine/com.dahenbank.bulkfundtransfer#BulkFundTransferFlowResponse_ESQL.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="434,120" computeExpression="esql://routine/com.dahenbank.bulkfundtransfer#ResponseToChannel.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel "/>
       </nodes>
       <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="321,12" rotation="BOTTOM_TO_TOP" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
@@ -37,10 +37,10 @@
       <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_6" location="412,199">
         <translation xmi:type="utility:ConstantString" string="ExceptionHandler"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="180,114" computeExpression="esql://routine/com.dahenbank.bulkfundtransfer#BulkFundTransfer_ESQl.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="180,114" computeExpression="esql://routine/com.dahenbank.bulkfundtransfer#RequestToBackend.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="507,174" computeExpression="esql://routine/com.dahenbank.bulkfundtransfer#BulidBusinessError_ESQL.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="507,174" computeExpression="esql://routine/com.dahenbank.bulkfundtransfer#BuildExceptionResponse.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="BuildBusinessError"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="316,114" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/CBS" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">

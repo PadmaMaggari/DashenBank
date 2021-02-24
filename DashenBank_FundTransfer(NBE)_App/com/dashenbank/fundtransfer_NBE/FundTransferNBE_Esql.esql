@@ -1,3 +1,5 @@
+
+
 BROKER SCHEMA com.dashenbank.fundtransfer_NBE
 
 PATH com.dashenbank.genericfunctions;
@@ -18,12 +20,12 @@ CREATE COMPUTE MODULE RequestToBackend
 		IF (rc = TRUE) THEN
 			CALL GenerateReqToBackend();
 		ELSE
-			SET Environment.Variables.Log4j.ErrorMsg  = LOG4J_ERROR;
+			SET Environment.Variables.Log4j.ErrorMsg = LOG4J_ERROR;
 		END IF;
 		RETURN TRUE;
-	END;
+	END;	
 
-	
+
 	CREATE PROCEDURE GenerateReqToBackend() BEGIN
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment.Variables;
@@ -49,9 +51,9 @@ CREATE COMPUTE MODULE RequestToBackend
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.reqPayload) INTO rc;
 		----------------------------------------------------
-		-------------Business Logic-------------------------
-		
-		
+		-------------Business Logic-------------------------		
+
+
 		DECLARE inputHeaderRef REFERENCE TO inRef.*:FCUBS_HEADER;
 		DECLARE inputBodyRef REFERENCE TO inRef.*:FCUBS_BODY;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
@@ -65,12 +67,12 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MODULEID = inputHeaderRef.*:MODULEID;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
-		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
-		
-		
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;		
+
+
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:XREF = inputBodyRef.*:"Transaction-Details".*:XREF;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:SCODE = inputBodyRef.*:"Transaction-Details".*:SCODE;
-		
+
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:PRODUCT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:PRODUCT;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:REMACCOUNT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:REMACCOUNT;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:INSTRNO = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:INSTRNO;
@@ -83,9 +85,8 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ENDPOINT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ENDPOINT;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:REMBRANCH = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:REMBRANCH;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:REMARKS = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:REMARKS;
-				
-		SET Environment.outputData = OutputRoot.SOAP;
 
+		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------------------------------------
 		----------------------Response Logging-------------------------
 		MOVE domainDataRef TO OutputRoot.SOAP;
@@ -102,10 +103,10 @@ CREATE COMPUTE MODULE RequestToBackend
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.resPayload) INTO rc;
 
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
-		
-		END;
-END MODULE;
 
+	END;
+END MODULE;
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE COMPUTE MODULE ResponseToFrontEnd
 	CREATE FUNCTION Main() RETURNS BOOLEAN
@@ -114,7 +115,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		RETURN TRUE;
 	END;
 	CREATE PROCEDURE GenerateResToFrontend() BEGIN
-		
+
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment.Variables;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
@@ -137,8 +138,6 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		DECLARE inputBodyRef REFERENCE TO inRef.*:FCUBS_BODY;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outDataRef REFERENCE TO OutputRoot.SOAP;
-		
-
 
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
@@ -160,7 +159,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:SCODE = inputBodyRef.*:"Transaction-Details".*:SCODE;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:STATUS = inputBodyRef.*:"Transaction-Details".*:STATUS;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:BATCHTOTAMT = inputBodyRef.*:"Transaction-Details".*:BATCHTOTAMT;
-		
+
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:PRODUCT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:PRODUCT;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:FCCREF = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:FCCREF;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ESN = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ESN;
@@ -179,7 +178,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:TXNCCY = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:TXNCCY;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ENDPOINT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ENDPOINT;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ACCCY = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ACCCY;
-		
+
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ACCCYAMT = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ACCCYAMT;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ROUTBNKCOD = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ROUTBNKCOD;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:ROUTBRNCOD = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:ROUTBRNCOD;
@@ -195,9 +194,9 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:XRATE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:XRATE;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:DIRECTION = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:DIRECTION;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:DIN = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:DIN;
-		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:DINDATE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:DINDATE;
-		
-		
+		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:DINDATE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:DINDATE;		
+
+
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:CUSTDATE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:CUSTDATE;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:MODULE = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:MODULE;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:MODREFNO = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:MODREFNO;
@@ -222,10 +221,10 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:COMPMIS3LBL3 = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:COMPMIS3LBL3;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:TXNMIS1LBL1 = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:TXNMIS1LBL1;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:TXNMIS2LBL2 = inputBodyRef.*:"Transaction-Details".*:"Clearing-Details".*:"Mis-Details".*:TXNMIS2LBL2;
-		
+
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE ;
 		SET outDataRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC;
-		
+
 		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------------------------------------
 		----------------------Response Logging-------------------------
@@ -248,6 +247,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = envRef.RequestIdentifier;
 	END;
 END MODULE;
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE COMPUTE MODULE BuildExceptionResponse
 	CREATE FUNCTION Main() RETURNS BOOLEAN
