@@ -1,5 +1,4 @@
 
-
 BROKER SCHEMA com.dashenbank.accountbalanceenquiry
 PATH com.dashenbank.genericfunctions;
 
@@ -7,11 +6,7 @@ DECLARE ns NAMESPACE 'http://www.example.org/AccBalEnq/';
 DECLARE ns1 NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
 DECLARE ns68 NAMESPACE 'http://www.example.org/AccountBalEnq/';
 
-DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER;
-DECLARE LOG4J_ERROR EXTERNAL CHARACTER;
-DECLARE BACKEND_URL EXTERNAL CHARACTER;
-DECLARE LOGGER_NAME EXTERNAL CHARACTER;
-DECLARE LOG_TYPE EXTERNAL CHARACTER;
+DECLARE LOG4J_CONFIG_PATH, LOG4J_ERROR_MSG, BACKEND_URL, LOGGER_NAME, LOG_TYPE EXTERNAL CHARACTER;
 --------------Global variables--------
 DECLARE rc BOOLEAN TRUE;
 -------------------------------------
@@ -19,11 +14,11 @@ CREATE COMPUTE MODULE RequestToBackend
 	-- DECLARE rc BOOLEAN;
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
+		CALL initLog4j(LOG4J_CONFIG_PATH) INTO rc;
 		IF (rc = TRUE) THEN
 			CALL request_from_channnel();
 		ELSE
-			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR;
+			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR_MSG;
 		END IF;
 		RETURN TRUE;
 	END;
@@ -58,7 +53,7 @@ CREATE COMPUTE MODULE RequestToBackend
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputSoapRef REFERENCE TO OutputRoot.SOAP;
-		 -- DECLARE outMsg REFERENCE TO OutputRoot.SOAP.Body.*:QUERYACCBAL_IOFS_REQ;
+		-- DECLARE outMsg REFERENCE TO OutputRoot.SOAP.Body.*:QUERYACCBAL_IOFS_REQ;
 
 		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
 		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;

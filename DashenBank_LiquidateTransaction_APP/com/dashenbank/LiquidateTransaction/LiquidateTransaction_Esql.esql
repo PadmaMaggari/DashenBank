@@ -1,22 +1,20 @@
+
+
 BROKER SCHEMA com.dashenbank.LiquidateTransaction
 PATH com.dashenbank.genericfunctions;
 
-DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER;
-DECLARE LOG4J_ERROR EXTERNAL CHARACTER;
-DECLARE BACKEND_URL EXTERNAL CHARACTER ;
-DECLARE LOGGER_NAME EXTERNAL CHARACTER ;
-DECLARE LOG_TYPE EXTERNAL CHARACTER ;
+DECLARE LOG4J_CONFIG_PATH, LOG4J_ERROR_MSG, BACKEND_URL, LOGGER_NAME, LOG_TYPE EXTERNAL CHARACTER;
 --------Global Variables----------
 DECLARE rc BOOLEAN;
 
 CREATE COMPUTE MODULE RequestToBackend
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
+		CALL initLog4j(LOG4J_CONFIG_PATH) INTO rc;
 		IF (rc = TRUE) THEN
 			CALL GenerateReqToBackend();
 		ELSE
-			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR;
+			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR_MSG;
 		END IF;
 		RETURN TRUE;
 	END;
@@ -69,7 +67,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outDataRef.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRNO = inputBodyRef.*:"Transaction-Details".*:INSTRNO;
 		SET outDataRef.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:INSTRAMT = inputBodyRef.*:"Transaction-Details".*:INSTRAMT;
 		SET outDataRef.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:NARRATIVE = inputBodyRef.*:"Transaction-Details".*:NARRATIVE;
-		
+
 		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------------------------------------
 		----------------------Response Logging-------------------------
@@ -87,7 +85,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.resPayload) INTO rc;
 
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
-  		
+
 	END;
 END MODULE;
 ---------------------------------------------------------------------------------------------------------------------
@@ -99,7 +97,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		RETURN TRUE;
 	END;
 	CREATE PROCEDURE GenerateResToFrontend() BEGIN
-	
+
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment.Variables;
 		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:LIQUIDATETRANSACTION_FSFS_RES;
@@ -188,8 +186,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		SET outDataRef.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WCODE ;
 		SET outDataRef.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC = inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING.*:WDESC;
 		SET Environment.outputData = OutputRoot.SOAP;
-		    
-        ----------------------------------------------------
+		----------------------------------------------------
 		----------------------Response Logging-------------------------
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);

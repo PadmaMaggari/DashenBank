@@ -1,14 +1,12 @@
+
+
 BROKER SCHEMA com.dashenbank.Fundstransfer
 
 PATH com.dashenbank.genericfunctions;
 DECLARE ns NAMESPACE 'http://localhost:7800/RTSERVICE/';
 --DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
 --DECLARE esb NAMESPACE 'http://www.dashenbank.org/ESB_RTService/';
-DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER;
-DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER;
-DECLARE BACKEND_URL EXTERNAL CHARACTER;
-DECLARE LOGGER_NAME EXTERNAL CHARACTER;
-DECLARE LOG_TYPE EXTERNAL CHARACTER;
+DECLARE LOG4J_CONFIG_PATH, LOG4J_ERROR_MSG, BACKEND_URL, LOGGER_NAME, LOG_TYPE EXTERNAL CHARACTER;
 ------------- Global Variable-----------
 DECLARE rc BOOLEAN TRUE;
 
@@ -16,7 +14,7 @@ CREATE COMPUTE MODULE RequestToBackend
 
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
-		CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
+		CALL initLog4j(LOG4J_CONFIG_PATH) INTO rc;
 		IF (rc = TRUE) THEN
 			CALL request_from_channnel();
 		ELSE
@@ -86,7 +84,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:VALDATE = inputBodyref.*:VALDATE;
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:NARRATIVE = inputBodyref.*:NARRATIVE;
 		SET Environment.outputData = OutputRoot.SOAP;
-        ---------------------- Response Logging -------------------------
+		---------------------- Response Logging -------------------------
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
@@ -96,7 +94,7 @@ CREATE COMPUTE MODULE RequestToBackend
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.SOAP = Environment.outputData;
-		
+
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||Environment.resPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------------------------------------------------------------------------') INTO rc;
@@ -245,7 +243,7 @@ END MODULE;
 
 
 CREATE COMPUTE MODULE BuildExceptionResponse
-CREATE FUNCTION Main() RETURNS BOOLEAN
+	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		CALL BuildExceptionResponse();
 		RETURN TRUE;
