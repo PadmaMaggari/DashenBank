@@ -1,4 +1,3 @@
-
 BROKER SCHEMA com.dashenbank.accountbalanceenquiry
 PATH com.dashenbank.genericfunctions;
 
@@ -7,7 +6,7 @@ DECLARE ns1 NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
 DECLARE ns68 NAMESPACE 'http://www.example.org/AccountBalEnq/';
 
 DECLARE LOG4J_CONFIG_PATH, LOG4J_ERROR_MSG, BACKEND_URL, LOGGER_NAME, LOG_TYPE EXTERNAL CHARACTER;
---------------Global variables--------
+--------------Global variables----------
 DECLARE rc BOOLEAN TRUE;
 -------------------------------------
 CREATE COMPUTE MODULE RequestToBackend
@@ -24,17 +23,18 @@ CREATE COMPUTE MODULE RequestToBackend
 	END;
 
 	CREATE PROCEDURE request_from_channnel() BEGIN
+		
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment.Variables;
 		CREATE LASTCHILD OF Environment AS envRef NAME 'Variables';
 
 		SET Environment.domainDataRef = InputRoot.SOAP;
-		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
-		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
+		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId; 
+		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;     
 		SET envRef.Encoding = encodeRef;
 		SET envRef.CodedCharSetId = ccidRef;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
-		DECLARE domainName CHARACTER FIELDNAME(InputBody);
+		DECLARE domainName CHARACTER FIELDNAME(InputBody);           
 
 		SET envRef.RequestIdentifier = CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
@@ -74,16 +74,14 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
 		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:SNAPSHOTID = inputHeaderRef.*:SNAPSHOTID;
 		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:PASSWORD = inputHeaderRef.*:PASSWORD;
-
 		DECLARE inrefheader REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
 		DECLARE I INTEGER 1;
 		WHILE LASTMOVE(inrefheader) DO
 			SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.ADDL.*:PARAM[I].*:NAME = inputHeaderRef.*:ADDL.*:PARAM.*:NAME;
 			SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.ADDL.*:PARAM[I].*:VALUE = inputHeaderRef.*:ADDL.*:PARAM.*:VALUE;
 			SET I = I + 1;
-			MOVE inrefheader NEXTSIBLING;
+			MOVE inrefheader NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;
-
 		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_BODY.*:"AC-Balance".*:ACC_BAL.*:BRANCH_CODE = inputBodyRef.*:BRANCH_CODE;
 		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_BODY.*:"AC-Balance".*:ACC_BAL.*:CUST_AC_NO = inputBodyRef.*:CUST_AC_NO;
 		SET Environment.outputData = OutputRoot.SOAP;
@@ -114,13 +112,12 @@ CREATE COMPUTE MODULE ResponseToChannel
 		RETURN TRUE;
 	END;
 	CREATE PROCEDURE response_from_Backend() BEGIN
-
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment.Variables;
-		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
-		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
+		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;        
+		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;            
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
-		DECLARE domainName CHARACTER FIELDNAME(InputBody);
+		DECLARE domainName CHARACTER FIELDNAME(InputBody);                  
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		---------------------- Request Logging -------------------------
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
