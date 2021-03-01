@@ -1,18 +1,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
 BROKER SCHEMA com.dashenbank.genericsubflow
-
 PATH com.dashenbank.genericfunctions;
 
 DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER '';
@@ -31,11 +20,10 @@ DECLARE MSGCLASSREV EXTERNAL CHARACTER '';
 DECLARE MSGFUNADV EXTERNAL CHARACTER '';
 --------Global Variables----------
 DECLARE rc BOOLEAN FALSE;
-DECLARE encodeRef INTEGER;
-DECLARE ccidRef INTEGER;
-
 
 CREATE COMPUTE MODULE ExceptionHandler_ESQL
+	DECLARE encodeRef INTEGER;
+	DECLARE ccidRef INTEGER;
 	DECLARE envRef REFERENCE TO Environment.Variables;
 
 	CREATE FUNCTION Main() RETURNS BOOLEAN
