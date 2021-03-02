@@ -1,0 +1,77 @@
+
+
+CREATE COMPUTE MODULE Simulator_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		 CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		
+		DECLARE Service_Name CHARACTER;
+		SET Service_Name = InputRoot.SOAP.Context.operation;
+		CASE
+		WHEN Service_Name = 'DriverLookup' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'DriverLookupResponse.xml';
+		WHEN Service_Name = 'VoidPayment' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'VoidPaymentResponse.xml';
+		WHEN Service_Name = 'QUERYACCSUMM_IOFS_REQ' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'AccountSummaryResponse.xml';
+		WHEN Service_Name = 'CLOSEAMTBLK_FSFS' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'UnblockingAmountResponse.xml';
+		WHEN Service_Name = 'QUERYACCBAL_IOFS_REQ' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'AccountBalanceEnquiryResponse.xml';
+		WHEN Service_Name = 'CREATETRANSACTION_FSFS_REQ' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'FundTransferResponse.xml';
+		WHEN Service_Name = 'QUERYCUSTACC_IOFS_REQ' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'BankAccountDetailsResponse.xml';
+		WHEN Service_Name = 'BlockAmuont_Service' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'BlockAmountResponse.xml';
+		WHEN Service_Name = 'RegisterDriver' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'RegistrationForDriverAPIResponse.xml';
+		WHEN Service_Name = 'RegisterPenalty' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'RegistrationForPenaltyResponse.xml';
+		WHEN Service_Name = 'LIQUIDATETRANSACTION_FSFS_REQ' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'LiquidateTransactionResponse.xml';
+		WHEN Service_Name = 'SubmitPayment' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'SubmitPaymentResponse.xml';
+		WHEN Service_Name = 'SubmitACHTxn' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'SubmitACHResponse.xml';
+		WHEN Service_Name = 'GetAuthToken' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'GetAuthTokenResponse.xml';
+		WHEN Service_Name = 'CREATEMJRNLBOOK_IOPK_REQ' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'BulkFundTransferResponse.xml';
+		WHEN Service_Name = 'RetrievePenalty' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'RetrievePenaltyResponse.xml';
+		WHEN Service_Name = 'FetchPaymentListByDriverID' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'FetchPaymentListResponse.xml';
+		WHEN Service_Name = 'MakePayment' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'MakePaymentResponse.xml';
+		WHEN Service_Name = 'NotifyAuthority' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'NotificationToTaxSystemResponse.xml';
+		WHEN Service_Name = 'FCUBS_REQ_ENV' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'AuthorizationResponse.xml';
+		WHEN Service_Name = 'CREATETRANSACTION_FSFS_REQ' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'FundTransferNBEResponse.xml';
+		WHEN Service_Name = 'CheckStatus' THEN
+		SET OutputLocalEnvironment.Destination.File.Name = 'BillStatusResponse.xml';
+		ELSE
+			SET OutputRoot= NULL;
+			
+		END CASE;
+		SET OutputRoot = InputRoot;
+		
+	END;
+END MODULE;
