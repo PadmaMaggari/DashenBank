@@ -37,7 +37,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		IF ( rc = FALSE ) THEN
 			SET envRef.Log4j.ErrorMsg = LOG4J_INIT_ERROR_MSG;
 		END IF;
-
+        CALL writeToLogFile(MessageFlowLabel,'ErrorLogger','ERROR','..............***************************************...........') INTO rc;
 		DECLARE exceptiondesc,inputChar,logdata CHARACTER '';
 		DECLARE domainDataRef REFERENCE TO InputRoot;
 		SET Environment.domainDataRef = domainDataRef;

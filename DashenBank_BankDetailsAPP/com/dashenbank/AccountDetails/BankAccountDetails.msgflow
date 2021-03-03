@@ -18,9 +18,9 @@
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG_TYPE" name="LOG_TYPE" defaultValueLiteral="DEBUG">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <translation xmi:type="utility:TranslatableString" key="BankAccountDetails" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_APP"/>
-    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_BankAccountDetails_APP/icons/full/obj16/BankAccountDetails.gif"/>
-    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_BankAccountDetails_APP/icons/full/obj30/BankAccountDetails.gif"/>
+    <translation xmi:type="utility:TranslatableString" key="BankAccountDetails" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_App"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_BankAccountDetails_App/icons/full/obj16/BankAccountDetails.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_BankAccountDetails_App/icons/full/obj30/BankAccountDetails.gif"/>
     <composition>
       <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_27" location="587,121">
         <translation xmi:type="utility:ConstantString" string="Service_Response"/>
@@ -62,15 +62,15 @@
     </composition>
     <propertyOrganizer>
       <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_CONFIG_PATH">
-        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_CONFIG_PATH" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_APP"/>
+        <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_CONFIG_PATH" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_App"/>
         <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_ERROR_MSG">
-          <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR_MSG" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_APP"/>
+          <propertyName xmi:type="utility:TranslatableString" key="Property.LOG4J_ERROR_MSG" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_App"/>
           <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.BACKEND_URL">
-            <propertyName xmi:type="utility:TranslatableString" key="Property.BACKEND_URL" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_APP"/>
+            <propertyName xmi:type="utility:TranslatableString" key="Property.BACKEND_URL" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_App"/>
             <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOGGER_NAME">
-              <propertyName xmi:type="utility:TranslatableString" key="Property.LOGGER_NAME" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_APP"/>
+              <propertyName xmi:type="utility:TranslatableString" key="Property.LOGGER_NAME" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_App"/>
               <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG_TYPE">
-                <propertyName xmi:type="utility:TranslatableString" key="Property.LOG_TYPE" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_APP"/>
+                <propertyName xmi:type="utility:TranslatableString" key="Property.LOG_TYPE" bundleName="com/dashenbank/AccountDetails/BankAccountDetails" pluginId="DashenBank_BankAccountDetails_App"/>
               </propertyDescriptor>
             </propertyDescriptor>
           </propertyDescriptor>
