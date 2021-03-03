@@ -1,6 +1,5 @@
 
 BROKER SCHEMA com.dashenbank.BankAccountDetails
-
 PATH com.dashenbank.genericfunctions;
 
 DECLARE LOG4J_CONFIG_PATH, LOG4J_ERROR_MSG, BACKEND_URL, LOGGER_NAME, LOG_TYPE EXTERNAL CHARACTER;
@@ -39,9 +38,9 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET envRef.id = InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:MSGID;
 		----------------------Request Logging-------------------------
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
+	--	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	--	DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+	--	CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
@@ -71,14 +70,14 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		MOVE OutRef TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
+	--	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	--	MOVE OutRef TO OutputRoot.XMLNSC;
+	--	CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.SOAP = Environment.outputData;
 
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ FLEXCUBE_REQ ------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_REQ data is: '||Environment.resPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
 
@@ -103,11 +102,11 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		----------------------Request Logging-------------------------
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(envRef.id,Environment.reqPayload,'FLEXCUBE_RES',ApplicationLabel,OutRef);
+	--	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	--	DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+	--	CALL PayloadLogging(envRef.id,Environment.reqPayload,'FLEXCUBE_RES',ApplicationLabel,OutRef);
 
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- FLEXCUBE_RESP -------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- BACKEND_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'FLEXCUBE_RESP data  is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		--------------- generating response to channel ---------------
@@ -369,10 +368,10 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		---------------------- Response Logging -------------------------
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		MOVE OutRef TO OutputRoot.XMLNSC;
+	--	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	--	MOVE OutRef TO OutputRoot.XMLNSC;
 		SET OutputRoot.SOAP = NULL;
-		CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
+	--	CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;

@@ -40,9 +40,9 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET envRef.id = InputRoot.SOAP.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:MSGID;
 		------------------- Request Logging -------------------------
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
+	--	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	--	DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+	--	CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
@@ -89,9 +89,9 @@ CREATE COMPUTE MODULE RequestToBackend
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		MOVE OutRef TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
+	--	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	--	MOVE OutRef TO OutputRoot.XMLNSC;
+	--	CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.SOAP = Environment.outputData;
@@ -120,9 +120,9 @@ CREATE COMPUTE MODULE ResponseToChannel
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);                  
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		---------------------- Request Logging -------------------------
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(envRef.id,Environment.reqPayload,'BACKEND_RES',ApplicationLabel,OutRef);
+	--	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	--	DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+	--	CALL PayloadLogging(envRef.id,Environment.reqPayload,'BACKEND_RES',ApplicationLabel,OutRef);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- BACKEND_RES -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RES data  is: '||Environment.reqPayload) INTO rc;
@@ -158,11 +158,11 @@ CREATE COMPUTE MODULE ResponseToChannel
 		---------------------- Response Logging -------------------------
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		MOVE OutRef TO OutputRoot.XMLNSC;
+	--	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+	--	MOVE OutRef TO OutputRoot.XMLNSC;
 		SET OutputRoot.SOAP = NULL;
 
-		CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
+	--	CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;

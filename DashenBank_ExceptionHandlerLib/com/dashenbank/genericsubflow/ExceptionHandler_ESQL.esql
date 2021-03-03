@@ -223,7 +223,7 @@ CREATE COMPUTE MODULE ExceptionHandler_ESQL
 		IF Environment.ExceptionType = 'DatabaseException' THEN
 			SET Environment.ExceptionName = 'Database Exception';
 		ELSE
-			CALL ErrorDBLogging();
+		--	CALL ErrorDBLogging();
 		END IF;
 		RETURN TRUE;
 
