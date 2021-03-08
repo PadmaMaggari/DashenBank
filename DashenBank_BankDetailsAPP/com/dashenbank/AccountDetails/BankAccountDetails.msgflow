@@ -9,7 +9,7 @@
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR_MSG" name="LOG4J_ERROR_MSG" defaultValueLiteral="Log4J Initialization Error">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://172.30.1.29:7005/FCUBSAccService/FCUBSAccService">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://localhost:7800/Simulator">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOGGER_NAME" name="LOGGER_NAME" defaultValueLiteral="BankAccountDetailsLogger">
@@ -38,7 +38,7 @@
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="182,117" computeExpression="esql://routine/com.dashenbank.BankAccountDetails#BankAccountDetails_RequestToBackend.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="398,118" computeExpression="esql://routine/com.dashenbank.BankAccountDetails#BankAccountDetails_ResponseToChannel.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="410,120" computeExpression="esql://routine/com.dashenbank.BankAccountDetails#BankAccountDetails_ResponseToChannel.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel"/>
       </nodes>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="493,193" computeExpression="esql://routine/com.dashenbank.BankAccountDetails#BankAccountDetails_BuildExceptionResponse.Main" computeMode="all">
