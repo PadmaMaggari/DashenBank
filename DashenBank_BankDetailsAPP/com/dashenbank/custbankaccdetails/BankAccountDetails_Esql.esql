@@ -129,6 +129,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
 		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
+		SET Environment.data = InputRoot;
 
 		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.SOURCE = inputHeaderRef.SOURCE;
 		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.UBSCOMP = inputHeaderRef.UBSCOMP;
@@ -400,7 +401,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RESP',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
-		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+	SET OutputRoot.HTTPResponseHeader  = Environment.data.HTTPResponseHeader;
 		SET OutputRoot.SOAP = Environment.outputData;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
