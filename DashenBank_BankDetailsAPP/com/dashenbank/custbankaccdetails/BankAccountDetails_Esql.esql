@@ -123,9 +123,9 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RESP data  is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		-------------- generating response to channel ---------------
-		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
-		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full";
-		DECLARE inputBodyWarnRef REFERENCE TO InputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING;
+		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
+		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full";
+		DECLARE inputBodyWarnRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
