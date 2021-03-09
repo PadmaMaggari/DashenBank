@@ -1,5 +1,6 @@
 
 
+
 BROKER SCHEMA com.dashenbank.custbankaccdetails
 PATH com.dashenbank.genericfunctions;
 
@@ -119,7 +120,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- BACKEND_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RESP data  is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
-		-------------- generating response to channel ---------------
+		-------------- Generating response to channel ---------------
 		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
 		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full";
 		DECLARE inputBodyWarnRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING;
@@ -398,7 +399,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RESP',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
-	--	SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+		-- SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 		SET OutputRoot.SOAP = Environment.outputData;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
@@ -453,5 +454,4 @@ CREATE COMPUTE MODULE BankAccountDetails_BuildExceptionResponse
 		SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
 	END;
-
 END MODULE;
