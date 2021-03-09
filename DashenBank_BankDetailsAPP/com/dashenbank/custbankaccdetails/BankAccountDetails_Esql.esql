@@ -1,4 +1,8 @@
 
+
+
+
+
 BROKER SCHEMA com.dashenbank.custbankaccdetails
 PATH com.dashenbank.genericfunctions;
 
@@ -21,7 +25,6 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 	END;
 
 	CREATE PROCEDURE RequestToBackend() BEGIN
-
 
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef, encodeRef INTEGER;
@@ -90,7 +93,7 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
 	END;
 END MODULE;
----------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
@@ -118,30 +121,17 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- BACKEND_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RESP data  is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
-
-		-------------- generating response to channel ---------------
-		-- DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
-		-- DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full";
-		-- DECLARE inputBodyWarnRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING;
-		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-		-- DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
-
 		-------------- Generating response to channel ---------------
-		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
-		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full";
-		DECLARE inputBodyWarnRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING;
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
-
-		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
-
-		IF FIELDVALUE(inputHeaderRef.*:MSGSTAT)='FAILURE' THEN
+		IF FIELDVALUE(InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER.*:MSGSTAT)='FAILURE' THEN
 			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
-			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full";
+			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-IO";
 			DECLARE inputBodyErrRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR;
 			CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
+
+			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
+
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.SOURCE = inputHeaderRef.*:SOURCE;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.UBSCOMP = inputHeaderRef.*:UBSCOMP;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.MSGID = inputHeaderRef.*:MSGID;
@@ -159,14 +149,17 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".BRN = inputBodyRef.*:BRN;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACC = inputBodyRef.*:ACC;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_ERROR_RESP.ERROR.WCODE = inputBodyErrRef.*:WCODE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_ERROR_RESP.ERROR.WDESC = inputBodyErrRef.*:WDESC;
+			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_ERROR_RESP.ERROR.WCODE = inputBodyErrRef.*:ECODE;
+			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_ERROR_RESP.ERROR.WDESC = inputBodyErrRef.*:EDESC;
 		ELSE
 			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
 			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full";
 			DECLARE inputBodyWarnRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING;
 			CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
+
+			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
+
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.SOURCE = inputHeaderRef.*:SOURCE;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.UBSCOMP = inputHeaderRef.*:UBSCOMP;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.MSGID = inputHeaderRef.*:MSGID;
@@ -352,7 +345,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".INT_OUTSTAND = inputBodyRef.*:"Amount-Dates".*:INT_OUTSTAND;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".CHG_OUTSTAND = inputBodyRef.*:"Amount-Dates".*:CHG_OUTSTAND;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".PBKBAL = inputBodyRef.*:"Amount-Dates".*:PBKBAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DC_ILM_SWEEP_BAL = inputBodyRef."Amount-Dates".*:DC_ILM_SWEEP_BAL;
+			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DC_ILM_SWEEP_BAL = inputBodyRef.*:"Amount-Dates".*:DC_ILM_SWEEP_BAL;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".AMTDUE = inputBodyRef.*:"Amount-Dates".*:AMTDUE;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".Turnovers.ACY_MTD_TOVER_DR = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:ACY_MTD_TOVER_DR;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".Turnovers.LCY_MTD_TOVER_DR = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:LCY_MTD_TOVER_DR;
@@ -361,8 +354,8 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".Turnovers.ACY_TOV = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:ACY_TOV;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".Turnovers.LCY_TOV = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:LCY_TOV;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Noticepref = inputBodyRef.Noticepref;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Cust-Acc-Check" = inputBodyRef."Cust-Acc-Check";
+			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Noticepref = inputBodyRef.*:Noticepref;
+			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Cust-Acc-Check" = inputBodyRef.*:"Cust-Acc-Check";
 
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Icccspcn".BRNCD = inputBodyRef.*:"Custacc-Icccspcn".*:BRNCD;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Icccspcn".ACCNO = inputBodyRef.*:"Custacc-Icccspcn".*:ACCNO;
@@ -449,7 +442,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 	END;
 END MODULE;
----------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 CREATE COMPUTE MODULE BankAccountDetails_BuildExceptionResponse
@@ -458,6 +451,7 @@ CREATE COMPUTE MODULE BankAccountDetails_BuildExceptionResponse
 		CALL BuildExceptionResponse();
 		RETURN TRUE;
 	END;
+
 	CREATE PROCEDURE BuildExceptionResponse() BEGIN
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
 		--DECLARE inRef REFERENCE TO InputRoot.SOAP;
@@ -492,6 +486,6 @@ CREATE COMPUTE MODULE BankAccountDetails_BuildExceptionResponse
 		SET outExcpRef.ActualExceptionText = inputRef.actualExcpText;
 
 		SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
-		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
 	END;
 END MODULE;
