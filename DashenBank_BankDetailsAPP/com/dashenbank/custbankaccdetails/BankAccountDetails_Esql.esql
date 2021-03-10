@@ -1,9 +1,12 @@
 
 
+
+
 BROKER SCHEMA com.dashenbank.custbankaccdetails
 PATH com.dashenbank.genericfunctions;
-
+DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
 DECLARE ns NAMESPACE 'http://fcubs.ofss.com/service/FCUBSAccService';
+
 DECLARE LOG4J_CONFIG_PATH, LOG4J_ERROR_MSG, BACKEND_URL, LOGGER_NAME, LOG_TYPE EXTERNAL CHARACTER;
 --------------Global variables--------
 DECLARE rc BOOLEAN TRUE;
@@ -22,7 +25,6 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 	END;
 
 	CREATE PROCEDURE RequestToBackend() BEGIN
-
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef, encodeRef INTEGER;
 		DECLARE envRef REFERENCE TO Environment.Variables;
@@ -44,7 +46,7 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		-- DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
 		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
-
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'**********************************************************************') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
@@ -52,23 +54,30 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER;
 		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_BODY.*:"Cust-Account-IO";
 
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
-
+		SET OutputRoot.HTTPInputHeader = InputRoot.HTTPInputHeader;
 		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
-		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_HEADER.ns:SOURCE = inputHeaderRef.*:SOURCE;
-		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_HEADER.ns:UBSCOMP = inputHeaderRef.*:UBSCOMP;
-		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_HEADER.ns:MSGID = inputHeaderRef.*:MSGID;
-		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_HEADER.ns:CORRELID = inputHeaderRef.*:CORRELID;
-		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_HEADER.ns:USERID = inputHeaderRef.*:USERID;
-		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_HEADER.ns:BRANCH = inputHeaderRef.*:BRANCH;
-		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_HEADER.ns:SERVICE = inputHeaderRef.*:SERVICE;
-		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_HEADER.ns:OPERATION = inputHeaderRef.*:OPERATION;
-		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_HEADER.ns:MSGSTAT = inputHeaderRef.*:MSGSTAT;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'QUERYCUSTACC_IOFS_REQ';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_REQ NAMESPACE ns NAME 'FCUBS_HEADER';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_REQ NAMESPACE ns NAME 'FCUBS_BODY';
 
-		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_BODY.ns:"Cust-Account-IO".ns:BRN = inputBodyRef.*:BRN;
-		SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_BODY.ns:"Cust-Account-IO".ns:ACC = inputBodyRef.*:ACC;
+		DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_HEADER;
+		DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_REQ.ns:FCUBS_BODY;
+
+		SET outputHeaderRef.ns:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outputHeaderRef.ns:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outputHeaderRef.ns:MSGID = inputHeaderRef.*:MSGID;
+		SET outputHeaderRef.ns:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outputHeaderRef.ns:USERID = inputHeaderRef.*:USERID;
+		SET outputHeaderRef.ns:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outputHeaderRef.ns:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outputHeaderRef.ns:OPERATION = inputHeaderRef.*:OPERATION;
+		SET outputHeaderRef.ns:MSGSTAT = inputHeaderRef.*:MSGSTAT;
+
+		SET outputBodyRef.ns:"Cust-Account-IO".ns:BRN = inputBodyRef.*:BRN;
+		SET outputBodyRef.ns:"Cust-Account-IO".ns:ACC = inputBodyRef.*:ACC;
 
 		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------Response Logging-------------------------
@@ -80,7 +89,6 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		-- CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
-		SET OutputRoot.HTTPInputHeader = InputRoot.HTTPInputHeader;
 		SET OutputRoot.SOAP = Environment.outputData;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_REQ ------') INTO rc;
@@ -119,339 +127,362 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RESP data  is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		-------------- Generating response to channel ---------------
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 
 		IF FIELDVALUE(InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER.*:MSGSTAT)='FAILURE' THEN
 			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
 			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-IO";
 			DECLARE inputBodyErrRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR;
-			CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
-			SET OutputRoot.Properties = InputRoot.Properties;
-		--	SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+--			SET OutputRoot.Properties = InputRoot.Properties;
+--			SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
+			-- CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+			CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'QUERYCUSTACC_IOFS_RES';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES NAME 'FCUBS_HEADER';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES NAME 'FCUBS_BODY';
+			
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.SOURCE = inputHeaderRef.*:SOURCE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.UBSCOMP = inputHeaderRef.*:UBSCOMP;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.MSGID = inputHeaderRef.*:MSGID;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.CORRELID = inputHeaderRef.*:CORRELID;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.USERID = inputHeaderRef.*:USERID;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.ENTITY = inputHeaderRef.*:ENTITY;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.BRANCH = inputHeaderRef.*:BRANCH;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.SERVICE = inputHeaderRef.*:SERVICE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.OPERATION = inputHeaderRef.*:OPERATION;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.DESTINATION = inputHeaderRef.*:DESTINATION;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.ACTION = inputHeaderRef.*:ACTION;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.MSGSTAT = inputHeaderRef.*:MSGSTAT;
+			DECLARE outputheaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER;
+			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".BRN = inputBodyRef.*:BRN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACC = inputBodyRef.*:ACC;
+			SET outputheaderRef.SOURCE = inputHeaderRef.*:SOURCE;
+			SET outputheaderRef.UBSCOMP = inputHeaderRef.*:UBSCOMP;
+			SET outputheaderRef.MSGID = inputHeaderRef.*:MSGID;
+			SET outputheaderRef.CORRELID = inputHeaderRef.*:CORRELID;
+			SET outputheaderRef.USERID = inputHeaderRef.*:USERID;
+			SET outputheaderRef.ENTITY = inputHeaderRef.*:ENTITY;
+			SET outputheaderRef.BRANCH = inputHeaderRef.*:BRANCH;
+			SET outputheaderRef.SERVICE = inputHeaderRef.*:SERVICE;
+			SET outputheaderRef.OPERATION = inputHeaderRef.*:OPERATION;
+			SET outputheaderRef.DESTINATION = inputHeaderRef.*:DESTINATION;
+			SET outputheaderRef.FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
+			SET outputheaderRef.ACTION = inputHeaderRef.*:ACTION;
+			SET outputheaderRef.MSGSTAT = inputHeaderRef.*:MSGSTAT;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_ERROR_RESP.ERROR.WCODE = inputBodyErrRef.*:ECODE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_ERROR_RESP.ERROR.WDESC = inputBodyErrRef.*:EDESC;
+			SET outputbodyRef."Cust-Account-Full".BRN = inputBodyRef.*:BRN;
+			SET outputbodyRef."Cust-Account-Full".ACC = inputBodyRef.*:ACC;
+
+			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR.WCODE = inputBodyErrRef.*:WCODE;
+			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR.WDESC = inputBodyErrRef.*:WDESC;
 
 			SET Environment.outputData = OutputRoot;
-			PROPAGATE TO TERMINAL 'out' DELETE NONE;
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
 
 		ELSEIF FIELDVALUE(InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER.*:MSGSTAT) IS NULL THEN
 
 			SET OutputRoot = InputRoot;
 			SET Environment.outputData = OutputRoot;
-			PROPAGATE TO TERMINAL 'out' DELETE NONE;
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
 
 		ELSE
 			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
 			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full";
 			DECLARE inputBodyWarnRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING;
-			CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
-			SET OutputRoot.Properties = InputRoot.Properties;
-		--	SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+--			SET OutputRoot.Properties = InputRoot.Properties;
+--			SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
+			-- CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.SOURCE = inputHeaderRef.*:SOURCE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.UBSCOMP = inputHeaderRef.*:UBSCOMP;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.MSGID = inputHeaderRef.*:MSGID;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.CORRELID = inputHeaderRef.*:CORRELID;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.USERID = inputHeaderRef.*:USERID;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.ENTITY = inputHeaderRef.*:ENTITY;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.BRANCH = inputHeaderRef.*:BRANCH;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.SERVICE = inputHeaderRef.*:SERVICE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.OPERATION = inputHeaderRef.*:OPERATION;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.DESTINATION = inputHeaderRef.*:DESTINATION;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.ACTION = inputHeaderRef.*:ACTION;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.MSGSTAT = inputHeaderRef.*:MSGSTAT;
+			CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'QUERYCUSTACC_IOFS_RES';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES NAME 'FCUBS_HEADER';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES NAME 'FCUBS_BODY';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY NAME 'Cust-Account-Full';
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".BRN = inputBodyRef.*:BRN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACC = inputBodyRef.*:ACC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CUSTNO = inputBodyRef.*:CUSTNO;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACCLS = inputBodyRef.*:ACCLS;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CCY = inputBodyRef.*:CCY;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CUSTNAME = inputBodyRef.*:CUSTNAME;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACCLSTYP = inputBodyRef.*:ACCLSTYP;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ADESC = inputBodyRef.*:ADESC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACSTATNODR = inputBodyRef.*:ACSTATNODR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACSTATNOCR = inputBodyRef.*:ACSTATNOCR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACSTATSTPAY = inputBodyRef.*:ACSTATSTPAY;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".DORM = inputBodyRef.*:DORM;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACCTYPE = inputBodyRef.*:ACCTYPE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACCOPENDT = inputBodyRef.*:ACCOPENDT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ALTACC = inputBodyRef.*:ALTACC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".FROZEN = inputBodyRef.*:FROZEN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ADDRESS_1 = inputBodyRef.*:ADDRESS_1;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ADDRESS_2 = inputBodyRef.*:ADDRESS_2;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ADDRESS_3 = inputBodyRef.*:ADDRESS_3;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".POSTALLOWED = inputBodyRef.*:POSTALLOWED;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".TRKREC = inputBodyRef.*:TRKREC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".REFREQ = inputBodyRef.*:REFREQ;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACCSTAT = inputBodyRef.*:ACCSTAT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".STATSINCE = inputBodyRef.*:STATSINCE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".INHERITREP = inputBodyRef.*:INHERITREP;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".AUTOSTATCHANGE = inputBodyRef.*:AUTOSTATCHANGE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".DORMPRM = inputBodyRef.*:DORMPRM;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".LOC = inputBodyRef.*:LOC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".MEDIA = inputBodyRef.*:MEDIA;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CHQBOOK = inputBodyRef.*:CHQBOOK;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".PASSBOOK = inputBodyRef.*:PASSBOOK;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CASACC = inputBodyRef.*:CASACC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".TYOFCHQ = inputBodyRef.*:TYOFCHQ;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ATMDLIM = inputBodyRef.*:ATMDLIM;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ATMDCNTLIM = inputBodyRef.*:ATMDCNTLIM;
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY NAME 'FCUBS_WARNING_RESP';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_WARNING_RESP NAME 'WARNING';
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".POSPAYAC = inputBodyRef.*:POSPAYAC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".AUTOREORDERCHKREQ = inputBodyRef.*:AUTOREORDERCHKREQ;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".LODGEBKFAC = inputBodyRef.*:LODGEBKFAC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ALLWBKPERENTRY = inputBodyRef.*:ALLWBKPERENTRY;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".AUTOPROVREQ = inputBodyRef.*:AUTOPROVREQ;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".PROVCCYTYPE = inputBodyRef.*:PROVCCYTYPE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".DEFRECON = inputBodyRef.*:DEFRECON;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CONSREQD = inputBodyRef.*:CONSREQD;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".FUNDING = inputBodyRef.*:FUNDING;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".MOD9RQD = inputBodyRef.*:MOD9RQD;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".NETREQ = inputBodyRef.*:NETREQ;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACSTMTDAY = inputBodyRef.*:ACSTMTDAY;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACSTMTCYCLE = inputBodyRef.*:ACSTMTCYCLE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ATM = inputBodyRef.*:ATM;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACSTMTTYPEP = inputBodyRef.*:ACSTMTTYPEP;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".GENSTMTMV = inputBodyRef.*:GENSTMTMV;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".DISPIBANINADV = inputBodyRef.*:DISPIBANINADV;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACSTMTTYPS = inputBodyRef.*:ACSTMTTYPS;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".GENSTMTMV2 = inputBodyRef.*:GENSTMTMV2;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACSTMTTYPE3 = inputBodyRef.*:ACSTMTTYPE3;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".GENSTMTMV3 = inputBodyRef.*:GENSTMTMV3;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".FLGEXCLRVRTRANS = inputBodyRef.*:FLGEXCLRVRTRANS;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".PREVSTMTDT = inputBodyRef.*:PREVSTMTDT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".PREVSTMTBAL = inputBodyRef.*:PREVSTMTBAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".PREVSTMTNO = inputBodyRef.*:PREVSTMTNO;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".SWPTYPE = inputBodyRef.*:SWPTYPE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".REGCCAVL = inputBodyRef.*:REGCCAVL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".REGDAPP = inputBodyRef.*:REGDAPP;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".REGDPER = inputBodyRef.*:REGDPER;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".PRDLST = inputBodyRef.*:PRDLST;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".TXNLST = inputBodyRef.*:TXNLST;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".SPCONDLST = inputBodyRef.*:SPCONDLST;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".SPCONDTXN = inputBodyRef.*:SPCONDTXN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ODREQ = inputBodyRef.*:ODREQ;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".DAYLIGHTLIMIT = inputBodyRef.*:DAYLIGHTLIMIT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ESCROWTRN = inputBodyRef.*:ESCROWTRN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".ACCOUNTAUTOCLOSED = inputBodyRef.*:ACCOUNTAUTOCLOSED;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CRS_STST_REQD = inputBodyRef.*:CRS_STST_REQD;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".MT110_RECON_REQD = inputBodyRef.*:MT110_RECON_REQD;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".PROJACC = inputBodyRef.*:PROJACC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".PRIVATE_CUSTOMER = inputBodyRef.*:PRIVATE_CUSTOMER;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".DFLT_WAIVER = inputBodyRef.*:DFLT_WAIVER;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".AUTO_DEBIT_CARD_REQUEST = inputBodyRef.*:AUTO_DEBIT_CARD_REQUEST;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".AUTO_CHEQUE_BOOK_REQ = inputBodyRef.*:AUTO_CHEQUE_BOOK_REQ;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".NSFBLKSTAT = inputBodyRef.*:NSFBLKSTAT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".DROVD = inputBodyRef.*:DROVD;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CROVD = inputBodyRef.*:CROVD;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".SPL_AC_GEN = inputBodyRef.*:SPL_AC_GEN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".MAKER = inputBodyRef.*:MAKER;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".MAKERSTAMP = inputBodyRef.*:MAKERSTAMP;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CHECKER = inputBodyRef.*:CHECKER;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CHECKERSTAMP = inputBodyRef.*:CHECKERSTAMP;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".MODNO = inputBodyRef.*:MODNO;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".TXNSTAT = inputBodyRef.*:TXNSTAT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".AUTHSTAT = inputBodyRef.*:AUTHSTAT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Provision-Main".PRVACCUI = inputBodyRef.*:"Provision-Main".*:PRVACCUI;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Interim-Details".INTRMSTMTCNT = inputBodyRef.*:"Interim-Details".*:INTRMSTMTCNT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Acstatuslines.ACSTATUS = inputBodyRef.*:Acstatuslines.*:ACSTATUS;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Acstatuslines.DRHOLINE = inputBodyRef.*:Acstatuslines.*:DRHOLINE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Acstatuslines.CRHOLINE = inputBodyRef.*:Acstatuslines.*:CRHOLINE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Acstatuslines.CRCBLINE = inputBodyRef.*:Acstatuslines.*:CRCBLINE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Acstatuslines.DRCBLINE = inputBodyRef.*:Acstatuslines.*:DRCBLINE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Acstatuslines.DRGL = inputBodyRef.*:Acstatuslines.*:DRGL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Acstatuslines.CRGL = inputBodyRef.*:Acstatuslines.*:CRGL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Acstatuslines.DESC = inputBodyRef.*:Acstatuslines.*:DESC;
+			DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER;
+			DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full";
+			DECLARE outputWarnRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_WARNING_RESP.WARNING;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Intdetails.CALCACC = inputBodyRef.*:Intdetails.*:CALCACC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Intdetails.BOOKACC = inputBodyRef.*:Intdetails.*:BOOKACC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Intdetails.HASIS = inputBodyRef.*:Intdetails.*:HASIS;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Intdetails.INTSTARTDT = inputBodyRef.*:Intdetails.*:INTSTARTDT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Intdetails.BOOKACCBRN = inputBodyRef.*:Intdetails.*:BOOKACCBRN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Intdetails.DRCRADV = inputBodyRef.*:Intdetails.*:DRCRADV;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Intdetails.CHGBOOKACCBRN = inputBodyRef.*:Intdetails.*:CHGBOOKACCBRN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Intdetails.CHGBOOKACC = inputBodyRef.*:Intdetails.*:CHGBOOKACC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Intdetails.CHGSTARTDT = inputBodyRef.*:Intdetails.*:CHGSTARTDT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Intdetails.BRN = inputBodyRef.*:Intdetails.*:BRN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Intdetails.ACC = inputBodyRef.*:Intdetails.*:ACC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Tddetails.AUTOROLL = inputBodyRef.*:Tddetails.*:AUTOROLL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Tddetails.CLONMAT = inputBodyRef.*:Tddetails.*:CLONMAT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Tddetails.MOVINTUNCLM = inputBodyRef.*:Tddetails.*:MOVINTUNCLM;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Tddetails.ROLLTYPE = inputBodyRef.*:Tddetails.*:ROLLTYPE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Tddetails.MOVPRIUNCLM = inputBodyRef.*:Tddetails.*:MOVPRIUNCLM;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Tddetails.INTSTDT = inputBodyRef.*:Tddetails.*:INTSTDT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".LCY = inputBodyRef.*:"Amount-Dates".*:LCY;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY = inputBodyRef.*:"Amount-Dates".*:ACY;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DR_INT_DUE = inputBodyRef.*:"Amount-Dates".*:DR_INT_DUE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".PROVAMT = inputBodyRef.*:"Amount-Dates".*:PROVAMT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".CHG_DUE = inputBodyRef.*:"Amount-Dates".*:CHG_DUE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".WITHDRAWABLE_UNCOLLED_FUND = inputBodyRef.*:"Amount-Dates".*:WITHDRAWABLE_UNCOLLED_FUND;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_OPENING_BAL = inputBodyRef.*:"Amount-Dates".*:ACY_OPENING_BAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".LCY_OPENING_BAL = inputBodyRef.*:"Amount-Dates".*:LCY_OPENING_BAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_TODAY_TOVER_DR = inputBodyRef.*:"Amount-Dates".*:ACY_TODAY_TOVER_DR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".LCY_TODAY_TOVER_DR = inputBodyRef.*:"Amount-Dates".*:LCY_TODAY_TOVER_DR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_TODAY_TOVER_CR = inputBodyRef.*:"Amount-Dates".*:ACY_TODAY_TOVER_CR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".LCY_TODAY_TOVER_CR = inputBodyRef.*:"Amount-Dates".*:LCY_TODAY_TOVER_CR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_TANK_CR = inputBodyRef.*:"Amount-Dates".*:ACY_TANK_CR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_TANK_DR = inputBodyRef.*:"Amount-Dates".*:ACY_TANK_DR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".LCY_TANK_CR = inputBodyRef.*:"Amount-Dates".*:LCY_TANK_CR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".LCY_TANK_DR = inputBodyRef.*:"Amount-Dates".*:LCY_TANK_DR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_TANK_UNCOLLECTED = inputBodyRef.*:"Amount-Dates".*:ACY_TANK_UNCOLLECTED;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_CURR_BALANCE = inputBodyRef.*:"Amount-Dates".*:ACY_CURR_BALANCE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".LCY_CURR_BALANCE = inputBodyRef.*:"Amount-Dates".*:LCY_CURR_BALANCE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_BLOCKED_AMOUNT = inputBodyRef.*:"Amount-Dates".*:ACY_BLOCKED_AMOUNT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_AVL_BAL = inputBodyRef.*:"Amount-Dates".*:ACY_AVL_BAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_UNAUTH_DR = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH_DR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_UNAUTH_TANK_DR = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH_TANK_DR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_UNAUTH_CR = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH_CR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_UNAUTH_TANK_CR = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH_TANK_CR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_UNAUTH_UNCOLLECTED = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH_UNCOLLECTED;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_UNAUTH_TANK_UNCOLLECTED = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH_TANK_UNCOLLECTED;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_ACCRUED_DR_IC = inputBodyRef.*:"Amount-Dates".*:ACY_ACCRUED_DR_IC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_ACCRUED_CR_IC = inputBodyRef.*:"Amount-Dates".*:ACY_ACCRUED_CR_IC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DATE_LAST_CR_ACTIVITY = inputBodyRef.*:"Amount-Dates".*:DATE_LAST_CR_ACTIVITY;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DATE_LAST_DR_ACTIVITY = inputBodyRef.*:"Amount-Dates".*:DATE_LAST_DR_ACTIVITY;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DATE_LAST_DR = inputBodyRef.*:"Amount-Dates".*:DATE_LAST_DR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DATE_LAST_CR = inputBodyRef.*:"Amount-Dates".*:DATE_LAST_CR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_UNCOLLECTED = inputBodyRef.*:"Amount-Dates".*:ACY_UNCOLLECTED;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".AMTAVL = inputBodyRef.*:"Amount-Dates".*:AMTAVL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DC_ACY_OPEN_BAL = inputBodyRef.*:"Amount-Dates".*:DC_ACY_OPEN_BAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DC_LCY_OPEN_BAL = inputBodyRef.*:"Amount-Dates".*:DC_LCY_OPEN_BAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DC_ACY_CURR_BAL = inputBodyRef.*:"Amount-Dates".*:DC_ACY_CURR_BAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DC_ACY_AVL_BAL = inputBodyRef.*:"Amount-Dates".*:DC_ACY_AVL_BAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DIS_UNUTILIZED_AMT = inputBodyRef.*:"Amount-Dates".*:DIS_UNUTILIZED_AMT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DIS_TOT_AVL_AMOUNT = inputBodyRef.*:"Amount-Dates".*:DIS_TOT_AVL_AMOUNT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DC_TOT_AVL_AMOUNT = inputBodyRef.*:"Amount-Dates".*:DC_TOT_AVL_AMOUNT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DC_LCY_CURR_BAL = inputBodyRef.*:"Amount-Dates".*:DC_LCY_CURR_BAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ACY_UNAUTH = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".UTILIZED_AMT = inputBodyRef.*:"Amount-Dates".*:UTILIZED_AMT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".LIMIT_AMOUNT = inputBodyRef.*:"Amount-Dates".*:LIMIT_AMOUNT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".ILM_SWEEP_BAL = inputBodyRef.*:"Amount-Dates".*:ILM_SWEEP_BAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".SWEEP_ELIG_BAL = inputBodyRef.*:"Amount-Dates".*:SWEEP_ELIG_BAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".PRINC_OUTSTAND = inputBodyRef.*:"Amount-Dates".*:PRINC_OUTSTAND;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".INT_OUTSTAND = inputBodyRef.*:"Amount-Dates".*:INT_OUTSTAND;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".CHG_OUTSTAND = inputBodyRef.*:"Amount-Dates".*:CHG_OUTSTAND;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".PBKBAL = inputBodyRef.*:"Amount-Dates".*:PBKBAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".DC_ILM_SWEEP_BAL = inputBodyRef.*:"Amount-Dates".*:DC_ILM_SWEEP_BAL;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".AMTDUE = inputBodyRef.*:"Amount-Dates".*:AMTDUE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".Turnovers.ACY_MTD_TOVER_DR = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:ACY_MTD_TOVER_DR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".Turnovers.LCY_MTD_TOVER_DR = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:LCY_MTD_TOVER_DR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".Turnovers.ACY_MTD_TOVER_CR = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:ACY_MTD_TOVER_CR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".Turnovers.LCY_MTD_TOVER_CR = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:LCY_MTD_TOVER_CR;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".Turnovers.ACY_TOV = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:ACY_TOV;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Amount-Dates".Turnovers.LCY_TOV = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:LCY_TOV;
+			SET outputHeaderRef.SOURCE = inputHeaderRef.*:SOURCE;
+			SET outputHeaderRef.UBSCOMP = inputHeaderRef.*:UBSCOMP;
+			SET outputHeaderRef.MSGID = inputHeaderRef.*:MSGID;
+			SET outputHeaderRef.CORRELID = inputHeaderRef.*:CORRELID;
+			SET outputHeaderRef.USERID = inputHeaderRef.*:USERID;
+			SET outputHeaderRef.ENTITY = inputHeaderRef.*:ENTITY;
+			SET outputHeaderRef.BRANCH = inputHeaderRef.*:BRANCH;
+			SET outputHeaderRef.SERVICE = inputHeaderRef.*:SERVICE;
+			SET outputHeaderRef.OPERATION = inputHeaderRef.*:OPERATION;
+			SET outputHeaderRef.DESTINATION = inputHeaderRef.*:DESTINATION;
+			SET outputHeaderRef.FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
+			SET outputHeaderRef.ACTION = inputHeaderRef.*:ACTION;
+			SET outputHeaderRef.MSGSTAT = inputHeaderRef.*:MSGSTAT;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".Noticepref = inputBodyRef.*:Noticepref;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Cust-Acc-Check" = inputBodyRef.*:"Cust-Acc-Check";
+			SET outputBodyRef.BRN = inputBodyRef.*:BRN;
+			SET outputBodyRef.ACC = inputBodyRef.*:ACC;
+			SET outputBodyRef.CUSTNO = inputBodyRef.*:CUSTNO;
+			SET outputBodyRef.ACCLS = inputBodyRef.*:ACCLS;
+			SET outputBodyRef.CCY = inputBodyRef.*:CCY;
+			SET outputBodyRef.CUSTNAME = inputBodyRef.*:CUSTNAME;
+			SET outputBodyRef.ACCLSTYP = inputBodyRef.*:ACCLSTYP;
+			SET outputBodyRef.ADESC = inputBodyRef.*:ADESC;
+			SET outputBodyRef.ACSTATNODR = inputBodyRef.*:ACSTATNODR;
+			SET outputBodyRef.ACSTATNOCR = inputBodyRef.*:ACSTATNOCR;
+			SET outputBodyRef.ACSTATSTPAY = inputBodyRef.*:ACSTATSTPAY;
+			SET outputBodyRef.DORM = inputBodyRef.*:DORM;
+			SET outputBodyRef.ACCTYPE = inputBodyRef.*:ACCTYPE;
+			SET outputBodyRef.ACCOPENDT = inputBodyRef.*:ACCOPENDT;
+			SET outputBodyRef.ALTACC = inputBodyRef.*:ALTACC;
+			SET outputBodyRef.FROZEN = inputBodyRef.*:FROZEN;
+			SET outputBodyRef.ADDRESS_1 = inputBodyRef.*:ADDRESS_1;
+			SET outputBodyRef.ADDRESS_2 = inputBodyRef.*:ADDRESS_2;
+			SET outputBodyRef.ADDRESS_3 = inputBodyRef.*:ADDRESS_3;
+			SET outputBodyRef.POSTALLOWED = inputBodyRef.*:POSTALLOWED;
+			SET outputBodyRef.TRKREC = inputBodyRef.*:TRKREC;
+			SET outputBodyRef.REFREQ = inputBodyRef.*:REFREQ;
+			SET outputBodyRef.ACCSTAT = inputBodyRef.*:ACCSTAT;
+			SET outputBodyRef.STATSINCE = inputBodyRef.*:STATSINCE;
+			SET outputBodyRef.INHERITREP = inputBodyRef.*:INHERITREP;
+			SET outputBodyRef.AUTOSTATCHANGE = inputBodyRef.*:AUTOSTATCHANGE;
+			SET outputBodyRef.DORMPRM = inputBodyRef.*:DORMPRM;
+			SET outputBodyRef.LOC = inputBodyRef.*:LOC;
+			SET outputBodyRef.MEDIA = inputBodyRef.*:MEDIA;
+			SET outputBodyRef.CHQBOOK = inputBodyRef.*:CHQBOOK;
+			SET outputBodyRef.PASSBOOK = inputBodyRef.*:PASSBOOK;
+			SET outputBodyRef.CASACC = inputBodyRef.*:CASACC;
+			SET outputBodyRef.TYOFCHQ = inputBodyRef.*:TYOFCHQ;
+			SET outputBodyRef.ATMDLIM = inputBodyRef.*:ATMDLIM;
+			SET outputBodyRef.ATMDCNTLIM = inputBodyRef.*:ATMDCNTLIM;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Icccspcn".BRNCD = inputBodyRef.*:"Custacc-Icccspcn".*:BRNCD;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Icccspcn".ACCNO = inputBodyRef.*:"Custacc-Icccspcn".*:ACCNO;
+			SET outputBodyRef.POSPAYAC = inputBodyRef.*:POSPAYAC;
+			SET outputBodyRef.AUTOREORDERCHKREQ = inputBodyRef.*:AUTOREORDERCHKREQ;
+			SET outputBodyRef.LODGEBKFAC = inputBodyRef.*:LODGEBKFAC;
+			SET outputBodyRef.ALLWBKPERENTRY = inputBodyRef.*:ALLWBKPERENTRY;
+			SET outputBodyRef.AUTOPROVREQ = inputBodyRef.*:AUTOPROVREQ;
+			SET outputBodyRef.PROVCCYTYPE = inputBodyRef.*:PROVCCYTYPE;
+			SET outputBodyRef.DEFRECON = inputBodyRef.*:DEFRECON;
+			SET outputBodyRef.CONSREQD = inputBodyRef.*:CONSREQD;
+			SET outputBodyRef.FUNDING = inputBodyRef.*:FUNDING;
+			SET outputBodyRef.MOD9RQD = inputBodyRef.*:MOD9RQD;
+			SET outputBodyRef.NETREQ = inputBodyRef.*:NETREQ;
+			SET outputBodyRef.ACSTMTDAY = inputBodyRef.*:ACSTMTDAY;
+			SET outputBodyRef.ACSTMTCYCLE = inputBodyRef.*:ACSTMTCYCLE;
+			SET outputBodyRef.ATM = inputBodyRef.*:ATM;
+			SET outputBodyRef.ACSTMTTYPEP = inputBodyRef.*:ACSTMTTYPEP;
+			SET outputBodyRef.GENSTMTMV = inputBodyRef.*:GENSTMTMV;
+			SET outputBodyRef.DISPIBANINADV = inputBodyRef.*:DISPIBANINADV;
+			SET outputBodyRef.ACSTMTTYPS = inputBodyRef.*:ACSTMTTYPS;
+			SET outputBodyRef.GENSTMTMV2 = inputBodyRef.*:GENSTMTMV2;
+			SET outputBodyRef.ACSTMTTYPE3 = inputBodyRef.*:ACSTMTTYPE3;
+			SET outputBodyRef.GENSTMTMV3 = inputBodyRef.*:GENSTMTMV3;
+			SET outputBodyRef.FLGEXCLRVRTRANS = inputBodyRef.*:FLGEXCLRVRTRANS;
+			SET outputBodyRef.PREVSTMTDT = inputBodyRef.*:PREVSTMTDT;
+			SET outputBodyRef.PREVSTMTBAL = inputBodyRef.*:PREVSTMTBAL;
+			SET outputBodyRef.PREVSTMTNO = inputBodyRef.*:PREVSTMTNO;
+			SET outputBodyRef.SWPTYPE = inputBodyRef.*:SWPTYPE;
+			SET outputBodyRef.REGCCAVL = inputBodyRef.*:REGCCAVL;
+			SET outputBodyRef.REGDAPP = inputBodyRef.*:REGDAPP;
+			SET outputBodyRef.REGDPER = inputBodyRef.*:REGDPER;
+			SET outputBodyRef.PRDLST = inputBodyRef.*:PRDLST;
+			SET outputBodyRef.TXNLST = inputBodyRef.*:TXNLST;
+			SET outputBodyRef.SPCONDLST = inputBodyRef.*:SPCONDLST;
+			SET outputBodyRef.SPCONDTXN = inputBodyRef.*:SPCONDTXN;
+			SET outputBodyRef.ODREQ = inputBodyRef.*:ODREQ;
+			SET outputBodyRef.DAYLIGHTLIMIT = inputBodyRef.*:DAYLIGHTLIMIT;
+			SET outputBodyRef.ESCROWTRN = inputBodyRef.*:ESCROWTRN;
+			SET outputBodyRef.ACCOUNTAUTOCLOSED = inputBodyRef.*:ACCOUNTAUTOCLOSED;
+			SET outputBodyRef.CRS_STST_REQD = inputBodyRef.*:CRS_STST_REQD;
+			SET outputBodyRef.MT110_RECON_REQD = inputBodyRef.*:MT110_RECON_REQD;
+			SET outputBodyRef.PROJACC = inputBodyRef.*:PROJACC;
+			SET outputBodyRef.PRIVATE_CUSTOMER = inputBodyRef.*:PRIVATE_CUSTOMER;
+			SET outputBodyRef.DFLT_WAIVER = inputBodyRef.*:DFLT_WAIVER;
+			SET outputBodyRef.AUTO_DEBIT_CARD_REQUEST = inputBodyRef.*:AUTO_DEBIT_CARD_REQUEST;
+			SET outputBodyRef.AUTO_CHEQUE_BOOK_REQ = inputBodyRef.*:AUTO_CHEQUE_BOOK_REQ;
+			SET outputBodyRef.NSFBLKSTAT = inputBodyRef.*:NSFBLKSTAT;
+			SET outputBodyRef.DROVD = inputBodyRef.*:DROVD;
+			SET outputBodyRef.CROVD = inputBodyRef.*:CROVD;
+			SET outputBodyRef.SPL_AC_GEN = inputBodyRef.*:SPL_AC_GEN;
+			SET outputBodyRef.MAKER = inputBodyRef.*:MAKER;
+			SET outputBodyRef.MAKERSTAMP = inputBodyRef.*:MAKERSTAMP;
+			SET outputBodyRef.CHECKER = inputBodyRef.*:CHECKER;
+			SET outputBodyRef.CHECKERSTAMP = inputBodyRef.*:CHECKERSTAMP;
+			SET outputBodyRef.MODNO = inputBodyRef.*:MODNO;
+			SET outputBodyRef.TXNSTAT = inputBodyRef.*:TXNSTAT;
+			SET outputBodyRef.AUTHSTAT = inputBodyRef.*:AUTHSTAT;
+			SET outputBodyRef."Provision-Main".PRVACCUI = inputBodyRef.*:"Provision-Main".*:PRVACCUI;
+			SET outputBodyRef."Interim-Details".INTRMSTMTCNT = inputBodyRef.*:"Interim-Details".*:INTRMSTMTCNT;
+			SET outputBodyRef.Acstatuslines.ACSTATUS = inputBodyRef.*:Acstatuslines.*:ACSTATUS;
+			SET outputBodyRef.Acstatuslines.DRHOLINE = inputBodyRef.*:Acstatuslines.*:DRHOLINE;
+			SET outputBodyRef.Acstatuslines.CRHOLINE = inputBodyRef.*:Acstatuslines.*:CRHOLINE;
+			SET outputBodyRef.Acstatuslines.CRCBLINE = inputBodyRef.*:Acstatuslines.*:CRCBLINE;
+			SET outputBodyRef.Acstatuslines.DRCBLINE = inputBodyRef.*:Acstatuslines.*:DRCBLINE;
+			SET outputBodyRef.Acstatuslines.DRGL = inputBodyRef.*:Acstatuslines.*:DRGL;
+			SET outputBodyRef.Acstatuslines.CRGL = inputBodyRef.*:Acstatuslines.*:CRGL;
+			SET outputBodyRef.Acstatuslines.DESC = inputBodyRef.*:Acstatuslines.*:DESC;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Icchspcn".BRN = inputBodyRef.*:"Custacc-Icchspcn".*:BRN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Icchspcn".ACC = inputBodyRef.*:"Custacc-Icchspcn".*:ACC;
+			SET outputBodyRef.Intdetails.CALCACC = inputBodyRef.*:Intdetails.*:CALCACC;
+			SET outputBodyRef.Intdetails.BOOKACC = inputBodyRef.*:Intdetails.*:BOOKACC;
+			SET outputBodyRef.Intdetails.HASIS = inputBodyRef.*:Intdetails.*:HASIS;
+			SET outputBodyRef.Intdetails.INTSTARTDT = inputBodyRef.*:Intdetails.*:INTSTARTDT;
+			SET outputBodyRef.Intdetails.BOOKACCBRN = inputBodyRef.*:Intdetails.*:BOOKACCBRN;
+			SET outputBodyRef.Intdetails.DRCRADV = inputBodyRef.*:Intdetails.*:DRCRADV;
+			SET outputBodyRef.Intdetails.CHGBOOKACCBRN = inputBodyRef.*:Intdetails.*:CHGBOOKACCBRN;
+			SET outputBodyRef.Intdetails.CHGBOOKACC = inputBodyRef.*:Intdetails.*:CHGBOOKACC;
+			SET outputBodyRef.Intdetails.CHGSTARTDT = inputBodyRef.*:Intdetails.*:CHGSTARTDT;
+			SET outputBodyRef.Intdetails.BRN = inputBodyRef.*:Intdetails.*:BRN;
+			SET outputBodyRef.Intdetails.ACC = inputBodyRef.*:Intdetails.*:ACC;
+			SET outputBodyRef.Tddetails.AUTOROLL = inputBodyRef.*:Tddetails.*:AUTOROLL;
+			SET outputBodyRef.Tddetails.CLONMAT = inputBodyRef.*:Tddetails.*:CLONMAT;
+			SET outputBodyRef.Tddetails.MOVINTUNCLM = inputBodyRef.*:Tddetails.*:MOVINTUNCLM;
+			SET outputBodyRef.Tddetails.ROLLTYPE = inputBodyRef.*:Tddetails.*:ROLLTYPE;
+			SET outputBodyRef.Tddetails.MOVPRIUNCLM = inputBodyRef.*:Tddetails.*:MOVPRIUNCLM;
+			SET outputBodyRef.Tddetails.INTSTDT = inputBodyRef.*:Tddetails.*:INTSTDT;
+			SET outputBodyRef."Amount-Dates".LCY = inputBodyRef.*:"Amount-Dates".*:LCY;
+			SET outputBodyRef."Amount-Dates".ACY = inputBodyRef.*:"Amount-Dates".*:ACY;
+			SET outputBodyRef."Amount-Dates".DR_INT_DUE = inputBodyRef.*:"Amount-Dates".*:DR_INT_DUE;
+			SET outputBodyRef."Amount-Dates".PROVAMT = inputBodyRef.*:"Amount-Dates".*:PROVAMT;
+			SET outputBodyRef."Amount-Dates".CHG_DUE = inputBodyRef.*:"Amount-Dates".*:CHG_DUE;
+			SET outputBodyRef."Amount-Dates".WITHDRAWABLE_UNCOLLED_FUND = inputBodyRef.*:"Amount-Dates".*:WITHDRAWABLE_UNCOLLED_FUND;
+			SET outputBodyRef."Amount-Dates".ACY_OPENING_BAL = inputBodyRef.*:"Amount-Dates".*:ACY_OPENING_BAL;
+			SET outputBodyRef."Amount-Dates".LCY_OPENING_BAL = inputBodyRef.*:"Amount-Dates".*:LCY_OPENING_BAL;
+			SET outputBodyRef."Amount-Dates".ACY_TODAY_TOVER_DR = inputBodyRef.*:"Amount-Dates".*:ACY_TODAY_TOVER_DR;
+			SET outputBodyRef."Amount-Dates".LCY_TODAY_TOVER_DR = inputBodyRef.*:"Amount-Dates".*:LCY_TODAY_TOVER_DR;
+			SET outputBodyRef."Amount-Dates".ACY_TODAY_TOVER_CR = inputBodyRef.*:"Amount-Dates".*:ACY_TODAY_TOVER_CR;
+			SET outputBodyRef."Amount-Dates".LCY_TODAY_TOVER_CR = inputBodyRef.*:"Amount-Dates".*:LCY_TODAY_TOVER_CR;
+			SET outputBodyRef."Amount-Dates".ACY_TANK_CR = inputBodyRef.*:"Amount-Dates".*:ACY_TANK_CR;
+			SET outputBodyRef."Amount-Dates".ACY_TANK_DR = inputBodyRef.*:"Amount-Dates".*:ACY_TANK_DR;
+			SET outputBodyRef."Amount-Dates".LCY_TANK_CR = inputBodyRef.*:"Amount-Dates".*:LCY_TANK_CR;
+			SET outputBodyRef."Amount-Dates".LCY_TANK_DR = inputBodyRef.*:"Amount-Dates".*:LCY_TANK_DR;
+			SET outputBodyRef."Amount-Dates".ACY_TANK_UNCOLLECTED = inputBodyRef.*:"Amount-Dates".*:ACY_TANK_UNCOLLECTED;
+			SET outputBodyRef."Amount-Dates".ACY_CURR_BALANCE = inputBodyRef.*:"Amount-Dates".*:ACY_CURR_BALANCE;
+			SET outputBodyRef."Amount-Dates".LCY_CURR_BALANCE = inputBodyRef.*:"Amount-Dates".*:LCY_CURR_BALANCE;
+			SET outputBodyRef."Amount-Dates".ACY_BLOCKED_AMOUNT = inputBodyRef.*:"Amount-Dates".*:ACY_BLOCKED_AMOUNT;
+			SET outputBodyRef."Amount-Dates".ACY_AVL_BAL = inputBodyRef.*:"Amount-Dates".*:ACY_AVL_BAL;
+			SET outputBodyRef."Amount-Dates".ACY_UNAUTH_DR = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH_DR;
+			SET outputBodyRef."Amount-Dates".ACY_UNAUTH_TANK_DR = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH_TANK_DR;
+			SET outputBodyRef."Amount-Dates".ACY_UNAUTH_CR = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH_CR;
+			SET outputBodyRef."Amount-Dates".ACY_UNAUTH_TANK_CR = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH_TANK_CR;
+			SET outputBodyRef."Amount-Dates".ACY_UNAUTH_UNCOLLECTED = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH_UNCOLLECTED;
+			SET outputBodyRef."Amount-Dates".ACY_UNAUTH_TANK_UNCOLLECTED = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH_TANK_UNCOLLECTED;
+			SET outputBodyRef."Amount-Dates".ACY_ACCRUED_DR_IC = inputBodyRef.*:"Amount-Dates".*:ACY_ACCRUED_DR_IC;
+			SET outputBodyRef."Amount-Dates".ACY_ACCRUED_CR_IC = inputBodyRef.*:"Amount-Dates".*:ACY_ACCRUED_CR_IC;
+			SET outputBodyRef."Amount-Dates".DATE_LAST_CR_ACTIVITY = inputBodyRef.*:"Amount-Dates".*:DATE_LAST_CR_ACTIVITY;
+			SET outputBodyRef."Amount-Dates".DATE_LAST_DR_ACTIVITY = inputBodyRef.*:"Amount-Dates".*:DATE_LAST_DR_ACTIVITY;
+			SET outputBodyRef."Amount-Dates".DATE_LAST_DR = inputBodyRef.*:"Amount-Dates".*:DATE_LAST_DR;
+			SET outputBodyRef."Amount-Dates".DATE_LAST_CR = inputBodyRef.*:"Amount-Dates".*:DATE_LAST_CR;
+			SET outputBodyRef."Amount-Dates".ACY_UNCOLLECTED = inputBodyRef.*:"Amount-Dates".*:ACY_UNCOLLECTED;
+			SET outputBodyRef."Amount-Dates".AMTAVL = inputBodyRef.*:"Amount-Dates".*:AMTAVL;
+			SET outputBodyRef."Amount-Dates".DC_ACY_OPEN_BAL = inputBodyRef.*:"Amount-Dates".*:DC_ACY_OPEN_BAL;
+			SET outputBodyRef."Amount-Dates".DC_LCY_OPEN_BAL = inputBodyRef.*:"Amount-Dates".*:DC_LCY_OPEN_BAL;
+			SET outputBodyRef."Amount-Dates".DC_ACY_CURR_BAL = inputBodyRef.*:"Amount-Dates".*:DC_ACY_CURR_BAL;
+			SET outputBodyRef."Amount-Dates".DC_ACY_AVL_BAL = inputBodyRef.*:"Amount-Dates".*:DC_ACY_AVL_BAL;
+			SET outputBodyRef."Amount-Dates".DIS_UNUTILIZED_AMT = inputBodyRef.*:"Amount-Dates".*:DIS_UNUTILIZED_AMT;
+			SET outputBodyRef."Amount-Dates".DIS_TOT_AVL_AMOUNT = inputBodyRef.*:"Amount-Dates".*:DIS_TOT_AVL_AMOUNT;
+			SET outputBodyRef."Amount-Dates".DC_TOT_AVL_AMOUNT = inputBodyRef.*:"Amount-Dates".*:DC_TOT_AVL_AMOUNT;
+			SET outputBodyRef."Amount-Dates".DC_LCY_CURR_BAL = inputBodyRef.*:"Amount-Dates".*:DC_LCY_CURR_BAL;
+			SET outputBodyRef."Amount-Dates".ACY_UNAUTH = inputBodyRef.*:"Amount-Dates".*:ACY_UNAUTH;
+			SET outputBodyRef."Amount-Dates".UTILIZED_AMT = inputBodyRef.*:"Amount-Dates".*:UTILIZED_AMT;
+			SET outputBodyRef."Amount-Dates".LIMIT_AMOUNT = inputBodyRef.*:"Amount-Dates".*:LIMIT_AMOUNT;
+			SET outputBodyRef."Amount-Dates".ILM_SWEEP_BAL = inputBodyRef.*:"Amount-Dates".*:ILM_SWEEP_BAL;
+			SET outputBodyRef."Amount-Dates".SWEEP_ELIG_BAL = inputBodyRef.*:"Amount-Dates".*:SWEEP_ELIG_BAL;
+			SET outputBodyRef."Amount-Dates".PRINC_OUTSTAND = inputBodyRef.*:"Amount-Dates".*:PRINC_OUTSTAND;
+			SET outputBodyRef."Amount-Dates".INT_OUTSTAND = inputBodyRef.*:"Amount-Dates".*:INT_OUTSTAND;
+			SET outputBodyRef."Amount-Dates".CHG_OUTSTAND = inputBodyRef.*:"Amount-Dates".*:CHG_OUTSTAND;
+			SET outputBodyRef."Amount-Dates".PBKBAL = inputBodyRef.*:"Amount-Dates".*:PBKBAL;
+			SET outputBodyRef."Amount-Dates".DC_ILM_SWEEP_BAL = inputBodyRef.*:"Amount-Dates".*:DC_ILM_SWEEP_BAL;
+			SET outputBodyRef."Amount-Dates".AMTDUE = inputBodyRef.*:"Amount-Dates".*:AMTDUE;
+			SET outputBodyRef."Amount-Dates".Turnovers.ACY_MTD_TOVER_DR = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:ACY_MTD_TOVER_DR;
+			SET outputBodyRef."Amount-Dates".Turnovers.LCY_MTD_TOVER_DR = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:LCY_MTD_TOVER_DR;
+			SET outputBodyRef."Amount-Dates".Turnovers.ACY_MTD_TOVER_CR = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:ACY_MTD_TOVER_CR;
+			SET outputBodyRef."Amount-Dates".Turnovers.LCY_MTD_TOVER_CR = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:LCY_MTD_TOVER_CR;
+			SET outputBodyRef."Amount-Dates".Turnovers.ACY_TOV = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:ACY_TOV;
+			SET outputBodyRef."Amount-Dates".Turnovers.LCY_TOV = inputBodyRef.*:"Amount-Dates".*:Turnovers.*:LCY_TOV;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Iccinstr".BRN = inputBodyRef.*:"Custacc-Iccinstr".*:BRN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Iccinstr".ACC = inputBodyRef.*:"Custacc-Iccinstr".*:ACC;
+			SET outputBodyRef.Noticepref = inputBodyRef.*:Noticepref;
+			SET outputBodyRef."Cust-Acc-Check" = inputBodyRef.*:"Cust-Acc-Check";
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CustAcc.BRN = inputBodyRef.*:CustAcc.*:BRN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CustAcc.ACC = inputBodyRef.*:CustAcc.*:ACC;
+			SET outputBodyRef."Custacc-Icccspcn".BRNCD = inputBodyRef.*:"Custacc-Icccspcn".*:BRNCD;
+			SET outputBodyRef."Custacc-Icccspcn".ACCNO = inputBodyRef.*:"Custacc-Icccspcn".*:ACCNO;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CustAcc.Misdetails.POOLCD = inputBodyRef.*:CustAcc.*:Misdetails.*:POOLCD;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CustAcc.Misdetails.REFRTTYPE = inputBodyRef.*:CustAcc.*:Misdetails.*:REFRTTYPE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CustAcc.Misdetails.CALCMETH = inputBodyRef.*:CustAcc.*:Misdetails.*:CALCMETH;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CustAcc.Misdetails.TXNMIS1 = inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS1;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CustAcc.Misdetails.TXNMIS2 = inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS2;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CustAcc.Misdetails.COMPMIS3 = inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS3;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".CustAcc.Misdetails.RTFLAG = inputBodyRef.*:CustAcc.*:Misdetails.*:RTFLAG;
+			SET outputBodyRef."Custacc-Icchspcn".BRN = inputBodyRef.*:"Custacc-Icchspcn".*:BRN;
+			SET outputBodyRef."Custacc-Icchspcn".ACC = inputBodyRef.*:"Custacc-Icchspcn".*:ACC;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Sicdiary" = inputBodyRef.*:"Custacc-Sicdiary";
+			SET outputBodyRef."Custacc-Iccinstr".BRN = inputBodyRef.*:"Custacc-Iccinstr".*:BRN;
+			SET outputBodyRef."Custacc-Iccinstr".ACC = inputBodyRef.*:"Custacc-Iccinstr".*:ACC;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Stccusbl".BRN = inputBodyRef.*:"Custacc-Stccusbl".*:BRN;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Stccusbl".ACCNO = inputBodyRef.*:"Custacc-Stccusbl".*:ACCNO;
+			SET outputBodyRef.CustAcc.BRN = inputBodyRef.*:CustAcc.*:BRN;
+			SET outputBodyRef.CustAcc.ACC = inputBodyRef.*:CustAcc.*:ACC;
+
+			SET outputBodyRef.CustAcc.Misdetails.POOLCD = inputBodyRef.*:CustAcc.*:Misdetails.*:POOLCD;
+			SET outputBodyRef.CustAcc.Misdetails.REFRTTYPE = inputBodyRef.*:CustAcc.*:Misdetails.*:REFRTTYPE;
+			SET outputBodyRef.CustAcc.Misdetails.CALCMETH = inputBodyRef.*:CustAcc.*:Misdetails.*:CALCMETH;
+			SET outputBodyRef.CustAcc.Misdetails.TXNMIS1 = inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS1;
+			SET outputBodyRef.CustAcc.Misdetails.TXNMIS2 = inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS2;
+			SET outputBodyRef.CustAcc.Misdetails.COMPMIS3 = inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS3;
+			SET outputBodyRef.CustAcc.Misdetails.RTFLAG = inputBodyRef.*:CustAcc.*:Misdetails.*:RTFLAG;
+
+			SET outputBodyRef."Custacc-Sicdiary" = inputBodyRef.*:"Custacc-Sicdiary";
+
+			SET outputBodyRef."Custacc-Stccusbl".BRN = inputBodyRef.*:"Custacc-Stccusbl".*:BRN;
+			SET outputBodyRef."Custacc-Stccusbl".ACCNO = inputBodyRef.*:"Custacc-Stccusbl".*:ACCNO;
 
 			DECLARE Inrefsoapbody REFERENCE TO inputBodyRef.*:UDFDETAILS[>];
 			DECLARE J INTEGER CARDINALITY(inputBodyRef.*:UDFDETAILS[]);
 			DECLARE I INTEGER 1;
 			WHILE I<=J DO
-				SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full".UDFDETAILS[I].FLDNAM = Inrefsoapbody.*:FLDNAM;
+				SET outputBodyRef.UDFDETAILS[I].FLDNAM = Inrefsoapbody.*:FLDNAM;
 				SET I = I + 1;
 				MOVE Inrefsoapbody NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".ACBRN1 = inputBodyRef.*:"Acc-Svcacsig".*:ACBRN1;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".ACTNO = inputBodyRef.*:"Acc-Svcacsig".*:ACTNO;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".ACDESC = inputBodyRef.*:"Acc-Svcacsig".*:ACDESC;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".MINNOSIG = inputBodyRef.*:"Acc-Svcacsig".*:MINNOSIG;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".ACCCY = inputBodyRef.*:"Acc-Svcacsig".*:ACCCY;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.CUST_ID = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:CUST_ID;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.RELATIONTYP = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:RELATIONTYP;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.SIGID = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SIGID;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.SIGTYPE = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SIGTYPE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.APPROVLIMIT = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:APPROVLIMIT;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.SIGNAME = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SIGNAME;
+			SET outputBodyRef."Acc-Svcacsig".ACBRN1 = inputBodyRef.*:"Acc-Svcacsig".*:ACBRN1;
+			SET outputBodyRef."Acc-Svcacsig".ACTNO = inputBodyRef.*:"Acc-Svcacsig".*:ACTNO;
+			SET outputBodyRef."Acc-Svcacsig".ACDESC = inputBodyRef.*:"Acc-Svcacsig".*:ACDESC;
+			SET outputBodyRef."Acc-Svcacsig".ACCMSG = inputBodyRef.*:"Acc-Svcacsig".*:ACCMSG;
+			SET outputBodyRef."Acc-Svcacsig".MINNOSIG = inputBodyRef.*:"Acc-Svcacsig".*:MINNOSIG;
+			SET outputBodyRef."Acc-Svcacsig".ACCCY = inputBodyRef.*:"Acc-Svcacsig".*:ACCCY;
+			SET outputBodyRef."Acc-Svcacsig".Accsigdetails.CUST_ID = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:CUST_ID;
+			SET outputBodyRef."Acc-Svcacsig".Accsigdetails.RELATIONTYP = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:RELATIONTYP;
+			SET outputBodyRef."Acc-Svcacsig".Accsigdetails.SIGID = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SIGID;
+			SET outputBodyRef."Acc-Svcacsig".Accsigdetails.SIGMSG = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SIGMSG;
+			SET outputBodyRef."Acc-Svcacsig".Accsigdetails.SIGTYPE = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SIGTYPE;
+			SET outputBodyRef."Acc-Svcacsig".Accsigdetails.APPROVLIMIT = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:APPROVLIMIT;
+			SET outputBodyRef."Acc-Svcacsig".Accsigdetails.SIGNAME = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SIGNAME;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.SOLOSIG = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SOLOSIG;
+			SET outputBodyRef."Acc-Svcacsig".Accsigdetails.SOLOSIG = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SOLOSIG;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Iccintpo".BRANCH_CODE = inputBodyRef.*:"Custacc-Iccintpo".*:BRANCH_CODE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Iccintpo".CUST_AC_NO = inputBodyRef.*:"Custacc-Iccintpo".*:CUST_AC_NO;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Custacc-Iccintpo".CCY = inputBodyRef.*:"Custacc-Iccintpo".*:CCY;
+			SET outputBodyRef."Custacc-Iccintpo".BRANCH_CODE = inputBodyRef.*:"Custacc-Iccintpo".*:BRANCH_CODE;
+			SET outputBodyRef."Custacc-Iccintpo".CUST_AC_NO = inputBodyRef.*:"Custacc-Iccintpo".*:CUST_AC_NO;
+			SET outputBodyRef."Custacc-Iccintpo".CCY = inputBodyRef.*:"Custacc-Iccintpo".*:CCY;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Customer-Acc".BRANCH_CODE = inputBodyRef.*:"Customer-Acc".*:BRANCH_CODE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Customer-Acc".CUST_AC_NO = inputBodyRef.*:"Customer-Acc".*:CUST_AC_NO;
+			SET outputBodyRef."Customer-Acc".BRANCH_CODE = inputBodyRef.*:"Customer-Acc".*:BRANCH_CODE;
+			SET outputBodyRef."Customer-Acc".CUST_AC_NO = inputBodyRef.*:"Customer-Acc".*:CUST_AC_NO;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Sttms-Cust-Acc-Swp".BRANCH_CODE = inputBodyRef.*:"Sttms-Cust-Acc-Swp".*:BRANCH_CODE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Sttms-Cust-Acc-Swp".CUST_AC_NO = inputBodyRef.*:"Sttms-Cust-Acc-Swp".*:CUST_AC_NO;
+			SET outputBodyRef."Sttms-Cust-Acc-Swp".BRANCH_CODE = inputBodyRef.*:"Sttms-Cust-Acc-Swp".*:BRANCH_CODE;
+			SET outputBodyRef."Sttms-Cust-Acc-Swp".CUST_AC_NO = inputBodyRef.*:"Sttms-Cust-Acc-Swp".*:CUST_AC_NO;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Chnl".BRANCH_CODE = inputBodyRef.*:"Acc-Chnl".*:BRANCH_CODE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Chnl".CUST_AC_NO = inputBodyRef.*:"Acc-Chnl".*:CUST_AC_NO;
+			SET outputBodyRef."Acc-Chnl".BRANCH_CODE = inputBodyRef.*:"Acc-Chnl".*:BRANCH_CODE;
+			SET outputBodyRef."Acc-Chnl".CUST_AC_NO = inputBodyRef.*:"Acc-Chnl".*:CUST_AC_NO;
 
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_WARNING_RESP.WARNING.WCODE = inputBodyWarnRef.*:WCODE;
-			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_WARNING_RESP.WARNING.WDESC = inputBodyWarnRef.*:WDESC;
+			SET outputWarnRef.WCODE = inputBodyWarnRef.*:WCODE;
+			SET outputWarnRef.WDESC = inputBodyWarnRef.*:WDESC;
 
 			SET Environment.outputData = OutputRoot;
-			PROPAGATE TO TERMINAL 'out' DELETE NONE;
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
 		END IF;
 		---------------------- Response Logging -------------------------
-		MOVE domainDataRef TO Environment.outputData;
+		MOVE domainDataRef TO Environment.outputData.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		-- MOVE OutRef TO OutputRoot.XMLNSC;
 		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RESP',MessageFlowLabel,OutRef);
-		
+
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||Environment.resPayload) INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'**********************************************************************') INTO rc;
 
 	END;
 END MODULE;
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 CREATE COMPUTE MODULE BankAccountDetails_BuildExceptionResponse
