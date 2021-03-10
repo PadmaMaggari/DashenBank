@@ -1,10 +1,5 @@
 
 
-
-
-
-
-
 BROKER SCHEMA com.dashenbank.custbankaccdetails
 PATH com.dashenbank.genericfunctions;
 
@@ -153,9 +148,11 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_ERROR_RESP.ERROR.WCODE = inputBodyErrRef.*:ECODE;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_ERROR_RESP.ERROR.WDESC = inputBodyErrRef.*:EDESC;
-		ELSEIF InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER.*:UBSCOMP <> 'FCUBS' THEN
+
+		ELSEIF FIELDVALUE(InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES) IS NULL THEN
 			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 			SET OutputRoot.SOAP.Body = InputRoot.SOAP.Body;
+
 		ELSE
 			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
 			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full";
