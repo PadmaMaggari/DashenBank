@@ -97,7 +97,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		CALL ResponseToChannel();
-		RETURN TRUE;
+		RETURN FALSE;
 	END;
 	CREATE PROCEDURE ResponseToChannel() BEGIN
 
@@ -127,6 +127,8 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
+			SET OutputRoot.Properties = InputRoot.Properties;
+		--	SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.SOURCE = inputHeaderRef.*:SOURCE;
@@ -149,9 +151,16 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_ERROR_RESP.ERROR.WCODE = inputBodyErrRef.*:ECODE;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_ERROR_RESP.ERROR.WDESC = inputBodyErrRef.*:EDESC;
 
-		ELSEIF FIELDVALUE(InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES) IS NULL THEN
-			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
-			SET OutputRoot.SOAP.Body = InputRoot.SOAP.Body;
+			SET Environment.outputData = OutputRoot;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+
+		ELSEIF FIELDVALUE(InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER.*:MSGSTAT) IS NULL THEN
+
+			SET OutputRoot = InputRoot;
+			SET Environment.outputData = OutputRoot;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 
 		ELSE
 			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
@@ -160,6 +169,8 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
+			SET OutputRoot.Properties = InputRoot.Properties;
+		--	SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.SOURCE = inputHeaderRef.*:SOURCE;
@@ -423,25 +434,21 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_WARNING_RESP.WARNING.WCODE = inputBodyWarnRef.*:WCODE;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY.FCUBS_WARNING_RESP.WARNING.WDESC = inputBodyWarnRef.*:WDESC;
 
+			SET Environment.outputData = OutputRoot;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 		END IF;
-
-		SET Environment.outputData = OutputRoot.SOAP;
 		---------------------- Response Logging -------------------------
-		MOVE domainDataRef TO OutputRoot.SOAP;
+		MOVE domainDataRef TO Environment.outputData;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		-- MOVE OutRef TO OutputRoot.XMLNSC;
 		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RESP',MessageFlowLabel,OutRef);
-
-		SET OutputRoot.Properties = InputRoot.Properties;
-		-- SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
-		SET OutputRoot.SOAP = Environment.outputData;
-
+		
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||Environment.resPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'**********************************************************************') INTO rc;
 
-		SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 	END;
 END MODULE;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
