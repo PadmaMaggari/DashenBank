@@ -1,3 +1,5 @@
+
+
 BROKER SCHEMA com.dashenbank.accountbalanceenquiry
 PATH com.dashenbank.genericfunctions;
 
@@ -50,10 +52,21 @@ CREATE COMPUTE MODULE RequestToBackend
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		DECLARE outputSoapRef REFERENCE TO OutputRoot.SOAP;
-		-- DECLARE outMsg REFERENCE TO OutputRoot.SOAP.Body.*:QUERYACCBAL_IOFS_REQ;
+		DECLARE ns1 NAMESPACE 'http://fcubs.ofss.com/service/FCUBSAccService';
+		DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope';
 
-		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
-		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		CREATE LASTCHILD OF OutputRoot.SOAP NAMESPACE soapenv NAME 'Body';
+		CREATE LASTCHILD OF OutputRoot.SOAP.soapenv:Body NAMESPACE ns1 NAME 'QUERYACCBAL_IOFS_REQ';
+		CREATE LASTCHILD OF OutputRoot.SOAP.soapenv:Body.ns1:QUERYACCBAL_IOFS_REQ NAMESPACE ns1 NAME 'FCUBS_HEADER';
+		-- DECLARE outMsg REFERENCE TO OutputRoot.SOAP.Body.*:QUERYACCBAL_IOFS_REQ;
+		DECLARE outputSoapRefer REFERENCE TO OutputRoot.SOAP.soapenv:Body.ns1:QUERYACCBAL_IOFS_REQ.ns1:FCUBS_HEADER;
+
+	--	DECLARE blobInputMsg BLOB ASBITSTREAM(InputBody CCSID 1208 ENCODING 546);
+	--	DECLARE charInputMsg CHAR CAST(blobInputMsg AS CHARACTER CCSID 1208 ENCODING 546);
+
+
+		SET outputSoapRefer.ns1:SOURCE = inputHeaderRef.ns1:SOURCE;
+		SET outputSoapRef.*:Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
 		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:MSGID = inputHeaderRef.*:MSGID;
 		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
 		SET outputSoapRef.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
@@ -128,7 +141,7 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RESP data  is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		-------------- Generating response to channel ---------------
-		
+
 		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCBAL_IOFS_RES.*:FCUBS_HEADER;
 		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCBAL_IOFS_RES.*:FCUBS_BODY;
 
