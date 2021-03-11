@@ -1,5 +1,7 @@
 
 
+
+
 BROKER SCHEMA com.dashenbank.custbankaccdetails
 PATH com.dashenbank.genericfunctions;
 
@@ -128,7 +130,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
 			SET OutputRoot.Properties = InputRoot.Properties;
-		--	SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+			-- SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.SOURCE = inputHeaderRef.*:SOURCE;
@@ -170,7 +172,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
 
 			SET OutputRoot.Properties = InputRoot.Properties;
-		--	SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+			-- SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER.SOURCE = inputHeaderRef.*:SOURCE;
@@ -407,11 +409,14 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".ACBRN1 = inputBodyRef.*:"Acc-Svcacsig".*:ACBRN1;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".ACTNO = inputBodyRef.*:"Acc-Svcacsig".*:ACTNO;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".ACDESC = inputBodyRef.*:"Acc-Svcacsig".*:ACDESC;
+			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".ACCMSG = inputBodyRef.*:"Acc-Svcacsig".*:ACCMSG;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".MINNOSIG = inputBodyRef.*:"Acc-Svcacsig".*:MINNOSIG;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".ACCCY = inputBodyRef.*:"Acc-Svcacsig".*:ACCCY;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.CUST_ID = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:CUST_ID;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.RELATIONTYP = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:RELATIONTYP;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.SIGID = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SIGID;
+			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.SIGMSG = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SIGMSG;
+
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.SIGTYPE = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SIGTYPE;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.APPROVLIMIT = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:APPROVLIMIT;
 			SET outputbodyRef.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.SIGNAME = inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails.*:SIGNAME;
@@ -444,7 +449,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		-- MOVE OutRef TO OutputRoot.XMLNSC;
 		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RESP',MessageFlowLabel,OutRef);
-		
+
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||Environment.resPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'**********************************************************************') INTO rc;
