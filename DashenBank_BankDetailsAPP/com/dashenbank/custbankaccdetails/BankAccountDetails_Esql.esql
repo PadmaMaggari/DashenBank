@@ -1,10 +1,8 @@
 
 
-
-
 BROKER SCHEMA com.dashenbank.custbankaccdetails
 PATH com.dashenbank.genericfunctions;
-DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
+-- DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
 DECLARE ns NAMESPACE 'http://fcubs.ofss.com/service/FCUBSAccService';
 
 DECLARE LOG4J_CONFIG_PATH, LOG4J_ERROR_MSG, BACKEND_URL, LOGGER_NAME, LOG_TYPE EXTERNAL CHARACTER;
@@ -12,7 +10,6 @@ DECLARE LOG4J_CONFIG_PATH, LOG4J_ERROR_MSG, BACKEND_URL, LOGGER_NAME, LOG_TYPE E
 DECLARE rc BOOLEAN TRUE;
 -------------------------------------
 CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
-	-- DECLARE rc BOOLEAN;
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		CALL initLog4j(LOG4J_CONFIG_PATH) INTO rc;
@@ -54,10 +51,11 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER;
 		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_BODY.*:"Cust-Account-IO";
 
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPInputHeader = InputRoot.HTTPInputHeader;
 		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
 		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'QUERYCUSTACC_IOFS_REQ';
 		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_REQ NAMESPACE ns NAME 'FCUBS_HEADER';
@@ -79,17 +77,17 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		SET outputBodyRef.ns:"Cust-Account-IO".ns:BRN = inputBodyRef.*:BRN;
 		SET outputBodyRef.ns:"Cust-Account-IO".ns:ACC = inputBodyRef.*:ACC;
 
-		SET Environment.outputData = OutputRoot.SOAP;
+		SET Environment.outputData = OutputRoot;
 		----------------------Response Logging-------------------------
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		SET OutputRoot.HTTPInputHeader = NULL;
 		SET OutputRoot.SOAP = NULL;
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		-- MOVE OutRef TO OutputRoot.XMLNSC;
 		-- CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
 
-		SET OutputRoot.Properties = InputRoot.Properties;
-		SET OutputRoot.SOAP = Environment.outputData;
+		SET OutputRoot = Environment.outputData;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_REQ data is: '||Environment.resPayload) INTO rc;
@@ -121,7 +119,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 		----------------------Request Logging-------------------------
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		-- DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'FLEXCUBE_RES',ApplicationLabel,OutRef);
+		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'BACKEND_RESP',ApplicationLabel,OutRef);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- BACKEND_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RESP data  is: '||Environment.reqPayload) INTO rc;
@@ -136,15 +134,12 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-IO";
 			DECLARE inputBodyErrRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR;
 
---			SET OutputRoot.Properties = InputRoot.Properties;
---			SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
-			-- CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+
 			CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
 			CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'QUERYCUSTACC_IOFS_RES';
 			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES NAME 'FCUBS_HEADER';
 			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES NAME 'FCUBS_BODY';
-			
 
 			DECLARE outputheaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER;
 			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY;
@@ -185,10 +180,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full";
 			DECLARE inputBodyWarnRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING;
 
---			SET OutputRoot.Properties = InputRoot.Properties;
---			SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
-			-- CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 
 			CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
 			CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'QUERYCUSTACC_IOFS_RES';
