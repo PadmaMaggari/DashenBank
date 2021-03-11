@@ -52,8 +52,7 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_BODY.*:"Cust-Account-IO";
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-		SET OutputRoot.Properties = InputRoot.Properties;
-		SET OutputRoot.HTTPInputHeader = InputRoot.HTTPInputHeader;
+		
 		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
 		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
@@ -77,17 +76,18 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		SET outputBodyRef.ns:"Cust-Account-IO".ns:BRN = inputBodyRef.*:BRN;
 		SET outputBodyRef.ns:"Cust-Account-IO".ns:ACC = inputBodyRef.*:ACC;
 
-		SET Environment.outputData = OutputRoot;
+		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------Response Logging-------------------------
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		SET OutputRoot.HTTPInputHeader = NULL;
 		SET OutputRoot.SOAP = NULL;
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		-- MOVE OutRef TO OutputRoot.XMLNSC;
 		-- CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
 
-		SET OutputRoot = Environment.outputData;
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.HTTPInputHeader = InputRoot.HTTPInputHeader;
+		SET OutputRoot.SOAP = Environment.outputData;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_REQ data is: '||Environment.resPayload) INTO rc;
@@ -161,8 +161,8 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputbodyRef."Cust-Account-Full".BRN = inputBodyRef.*:BRN;
 			SET outputbodyRef."Cust-Account-Full".ACC = inputBodyRef.*:ACC;
 
-			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR.WCODE = inputBodyErrRef.*:WCODE;
-			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR.WDESC = inputBodyErrRef.*:WDESC;
+			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR.ECODE = inputBodyErrRef.*:ECODE;
+			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR.EDESC = inputBodyErrRef.*:EDESC;
 
 			SET Environment.outputData = OutputRoot;
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
