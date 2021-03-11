@@ -133,7 +133,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 		IF FIELDVALUE(InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER.*:MSGSTAT)='FAILURE' THEN
 			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
-			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-IO";
+			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY;
 			DECLARE inputBodyErrRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR;
 
 			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
@@ -160,16 +160,18 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputheaderRef.ACTION = inputHeaderRef.*:ACTION;
 			SET outputheaderRef.MSGSTAT = inputHeaderRef.*:MSGSTAT;
 
-			SET outputbodyRef."Cust-Account-Full".BRN = inputBodyRef.*:BRN;
-			SET outputbodyRef."Cust-Account-Full".ACC = inputBodyRef.*:ACC;
-			DECLARE J INTEGER CARDINALITY(inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[]);
-			DECLARE I INTEGER 1;
-			WHILE I<=J DO
-				SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = inputBodyErrRef.*:ECODE;
-				SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = inputBodyErrRef.*:EDESC;
-				SET I = I + 1;
-				MOVE inputBodyErrRef NEXTSIBLING REPEAT TYPE NAME;
-			END WHILE;
+			SET outputbodyRef."Cust-Account-Full".BRN = inputBodyRef.*:"Cust-Account-IO".*:BRN;
+			SET outputbodyRef."Cust-Account-Full".ACC = inputBodyRef.*:"Cust-Account-IO".*:ACC;
+
+			 DECLARE inputBodyErrorRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP[>];
+			 DECLARE M INTEGER CARDINALITY(InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[]);
+			 DECLARE L INTEGER 1;
+			 WHILE L<=M DO
+			 SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[L].ECODE = InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[L].*:ECODE;
+			 SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[L].EDESC = InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[L].*:EDESC;
+			 SET L=L+1;
+			 MOVE inputBodyErrorRef NEXTSIBLING;
+			 END WHILE;
 
 			SET Environment.outputData = OutputRoot;
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
