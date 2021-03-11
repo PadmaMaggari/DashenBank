@@ -1,5 +1,7 @@
 
 
+
+
 BROKER SCHEMA com.dashenbank.custbankaccdetails
 PATH com.dashenbank.genericfunctions;
 -- DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
@@ -52,7 +54,7 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_BODY.*:"Cust-Account-IO";
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-		
+
 		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
 		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
@@ -131,7 +133,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 		IF FIELDVALUE(InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER.*:MSGSTAT)='FAILURE' THEN
 			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
-			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-IO";
+			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY;
 			DECLARE inputBodyErrRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR;
 
 			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
@@ -158,11 +160,18 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputheaderRef.ACTION = inputHeaderRef.*:ACTION;
 			SET outputheaderRef.MSGSTAT = inputHeaderRef.*:MSGSTAT;
 
-			SET outputbodyRef."Cust-Account-Full".BRN = inputBodyRef.*:BRN;
-			SET outputbodyRef."Cust-Account-Full".ACC = inputBodyRef.*:ACC;
+			SET outputbodyRef."Cust-Account-Full".BRN = inputBodyRef.*:"Cust-Account-IO".*:BRN;
+			SET outputbodyRef."Cust-Account-Full".ACC = inputBodyRef.*:"Cust-Account-IO".*:ACC;
 
-			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR.ECODE = inputBodyErrRef.*:ECODE;
-			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR.EDESC = inputBodyErrRef.*:EDESC;
+			 DECLARE inputBodyErrorRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP[>];
+			 DECLARE M INTEGER CARDINALITY(InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[]);
+			 DECLARE L INTEGER 1;
+			 WHILE L<=M DO
+			 SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[L].ECODE = InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[L].*:ECODE;
+			 SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[L].EDESC = InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[L].*:EDESC;
+			 SET L=L+1;
+			 MOVE inputBodyErrorRef NEXTSIBLING;
+			 END WHILE;
 
 			SET Environment.outputData = OutputRoot;
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
