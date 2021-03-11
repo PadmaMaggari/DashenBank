@@ -144,6 +144,8 @@ CREATE COMPUTE MODULE ResponseToChannel
 		SET OutputRoot.Properties = InputRoot.Properties;
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		
+		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
 		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCBAL_IOFS_RES.*:FCUBS_HEADER;
 		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYACCBAL_IOFS_RES.*:FCUBS_BODY;
