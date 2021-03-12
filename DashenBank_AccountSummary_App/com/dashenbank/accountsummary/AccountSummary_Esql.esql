@@ -1,9 +1,3 @@
-
-
-
-
-
-
 BROKER SCHEMA com.dashenbank.accountsummary
 PATH com.dashenbank.genericfunctions;
 -- DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
@@ -83,6 +77,16 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		SET outputHeaderRef.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
 		SET outputHeaderRef.*:USERID = inputHeaderRef.*:USERID;
 
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(inputHeaderRef.*:ADDL[]);
+		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL[>];
+		WHILE I<=J DO
+			SET outputHeaderRef.*:ADDL[I].NAME = inRef.*:NAME;
+			SET outputHeaderRef.*:ADDL[I].VALUE = inRef.*:VALUE;
+			SET I = I + 1;
+			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+		END WHILE;
+
 		SET outputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO;
 
 		SET Environment.outputData = OutputRoot.SOAP;
@@ -140,19 +144,18 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 
-		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
-		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-IO";
-		DECLARE inputBodyErrRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR;
+		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER;
+		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY;
 
 		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
 		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'QUERYCUSTACC_IOFS_RES';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES NAME 'FCUBS_HEADER';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES NAME 'FCUBS_BODY';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'QUERYACCSUMM_IOFS_RES';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES NAME 'FCUBS_HEADER';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES NAME 'FCUBS_BODY';
 
-		DECLARE outputheaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER;
-		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY;
+		DECLARE outputheaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES.FCUBS_HEADER;
+		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES.FCUBS_BODY;
 
 		SET outputheaderRef.ACTION = inputHeaderRef.*:ACTION;
 		SET outputheaderRef.BRANCH = inputHeaderRef.*:BRANCH;
@@ -171,44 +174,51 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		SET outputheaderRef.UBSCOMP = inputHeaderRef.*:UBSCOMP;
 		SET outputheaderRef.USERID = inputHeaderRef.*:USERID;
 		SET outputheaderRef.SOURCE_USERID = inputHeaderRef.*:SOURCE_USERID;
-		SET outputheaderRef.ADDL.PARAM.NAME = inputHeaderRef.*:ADDL.*:PARAM.*:NAME;
-		SET outputheaderRef.ADDL.PARAM.VALUE = inputHeaderRef.*:ADDL.*:PARAM.*:VALUE;
+		SET outputheaderRef.SNAPSHOTID = inputHeaderRef.*:SNAPSHOTID;
 		SET outputheaderRef.PASSWORD = inputHeaderRef.*:PASSWORD;
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER CARDINALITY(inputHeaderRef.*:ADDL.*:PARAM[]);
+		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
+		WHILE I<=J DO
+			SET outputheaderRef.ADDL.PARAM[I].NAME = inRef.*:NAME;
+			SET outputheaderRef.ADDL.PARAM[I].VALUE = inRef.*:VALUE;
+			SET I = I + 1;
+			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+		END WHILE;
+		
+		SET outputbodyRef."Stvw-Account-Sumary-IO".CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO;
+		
+		SET outputbodyRef."Stvw-Account-Sumary-Full".CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO;
+		
+		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".CUSTACNO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTACNO;
+		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".BRANCH_CODE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:BRANCH_CODE;
+		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".CCY = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CCY;
+		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".CURRBAL = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CURRBAL;
+		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".ACCOUNT_TYPE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_TYPE;
+		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".CUSTOMER_NAME = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTOMER_NAME;
+		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".AC_DESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:AC_DESC;
+		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".ACCOUNT_CLASS = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_CLASS;
+		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".ACCLASSDESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCLASSDESC;
 
-		SET outputbodyRef."ACC-Balance".ACC_BAL = inputBodyRef."ACC-Balance".ACC_BAL;
-		SET outputbodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO;
-		SET outputbodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:CUSTACNO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTACNO;
-		SET outputbodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:BRANCH_CODE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:BRANCH_CODE;
-		SET outputbodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:CCY = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CCY;
-		SET outputbodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:CURRBAL = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CURRBAL;
-		SET outputbodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:ACCOUNT_TYPE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_TYPE;
-		SET outputbodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:CUSTOMER_NAME = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTOMER_NAME;
-		SET outputbodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:AC_DESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:AC_DESC;
-		SET outputbodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:ACCOUNT_CLASS = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_CLASS;
-		SET outputbodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A".*:ACCLASSDESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCLASSDESC;
+		SET I = 1;
+		SET J = CARDINALITY(inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[]);
+		MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
+		WHILE I<=J Do
+			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = inRef.*:ECODE;
+			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = inRef.*:EDESC;
+			SET I = I + 1;
+			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+		END WHILE;
 
-		IF FIELDNAME(inputBodyRef.*:FCUBS_ERROR_RESP) IS NOT NULL THEN
-			DECLARE I INTEGER 1;
-			DECLARE J INTEGER CARDINALITY(inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[]);
-			DECLARE inref REFERENCE TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
-			WHILE I<=J Do
-				SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = inref.*:ECODE;
-				SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = inref.*:EDESC;
-				SET I = I + 1;
-				MOVE inref NEXTSIBLING REPEAT TYPE NAME;
-			END WHILE;
-		END IF;
-		IF FIELDNAME(inputBodyRef.*:FCUBS_WARNING_RESP) IS NOT NULL THEN
-			DECLARE I INTEGER 1;
-			DECLARE J INTEGER CARDINALITY(inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[]);
-			DECLARE inref REFERENCE TO inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
-			WHILE I<=J Do
-				SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = inref.*:WCODE;
-				SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = inref.*:WDESC;
-				SET I = I + 1;
-				MOVE inref NEXTSIBLING REPEAT TYPE NAME;
-			END WHILE;
-		END IF;
+		SET I = 1;
+		SET J = CARDINALITY(inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[]);
+		MOVE inRef TO inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
+		WHILE I<=J Do
+			SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = inRef.*:WCODE;
+			SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = inRef.*:WDESC;
+			SET I = I + 1;
+			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+		END WHILE;
 
 		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------------------------------------
