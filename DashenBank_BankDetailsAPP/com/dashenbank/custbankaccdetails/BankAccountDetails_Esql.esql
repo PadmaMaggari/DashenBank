@@ -2,6 +2,8 @@
 
 
 
+
+
 BROKER SCHEMA com.dashenbank.custbankaccdetails
 PATH com.dashenbank.genericfunctions;
 -- DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
@@ -163,15 +165,15 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputbodyRef."Cust-Account-Full".BRN = inputBodyRef.*:"Cust-Account-IO".*:BRN;
 			SET outputbodyRef."Cust-Account-Full".ACC = inputBodyRef.*:"Cust-Account-IO".*:ACC;
 
-			 DECLARE inputBodyErrorRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP[>];
-			 DECLARE M INTEGER CARDINALITY(InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[]);
-			 DECLARE L INTEGER 1;
-			 WHILE L<=M DO
-			 SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[L].ECODE = InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[L].*:ECODE;
-			 SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[L].EDESC = InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[L].*:EDESC;
-			 SET L=L+1;
-			 MOVE inputBodyErrorRef NEXTSIBLING;
-			 END WHILE;
+			DECLARE inputBodyErrorRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP[>];
+			DECLARE M INTEGER CARDINALITY(InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[]);
+			DECLARE L INTEGER 1;
+			WHILE L<=M DO
+				SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[L].ECODE = InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[L].*:ECODE;
+				SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[L].EDESC = InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[L].*:EDESC;
+				SET L=L+1;
+				MOVE inputBodyErrorRef NEXTSIBLING;
+			END WHILE;
 
 			SET Environment.outputData = OutputRoot;
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
@@ -237,6 +239,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef.ADDRESS_1 = inputBodyRef.*:ADDRESS_1;
 			SET outputBodyRef.ADDRESS_2 = inputBodyRef.*:ADDRESS_2;
 			SET outputBodyRef.ADDRESS_3 = inputBodyRef.*:ADDRESS_3;
+			SET outputBodyRef.ADDRESS_4 = inputBodyRef.*:ADDRESS_4;
 			SET outputBodyRef.POSTALLOWED = inputBodyRef.*:POSTALLOWED;
 			SET outputBodyRef.TRKREC = inputBodyRef.*:TRKREC;
 			SET outputBodyRef.REFREQ = inputBodyRef.*:REFREQ;
@@ -253,7 +256,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef.TYOFCHQ = inputBodyRef.*:TYOFCHQ;
 			SET outputBodyRef.ATMDLIM = inputBodyRef.*:ATMDLIM;
 			SET outputBodyRef.ATMDCNTLIM = inputBodyRef.*:ATMDCNTLIM;
-
+			SET outputBodyRef.MT210REQD = inputBodyRef.*:MT210REQD;
 			SET outputBodyRef.POSPAYAC = inputBodyRef.*:POSPAYAC;
 			SET outputBodyRef.AUTOREORDERCHKREQ = inputBodyRef.*:AUTOREORDERCHKREQ;
 			SET outputBodyRef.LODGEBKFAC = inputBodyRef.*:LODGEBKFAC;
@@ -264,6 +267,8 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef.CONSREQD = inputBodyRef.*:CONSREQD;
 			SET outputBodyRef.FUNDING = inputBodyRef.*:FUNDING;
 			SET outputBodyRef.MOD9RQD = inputBodyRef.*:MOD9RQD;
+			SET outputBodyRef.SUBLIMIT = inputBodyRef.*:SUBLIMIT;
+			SET outputBodyRef.UNCOLFUNDLIMIT = inputBodyRef.*:UNCOLFUNDLIMIT;
 			SET outputBodyRef.NETREQ = inputBodyRef.*:NETREQ;
 			SET outputBodyRef.ACSTMTDAY = inputBodyRef.*:ACSTMTDAY;
 			SET outputBodyRef.ACSTMTCYCLE = inputBodyRef.*:ACSTMTCYCLE;
