@@ -1,0 +1,291 @@
+
+
+Importing file: C:\Users\Administrator\git\DashenBank\DashenBank_FreezAmount_App\blocking.wsdl
+
+
+The following is a list of WS-I warning messages found when importing:
+XSD: There is no xmlns declaration for namespace 'http://fcubs.ofss.com/service/FCUBSCustomerService', Line: 4, Column: 1
+
+
+The WSDL import will proceed with bindings FCUBSCustomerServiceSEIBinding.
+Creating wsdl schema document for file:///C:/Users/Administrator/git/DashenBank/DashenBank_FreezAmount_App/blocking.wsdl.
+Parsing wsdl binding {http://FCUBSCustomerService.types.ws.gw.fcubs.ofss.com}FCUBSCustomerServiceSEIBinding.
+Parsing wsdl binding input QueryNSFMutualIO.
+Parsing wsdl binding output QueryNSFMutualIO.
+Parsing wsdl binding input QueryAccountStructureIO.
+Parsing wsdl binding output QueryAccountStructureIO.
+Parsing wsdl binding input QueryCustSegAssociationIO.
+Parsing wsdl binding output QueryCustSegAssociationIO.
+Parsing wsdl binding input ReopenCustSegAssociationIO.
+Parsing wsdl binding output ReopenCustSegAssociationIO.
+Parsing wsdl binding input ReopenTDAmountBlockIO.
+Parsing wsdl binding output ReopenTDAmountBlockIO.
+Parsing wsdl binding input CloseTDAmountBlockIO.
+Parsing wsdl binding output CloseTDAmountBlockIO.
+Parsing wsdl binding input ModifyNSFMutualFS.
+Parsing wsdl binding output ModifyNSFMutualFS.
+Parsing wsdl binding input QueryAmtBlkIO.
+Parsing wsdl binding output QueryAmtBlkIO.
+Parsing wsdl binding input ReopenCustomerIO.
+Parsing wsdl binding output ReopenCustomerIO.
+Parsing wsdl binding input CreateNSFMutualIO.
+Parsing wsdl binding output CreateNSFMutualIO.
+Parsing wsdl binding input DeleteAmtBlkFS.
+Parsing wsdl binding output DeleteAmtBlkFS.
+Parsing wsdl binding input CreateCustSegAssociationFS.
+Parsing wsdl binding output CreateCustSegAssociationFS.
+Parsing wsdl binding input DeleteCustomerIO.
+Parsing wsdl binding output DeleteCustomerIO.
+Parsing wsdl binding input ModifyFATCAIO.
+Parsing wsdl binding output ModifyFATCAIO.
+Parsing wsdl binding input CloseCustomerFS.
+Parsing wsdl binding output CloseCustomerFS.
+Parsing wsdl binding input ModifyCustomerFS.
+Parsing wsdl binding output ModifyCustomerFS.
+Parsing wsdl binding input DeleteNSFMaintFS.
+Parsing wsdl binding output DeleteNSFMaintFS.
+Parsing wsdl binding input DeleteTDAmountBlockIO.
+Parsing wsdl binding output DeleteTDAmountBlockIO.
+Parsing wsdl binding input ReopenAmtBlkIO.
+Parsing wsdl binding output ReopenAmtBlkIO.
+Parsing wsdl binding input CreateClosureDataFS.
+Parsing wsdl binding output CreateClosureDataFS.
+Parsing wsdl binding input CloseAmtBlkFS.
+Parsing wsdl binding output CloseAmtBlkFS.
+Parsing wsdl binding input DeleteNSFMaintIO.
+Parsing wsdl binding output DeleteNSFMaintIO.
+Parsing wsdl binding input CreateClosureDataIO.
+Parsing wsdl binding output CreateClosureDataIO.
+Parsing wsdl binding input ModifyNSFMaintFS.
+Parsing wsdl binding output ModifyNSFMaintFS.
+Parsing wsdl binding input QueryNSFCheckIO.
+Parsing wsdl binding output QueryNSFCheckIO.
+Parsing wsdl binding input CloseCustSegAssociationIO.
+Parsing wsdl binding output CloseCustSegAssociationIO.
+Parsing wsdl binding input ModifyTDAmountBlockFS.
+Parsing wsdl binding output ModifyTDAmountBlockFS.
+Parsing wsdl binding input ModifyNSFMutualIO.
+Parsing wsdl binding output ModifyNSFMutualIO.
+Parsing wsdl binding input AuthorizeAmtBlkIO.
+Parsing wsdl binding output AuthorizeAmtBlkIO.
+Parsing wsdl binding input DeleteFATCAFS.
+Parsing wsdl binding output DeleteFATCAFS.
+Parsing wsdl binding input ModifyCustSegAssociationIO.
+Parsing wsdl binding output ModifyCustSegAssociationIO.
+Parsing wsdl binding input QueryNSFMaintIO.
+Parsing wsdl binding output QueryNSFMaintIO.
+Parsing wsdl binding input DeleteCustomerFS.
+Parsing wsdl binding output DeleteCustomerFS.
+Parsing wsdl binding input AuthorizeTDAmountBlockIO.
+Parsing wsdl binding output AuthorizeTDAmountBlockIO.
+Parsing wsdl binding input CreateCustomerIO.
+Parsing wsdl binding output CreateCustomerIO.
+Parsing wsdl binding input ModifyFATCAFS.
+Parsing wsdl binding output ModifyFATCAFS.
+Parsing wsdl binding input CreateNSFMaintIO.
+Parsing wsdl binding output CreateNSFMaintIO.
+Parsing wsdl binding input ReopenTDAmountBlockFS.
+Parsing wsdl binding output ReopenTDAmountBlockFS.
+Parsing wsdl binding input CreateTDAmountBlockFS.
+Parsing wsdl binding output CreateTDAmountBlockFS.
+Parsing wsdl binding input CreateAmtBlkFS.
+Parsing wsdl binding output CreateAmtBlkFS.
+Parsing wsdl binding input ModifyAmtBlkIO.
+Parsing wsdl binding output ModifyAmtBlkIO.
+Parsing wsdl binding input DeleteCustSegAssociationIO.
+Parsing wsdl binding output DeleteCustSegAssociationIO.
+Parsing wsdl binding input DeleteFATCAIO.
+Parsing wsdl binding output DeleteFATCAIO.
+Parsing wsdl binding input QueryCustomerIO.
+Parsing wsdl binding output QueryCustomerIO.
+Parsing wsdl binding input AuthorizeTDAmountBlockFS.
+Parsing wsdl binding output AuthorizeTDAmountBlockFS.
+Parsing wsdl binding input ReopenAmtBlkFS.
+Parsing wsdl binding output ReopenAmtBlkFS.
+Parsing wsdl binding input CreateTDAmountBlockIO.
+Parsing wsdl binding output CreateTDAmountBlockIO.
+Parsing wsdl binding input CloseAmtBlkIO.
+Parsing wsdl binding output CloseAmtBlkIO.
+Parsing wsdl binding input CloseCustomerIO.
+Parsing wsdl binding output CloseCustomerIO.
+Parsing wsdl binding input ModifyClosureDataIO.
+Parsing wsdl binding output ModifyClosureDataIO.
+Parsing wsdl binding input AuthorizeClosureDataIO.
+Parsing wsdl binding output AuthorizeClosureDataIO.
+Parsing wsdl binding input CreateNSFMutualFS.
+Parsing wsdl binding output CreateNSFMutualFS.
+Parsing wsdl binding input ModifyCustomerIO.
+Parsing wsdl binding output ModifyCustomerIO.
+Parsing wsdl binding input CreateFATCAIO.
+Parsing wsdl binding output CreateFATCAIO.
+Parsing wsdl binding input ModifyTDAmountBlockIO.
+Parsing wsdl binding output ModifyTDAmountBlockIO.
+Parsing wsdl binding input AuthorizeAmtBlkFS.
+Parsing wsdl binding output AuthorizeAmtBlkFS.
+Parsing wsdl binding input ModifyAccountStructureIO.
+Parsing wsdl binding output ModifyAccountStructureIO.
+Parsing wsdl binding input AuthorizeNSFMaintFS.
+Parsing wsdl binding output AuthorizeNSFMaintFS.
+Parsing wsdl binding input CreateCustomerFS.
+Parsing wsdl binding output CreateCustomerFS.
+Parsing wsdl binding input AuthorizeCustSegAssociationIO.
+Parsing wsdl binding output AuthorizeCustSegAssociationIO.
+Parsing wsdl binding input CloseNSFMaintFS.
+Parsing wsdl binding output CloseNSFMaintFS.
+Parsing wsdl binding input QueryFATCAIO.
+Parsing wsdl binding output QueryFATCAIO.
+Parsing wsdl binding input AuthorizeCustomerIO.
+Parsing wsdl binding output AuthorizeCustomerIO.
+Parsing wsdl binding input CreateAccountStructureIO.
+Parsing wsdl binding output CreateAccountStructureIO.
+Parsing wsdl binding input ModifyClosureDataFS.
+Parsing wsdl binding output ModifyClosureDataFS.
+Parsing wsdl binding input AuthorizeClosureDataFS.
+Parsing wsdl binding output AuthorizeClosureDataFS.
+Parsing wsdl binding input AuthorizeCustSegAssociationFS.
+Parsing wsdl binding output AuthorizeCustSegAssociationFS.
+Parsing wsdl binding input CreateNSFMaintFS.
+Parsing wsdl binding output CreateNSFMaintFS.
+Parsing wsdl binding input AuthorizeCustomerFS.
+Parsing wsdl binding output AuthorizeCustomerFS.
+Parsing wsdl binding input CreateFATCAFS.
+Parsing wsdl binding output CreateFATCAFS.
+Parsing wsdl binding input DeleteCustSegAssociationFS.
+Parsing wsdl binding output DeleteCustSegAssociationFS.
+Parsing wsdl binding input ModifyAccountStructureFS.
+Parsing wsdl binding output ModifyAccountStructureFS.
+Parsing wsdl binding input CloseTDAmountBlockFS.
+Parsing wsdl binding output CloseTDAmountBlockFS.
+Parsing wsdl binding input CreateAmtBlkIO.
+Parsing wsdl binding output CreateAmtBlkIO.
+Parsing wsdl binding input ModifyAmtBlkFS.
+Parsing wsdl binding output ModifyAmtBlkFS.
+Parsing wsdl binding input AuthorizeNSFMaintIO.
+Parsing wsdl binding output AuthorizeNSFMaintIO.
+Parsing wsdl binding input DeleteAmtBlkIO.
+Parsing wsdl binding output DeleteAmtBlkIO.
+Parsing wsdl binding input ReopenCustSegAssociationFS.
+Parsing wsdl binding output ReopenCustSegAssociationFS.
+Parsing wsdl binding input ModifyCustSegAssociationFS.
+Parsing wsdl binding output ModifyCustSegAssociationFS.
+Parsing wsdl binding input QueryNSFCBenqIO.
+Parsing wsdl binding output QueryNSFCBenqIO.
+Parsing wsdl binding input CreateAccountStructureFS.
+Parsing wsdl binding output CreateAccountStructureFS.
+Parsing wsdl binding input ReopenCustomerFS.
+Parsing wsdl binding output ReopenCustomerFS.
+Parsing wsdl binding input ModifyNSFMaintIO.
+Parsing wsdl binding output ModifyNSFMaintIO.
+Parsing wsdl binding input QueryClosureDataIO.
+Parsing wsdl binding output QueryClosureDataIO.
+Parsing wsdl binding input CreateCustSegAssociationIO.
+Parsing wsdl binding output CreateCustSegAssociationIO.
+Parsing wsdl binding input QueryTDAmountBlockIO.
+Parsing wsdl binding output QueryTDAmountBlockIO.
+Parsing wsdl binding input CloseCustSegAssociationFS.
+Parsing wsdl binding output CloseCustSegAssociationFS.
+Parsing wsdl binding input DeleteTDAmountBlockFS.
+Parsing wsdl binding output DeleteTDAmountBlockFS.
+Parsing wsdl binding input CloseNSFMaintIO.
+Parsing wsdl binding output CloseNSFMaintIO.
+Processing doc style for operation QueryNSFMutualIO.
+Processing doc style for operation QueryAccountStructureIO.
+Processing doc style for operation QueryCustSegAssociationIO.
+Processing doc style for operation ReopenCustSegAssociationIO.
+Processing doc style for operation ReopenTDAmountBlockIO.
+Processing doc style for operation CloseTDAmountBlockIO.
+Processing doc style for operation ModifyNSFMutualFS.
+Processing doc style for operation QueryAmtBlkIO.
+Processing doc style for operation ReopenCustomerIO.
+Processing doc style for operation CreateNSFMutualIO.
+Processing doc style for operation DeleteAmtBlkFS.
+Processing doc style for operation CreateCustSegAssociationFS.
+Processing doc style for operation DeleteCustomerIO.
+Processing doc style for operation ModifyFATCAIO.
+Processing doc style for operation CloseCustomerFS.
+Processing doc style for operation ModifyCustomerFS.
+Processing doc style for operation DeleteNSFMaintFS.
+Processing doc style for operation DeleteTDAmountBlockIO.
+Processing doc style for operation ReopenAmtBlkIO.
+Processing doc style for operation CreateClosureDataFS.
+Processing doc style for operation CloseAmtBlkFS.
+Processing doc style for operation DeleteNSFMaintIO.
+Processing doc style for operation CreateClosureDataIO.
+Processing doc style for operation ModifyNSFMaintFS.
+Processing doc style for operation QueryNSFCheckIO.
+Processing doc style for operation CloseCustSegAssociationIO.
+Processing doc style for operation ModifyTDAmountBlockFS.
+Processing doc style for operation ModifyNSFMutualIO.
+Processing doc style for operation AuthorizeAmtBlkIO.
+Processing doc style for operation DeleteFATCAFS.
+Processing doc style for operation ModifyCustSegAssociationIO.
+Processing doc style for operation QueryNSFMaintIO.
+Processing doc style for operation DeleteCustomerFS.
+Processing doc style for operation AuthorizeTDAmountBlockIO.
+Processing doc style for operation CreateCustomerIO.
+Processing doc style for operation ModifyFATCAFS.
+Processing doc style for operation CreateNSFMaintIO.
+Processing doc style for operation ReopenTDAmountBlockFS.
+Processing doc style for operation CreateTDAmountBlockFS.
+Processing doc style for operation CreateAmtBlkFS.
+Processing doc style for operation ModifyAmtBlkIO.
+Processing doc style for operation DeleteCustSegAssociationIO.
+Processing doc style for operation DeleteFATCAIO.
+Processing doc style for operation QueryCustomerIO.
+Processing doc style for operation AuthorizeTDAmountBlockFS.
+Processing doc style for operation ReopenAmtBlkFS.
+Processing doc style for operation CreateTDAmountBlockIO.
+Processing doc style for operation CloseAmtBlkIO.
+Processing doc style for operation CloseCustomerIO.
+Processing doc style for operation ModifyClosureDataIO.
+Processing doc style for operation AuthorizeClosureDataIO.
+Processing doc style for operation CreateNSFMutualFS.
+Processing doc style for operation ModifyCustomerIO.
+Processing doc style for operation CreateFATCAIO.
+Processing doc style for operation ModifyTDAmountBlockIO.
+Processing doc style for operation AuthorizeAmtBlkFS.
+Processing doc style for operation ModifyAccountStructureIO.
+Processing doc style for operation AuthorizeNSFMaintFS.
+Processing doc style for operation CreateCustomerFS.
+Processing doc style for operation AuthorizeCustSegAssociationIO.
+Processing doc style for operation CloseNSFMaintFS.
+Processing doc style for operation QueryFATCAIO.
+Processing doc style for operation AuthorizeCustomerIO.
+Processing doc style for operation CreateAccountStructureIO.
+Processing doc style for operation ModifyClosureDataFS.
+Processing doc style for operation AuthorizeClosureDataFS.
+Processing doc style for operation AuthorizeCustSegAssociationFS.
+Processing doc style for operation CreateNSFMaintFS.
+Processing doc style for operation AuthorizeCustomerFS.
+Processing doc style for operation CreateFATCAFS.
+Processing doc style for operation DeleteCustSegAssociationFS.
+Processing doc style for operation ModifyAccountStructureFS.
+Processing doc style for operation CloseTDAmountBlockFS.
+Processing doc style for operation CreateAmtBlkIO.
+Processing doc style for operation ModifyAmtBlkFS.
+Processing doc style for operation AuthorizeNSFMaintIO.
+Processing doc style for operation DeleteAmtBlkIO.
+Processing doc style for operation ReopenCustSegAssociationFS.
+Processing doc style for operation ModifyCustSegAssociationFS.
+Processing doc style for operation QueryNSFCBenqIO.
+Processing doc style for operation CreateAccountStructureFS.
+Processing doc style for operation ReopenCustomerFS.
+Processing doc style for operation ModifyNSFMaintIO.
+Processing doc style for operation QueryClosureDataIO.
+Processing doc style for operation CreateCustSegAssociationIO.
+Processing doc style for operation QueryTDAmountBlockIO.
+Processing doc style for operation CloseCustSegAssociationFS.
+Processing doc style for operation DeleteTDAmountBlockFS.
+Processing doc style for operation CloseNSFMaintIO.
+Populating WSDL schema blocking.xsd.
+Creating file blocking.xsd in the workspace.
+Creating file /DashenBank_FreezeAmount_App/DashenBank_FreezeAmount_App/RemoteFiles/xsd_1.xsd in the workspace.
+Copying source WSDL blocking.wsdl to blocking.wsdl.
+
+Elapsed time processing this message definition file: 2.504 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+
