@@ -34,7 +34,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET envRef.RequestIdentifier = CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
 		SET envRef.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		SET envRef.id = InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:MSGID;
+		SET envRef.id = InputRoot.SOAP.Body.*:QUERYACCBAL_IOFS_REQ.*:FCUBS_HEADER.*:MSGID;
 		----------------------Request Logging-------------------------
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		-- DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
