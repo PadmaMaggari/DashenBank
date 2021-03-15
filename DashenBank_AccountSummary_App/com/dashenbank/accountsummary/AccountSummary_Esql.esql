@@ -1,3 +1,7 @@
+
+
+
+
 BROKER SCHEMA com.dashenbank.accountsummary
 PATH com.dashenbank.genericfunctions;
 -- DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
@@ -36,7 +40,7 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		SET envRef.RequestIdentifier = CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
 		SET envRef.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		SET envRef.id = InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_REQ.*:FCUBS_HEADER.*:MSGID;
+		SET envRef.id = InputRoot.SOAP.Body.*:QUERYACCSUMM_IOFS_REQ.*:FCUBS_HEADER.*:MSGID;
 		----------------------Request Logging-------------------------
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		-- DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
@@ -185,11 +189,13 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 			SET I = I + 1;
 			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;
-		
-		SET outputbodyRef."Stvw-Account-Sumary-IO".CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO;
-		
+
+		IF inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO IS NOT NULL THEN
+			SET outputbodyRef."Stvw-Account-Sumary-IO".CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO;
+		END IF;       
+        
+        IF inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO IS NOT NULL THEN 
 		SET outputbodyRef."Stvw-Account-Sumary-Full".CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO;
-		
 		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".CUSTACNO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CUSTACNO;
 		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".BRANCH_CODE = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:BRANCH_CODE;
 		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".CCY = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:CCY;
@@ -199,7 +205,8 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".AC_DESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:AC_DESC;
 		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".ACCOUNT_CLASS = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCOUNT_CLASS;
 		SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A".ACCLASSDESC = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A".*:ACCLASSDESC;
-
+        END IF;
+        
 		SET I = 1;
 		SET J = CARDINALITY(inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[]);
 		MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
