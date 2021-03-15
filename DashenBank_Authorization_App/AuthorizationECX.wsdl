@@ -1,0 +1,1753 @@
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://schemas.xmlsoap.org/wsdl/" name="FCUBSDEService" targetNamespace="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsp1_2="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <documentation>
+    <appinfo source="WMQI_APPINFO">
+      <MRWSDLAppInfo imported="true">
+        <binding hasEncoding="false" imported="true" name="FCUBSDEServiceSEIBinding" originalBindingStyle="document"/>
+      </MRWSDLAppInfo>
+    </appinfo>
+  </documentation>
+<types>
+<xsd:schema>
+<xsd:import namespace="http://fcubs.ofss.com/service/FCUBSDEService" schemaLocation="RemoteFiles/xsd_1.xsd"/>
+</xsd:schema>
+</types>
+<message name="DeleteSingleJrnlIO">
+<part element="ns1:DELETESINGLEJRNL_IOPK_REQ" name="RequestMsg" xmlns:ns1="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteSingleJrnlIOResponse">
+<part element="ns2:DELETESINGLEJRNL_IOPK_RES" name="ResponseMsg" xmlns:ns2="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReopenDEDraftIssuerMaintFS">
+<part element="ns3:REOPENDEDRAFTISSUERMAINT_FSFS_REQ" name="RequestMsg" xmlns:ns3="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReopenDEDraftIssuerMaintFSResponse">
+<part element="ns4:REOPENDEDRAFTISSUERMAINT_FSFS_RES" name="ResponseMsg" xmlns:ns4="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeMjrnlbookIO">
+<part element="ns5:AUTHORIZEMJRNLBOOK_IOPK_REQ" name="RequestMsg" xmlns:ns5="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeMjrnlbookIOResponse">
+<part element="ns6:AUTHORIZEMJRNLBOOK_IOPK_RES" name="ResponseMsg" xmlns:ns6="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyMjrnlTemplateIO">
+<part element="ns7:MODIFYMJRNLTEMPLATE_IOPK_REQ" name="RequestMsg" xmlns:ns7="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyMjrnlTemplateIOResponse">
+<part element="ns8:MODIFYMJRNLTEMPLATE_IOPK_RES" name="ResponseMsg" xmlns:ns8="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReopenDEBranchRestIO">
+<part element="ns9:REOPENDEBRANCHREST_IOPK_REQ" name="RequestMsg" xmlns:ns9="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReopenDEBranchRestIOResponse">
+<part element="ns10:REOPENDEBRANCHREST_IOPK_RES" name="ResponseMsg" xmlns:ns10="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QuerySingleJrnlIO">
+<part element="ns11:QUERYSINGLEJRNL_IOFS_REQ" name="RequestMsg" xmlns:ns11="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QuerySingleJrnlIOResponse">
+<part element="ns12:QUERYSINGLEJRNL_IOFS_RES" name="ResponseMsg" xmlns:ns12="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="MultiNewIO">
+<part element="ns13:MULTINEW_IOPK_REQ" name="RequestMsg" xmlns:ns13="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="MultiNewIOResponse">
+<part element="ns14:MULTINEW_IOPK_RES" name="ResponseMsg" xmlns:ns14="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyMjrnlbookFS">
+<part element="ns15:MODIFYMJRNLBOOK_FSFS_REQ" name="RequestMsg" xmlns:ns15="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyMjrnlbookFSResponse">
+<part element="ns16:MODIFYMJRNLBOOK_FSFS_RES" name="ResponseMsg" xmlns:ns16="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEBatchBrowserIO">
+<part element="ns17:AUTHORIZEDEBATCHBROWSER_IOPK_REQ" name="RequestMsg" xmlns:ns17="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEBatchBrowserIOResponse">
+<part element="ns18:AUTHORIZEDEBATCHBROWSER_IOPK_RES" name="ResponseMsg" xmlns:ns18="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QueryMjrnlbookIO">
+<part element="ns19:QUERYMJRNLBOOK_IOFS_REQ" name="RequestMsg" xmlns:ns19="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QueryMjrnlbookIOResponse">
+<part element="ns20:QUERYMJRNLBOOK_IOFS_RES" name="ResponseMsg" xmlns:ns20="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="SingleNewIO">
+<part element="ns21:SINGLENEW_IOPK_REQ" name="RequestMsg" xmlns:ns21="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="SingleNewIOResponse">
+<part element="ns22:SINGLENEW_IOPK_RES" name="ResponseMsg" xmlns:ns22="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEMultiOffsetIO">
+<part element="ns23:DELETEDEMULTIOFFSET_IOPK_REQ" name="RequestMsg" xmlns:ns23="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEMultiOffsetIOResponse">
+<part element="ns24:DELETEDEMULTIOFFSET_IOPK_RES" name="ResponseMsg" xmlns:ns24="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="SingleDeleteIO">
+<part element="ns25:SINGLEDELETE_IOPK_REQ" name="RequestMsg" xmlns:ns25="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="SingleDeleteIOResponse">
+<part element="ns26:SINGLEDELETE_IOPK_RES" name="ResponseMsg" xmlns:ns26="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateMjrnlTemplateIO">
+<part element="ns27:CREATEMJRNLTEMPLATE_IOPK_REQ" name="RequestMsg" xmlns:ns27="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateMjrnlTemplateIOResponse">
+<part element="ns28:CREATEMJRNLTEMPLATE_IOPK_RES" name="ResponseMsg" xmlns:ns28="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyDEBranchRestFS">
+<part element="ns29:MODIFYDEBRANCHREST_FSFS_REQ" name="RequestMsg" xmlns:ns29="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyDEBranchRestFSResponse">
+<part element="ns30:MODIFYDEBRANCHREST_FSFS_RES" name="ResponseMsg" xmlns:ns30="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="MultiDeleteFS">
+<part element="ns31:MULTIDELETE_FSFS_REQ" name="RequestMsg" xmlns:ns31="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="MultiDeleteFSResponse">
+<part element="ns32:MULTIDELETE_FSFS_RES" name="ResponseMsg" xmlns:ns32="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyDEDraftIssuerMaintFS">
+<part element="ns33:MODIFYDEDRAFTISSUERMAINT_FSFS_REQ" name="RequestMsg" xmlns:ns33="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyDEDraftIssuerMaintFSResponse">
+<part element="ns34:MODIFYDEDRAFTISSUERMAINT_FSFS_RES" name="ResponseMsg" xmlns:ns34="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="BatchAuthorizeFS">
+<part element="ns35:BATCHAUTHORIZE_FSFS_REQ" name="RequestMsg" xmlns:ns35="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="BatchAuthorizeFSResponse">
+<part element="ns36:BATCHAUTHORIZE_FSFS_RES" name="ResponseMsg" xmlns:ns36="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeMjrnlTemplateFS">
+<part element="ns37:AUTHORIZEMJRNLTEMPLATE_FSFS_REQ" name="RequestMsg" xmlns:ns37="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeMjrnlTemplateFSResponse">
+<part element="ns38:AUTHORIZEMJRNLTEMPLATE_FSFS_RES" name="ResponseMsg" xmlns:ns38="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="SingleAuthorizeIO">
+<part element="ns39:SINGLEAUTHORIZE_IOPK_REQ" name="RequestMsg" xmlns:ns39="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="SingleAuthorizeIOResponse">
+<part element="ns40:SINGLEAUTHORIZE_IOPK_RES" name="ResponseMsg" xmlns:ns40="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="BatchTotDeleteIO">
+<part element="ns41:BATCHTOTDELETE_IOPK_REQ" name="RequestMsg" xmlns:ns41="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="BatchTotDeleteIOResponse">
+<part element="ns42:BATCHTOTDELETE_IOPK_RES" name="ResponseMsg" xmlns:ns42="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CloseMjrnlTemplateFS">
+<part element="ns43:CLOSEMJRNLTEMPLATE_FSFS_REQ" name="RequestMsg" xmlns:ns43="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CloseMjrnlTemplateFSResponse">
+<part element="ns44:CLOSEMJRNLTEMPLATE_FSFS_RES" name="ResponseMsg" xmlns:ns44="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QueryDEBatchBrowserIO">
+<part element="ns45:QUERYDEBATCHBROWSER_IOFS_REQ" name="RequestMsg" xmlns:ns45="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QueryDEBatchBrowserIOResponse">
+<part element="ns46:QUERYDEBATCHBROWSER_IOFS_RES" name="ResponseMsg" xmlns:ns46="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeTellerFS">
+<part element="ns47:AUTHORIZETELLER_FSFS_REQ" name="RequestMsg" xmlns:ns47="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeTellerFSResponse">
+<part element="ns48:AUTHORIZETELLER_FSFS_RES" name="ResponseMsg" xmlns:ns48="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeMjrnlTemplateIO">
+<part element="ns49:AUTHORIZEMJRNLTEMPLATE_IOPK_REQ" name="RequestMsg" xmlns:ns49="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeMjrnlTemplateIOResponse">
+<part element="ns50:AUTHORIZEMJRNLTEMPLATE_IOPK_RES" name="ResponseMsg" xmlns:ns50="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeTellerIO">
+<part element="ns51:AUTHORIZETELLER_IOPK_REQ" name="RequestMsg" xmlns:ns51="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeTellerIOResponse">
+<part element="ns52:AUTHORIZETELLER_IOPK_RES" name="ResponseMsg" xmlns:ns52="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateTellerIO">
+<part element="ns53:CREATETELLER_IOPK_REQ" name="RequestMsg" xmlns:ns53="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateTellerIOResponse">
+<part element="ns54:CREATETELLER_IOPK_RES" name="ResponseMsg" xmlns:ns54="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateMjrnlbookIO">
+<part element="ns55:CREATEMJRNLBOOK_IOPK_REQ" name="RequestMsg" xmlns:ns55="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateMjrnlbookIOResponse">
+<part element="ns56:CREATEMJRNLBOOK_IOPK_RES" name="ResponseMsg" xmlns:ns56="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEDraftIssuerMaintIO">
+<part element="ns57:DELETEDEDRAFTISSUERMAINT_IOPK_REQ" name="RequestMsg" xmlns:ns57="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEDraftIssuerMaintIOResponse">
+<part element="ns58:DELETEDEDRAFTISSUERMAINT_IOPK_RES" name="ResponseMsg" xmlns:ns58="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateDEBranchRestIO">
+<part element="ns59:CREATEDEBRANCHREST_IOPK_REQ" name="RequestMsg" xmlns:ns59="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateDEBranchRestIOResponse">
+<part element="ns60:CREATEDEBRANCHREST_IOPK_RES" name="ResponseMsg" xmlns:ns60="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReopenDEDraftIssuerMaintIO">
+<part element="ns61:REOPENDEDRAFTISSUERMAINT_IOPK_REQ" name="RequestMsg" xmlns:ns61="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReopenDEDraftIssuerMaintIOResponse">
+<part element="ns62:REOPENDEDRAFTISSUERMAINT_IOPK_RES" name="ResponseMsg" xmlns:ns62="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEDraftIssuerMaintIO">
+<part element="ns63:AUTHORIZEDEDRAFTISSUERMAINT_IOPK_REQ" name="RequestMsg" xmlns:ns63="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEDraftIssuerMaintIOResponse">
+<part element="ns64:AUTHORIZEDEDRAFTISSUERMAINT_IOPK_RES" name="ResponseMsg" xmlns:ns64="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeSingleJrnlFS">
+<part element="ns65:AUTHORIZESINGLEJRNL_FSFS_REQ" name="RequestMsg" xmlns:ns65="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeSingleJrnlFSResponse">
+<part element="ns66:AUTHORIZESINGLEJRNL_FSFS_RES" name="ResponseMsg" xmlns:ns66="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="MultiNewFS">
+<part element="ns67:MULTINEW_FSFS_REQ" name="RequestMsg" xmlns:ns67="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="MultiNewFSResponse">
+<part element="ns68:MULTINEW_FSFS_RES" name="ResponseMsg" xmlns:ns68="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateSingleJrnlIO">
+<part element="ns69:CREATESINGLEJRNL_IOPK_REQ" name="RequestMsg" xmlns:ns69="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateSingleJrnlIOResponse">
+<part element="ns70:CREATESINGLEJRNL_IOPK_RES" name="ResponseMsg" xmlns:ns70="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QueryDEMultiOffsetIO">
+<part element="ns71:QUERYDEMULTIOFFSET_IOFS_REQ" name="RequestMsg" xmlns:ns71="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QueryDEMultiOffsetIOResponse">
+<part element="ns72:QUERYDEMULTIOFFSET_IOFS_RES" name="ResponseMsg" xmlns:ns72="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateMjrnlTemplateFS">
+<part element="ns73:CREATEMJRNLTEMPLATE_FSFS_REQ" name="RequestMsg" xmlns:ns73="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateMjrnlTemplateFSResponse">
+<part element="ns74:CREATEMJRNLTEMPLATE_FSFS_RES" name="ResponseMsg" xmlns:ns74="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyDEBranchRestIO">
+<part element="ns75:MODIFYDEBRANCHREST_IOPK_REQ" name="RequestMsg" xmlns:ns75="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyDEBranchRestIOResponse">
+<part element="ns76:MODIFYDEBRANCHREST_IOPK_RES" name="ResponseMsg" xmlns:ns76="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEMultiOffsetFS">
+<part element="ns77:DELETEDEMULTIOFFSET_FSFS_REQ" name="RequestMsg" xmlns:ns77="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEMultiOffsetFSResponse">
+<part element="ns78:DELETEDEMULTIOFFSET_FSFS_RES" name="ResponseMsg" xmlns:ns78="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyDEDraftIssuerMaintIO">
+<part element="ns79:MODIFYDEDRAFTISSUERMAINT_IOPK_REQ" name="RequestMsg" xmlns:ns79="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyDEDraftIssuerMaintIOResponse">
+<part element="ns80:MODIFYDEDRAFTISSUERMAINT_IOPK_RES" name="ResponseMsg" xmlns:ns80="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CloseDEDraftIssuerMaintIO">
+<part element="ns81:CLOSEDEDRAFTISSUERMAINT_IOPK_REQ" name="RequestMsg" xmlns:ns81="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CloseDEDraftIssuerMaintIOResponse">
+<part element="ns82:CLOSEDEDRAFTISSUERMAINT_IOPK_RES" name="ResponseMsg" xmlns:ns82="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateTellerFS">
+<part element="ns83:CREATETELLER_FSFS_REQ" name="RequestMsg" xmlns:ns83="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateTellerFSResponse">
+<part element="ns84:CREATETELLER_FSFS_RES" name="ResponseMsg" xmlns:ns84="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEDraftIssuerMaintFS">
+<part element="ns85:DELETEDEDRAFTISSUERMAINT_FSFS_REQ" name="RequestMsg" xmlns:ns85="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEDraftIssuerMaintFSResponse">
+<part element="ns86:DELETEDEDRAFTISSUERMAINT_FSFS_RES" name="ResponseMsg" xmlns:ns86="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CloseDEBranchRestIO">
+<part element="ns87:CLOSEDEBRANCHREST_IOPK_REQ" name="RequestMsg" xmlns:ns87="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CloseDEBranchRestIOResponse">
+<part element="ns88:CLOSEDEBRANCHREST_IOPK_RES" name="ResponseMsg" xmlns:ns88="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateMjrnlbookFS">
+<part element="ns89:CREATEMJRNLBOOK_FSFS_REQ" name="RequestMsg" xmlns:ns89="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateMjrnlbookFSResponse">
+<part element="ns90:CREATEMJRNLBOOK_FSFS_RES" name="ResponseMsg" xmlns:ns90="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEBatchBrowserIO">
+<part element="ns91:DELETEDEBATCHBROWSER_IOPK_REQ" name="RequestMsg" xmlns:ns91="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEBatchBrowserIOResponse">
+<part element="ns92:DELETEDEBATCHBROWSER_IOPK_RES" name="ResponseMsg" xmlns:ns92="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReverseTellerFS">
+<part element="ns93:REVERSETELLER_FSFS_REQ" name="RequestMsg" xmlns:ns93="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReverseTellerFSResponse">
+<part element="ns94:REVERSETELLER_FSFS_RES" name="ResponseMsg" xmlns:ns94="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEDraftIssuerMaintFS">
+<part element="ns95:AUTHORIZEDEDRAFTISSUERMAINT_FSFS_REQ" name="RequestMsg" xmlns:ns95="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEDraftIssuerMaintFSResponse">
+<part element="ns96:AUTHORIZEDEDRAFTISSUERMAINT_FSFS_RES" name="ResponseMsg" xmlns:ns96="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEMultiOffsetFS">
+<part element="ns97:AUTHORIZEDEMULTIOFFSET_FSFS_REQ" name="RequestMsg" xmlns:ns97="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEMultiOffsetFSResponse">
+<part element="ns98:AUTHORIZEDEMULTIOFFSET_FSFS_RES" name="ResponseMsg" xmlns:ns98="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CloseMjrnlTemplateIO">
+<part element="ns99:CLOSEMJRNLTEMPLATE_IOPK_REQ" name="RequestMsg" xmlns:ns99="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CloseMjrnlTemplateIOResponse">
+<part element="ns100:CLOSEMJRNLTEMPLATE_IOPK_RES" name="ResponseMsg" xmlns:ns100="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="SingleDeleteFS">
+<part element="ns101:SINGLEDELETE_FSFS_REQ" name="RequestMsg" xmlns:ns101="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="SingleDeleteFSResponse">
+<part element="ns102:SINGLEDELETE_FSFS_RES" name="ResponseMsg" xmlns:ns102="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReverseCommonReversalFS">
+<part element="ns103:REVERSECOMMONREVERSAL_FSFS_REQ" name="RequestMsg" xmlns:ns103="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReverseCommonReversalFSResponse">
+<part element="ns104:REVERSECOMMONREVERSAL_FSFS_RES" name="ResponseMsg" xmlns:ns104="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateDEDraftIssuerMaintFS">
+<part element="ns105:CREATEDEDRAFTISSUERMAINT_FSFS_REQ" name="RequestMsg" xmlns:ns105="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateDEDraftIssuerMaintFSResponse">
+<part element="ns106:CREATEDEDRAFTISSUERMAINT_FSFS_RES" name="ResponseMsg" xmlns:ns106="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateDEMultiOffsetIO">
+<part element="ns107:CREATEDEMULTIOFFSET_IOPK_REQ" name="RequestMsg" xmlns:ns107="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateDEMultiOffsetIOResponse">
+<part element="ns108:CREATEDEMULTIOFFSET_IOPK_RES" name="ResponseMsg" xmlns:ns108="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteMjrnlbookIO">
+<part element="ns109:DELETEMJRNLBOOK_IOPK_REQ" name="RequestMsg" xmlns:ns109="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteMjrnlbookIOResponse">
+<part element="ns110:DELETEMJRNLBOOK_IOPK_RES" name="ResponseMsg" xmlns:ns110="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="SingleNewFS">
+<part element="ns111:SINGLENEW_FSFS_REQ" name="RequestMsg" xmlns:ns111="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="SingleNewFSResponse">
+<part element="ns112:SINGLENEW_FSFS_RES" name="ResponseMsg" xmlns:ns112="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEBatchBrowserFS">
+<part element="ns113:AUTHORIZEDEBATCHBROWSER_FSFS_REQ" name="RequestMsg" xmlns:ns113="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEBatchBrowserFSResponse">
+<part element="ns114:AUTHORIZEDEBATCHBROWSER_FSFS_RES" name="ResponseMsg" xmlns:ns114="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEBranchRestFS">
+<part element="ns115:AUTHORIZEDEBRANCHREST_FSFS_REQ" name="RequestMsg" xmlns:ns115="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEBranchRestFSResponse">
+<part element="ns116:AUTHORIZEDEBRANCHREST_FSFS_RES" name="ResponseMsg" xmlns:ns116="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateSingleJrnlFS">
+<part element="ns117:CREATESINGLEJRNL_FSFS_REQ" name="RequestMsg" xmlns:ns117="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateSingleJrnlFSResponse">
+<part element="ns118:CREATESINGLEJRNL_FSFS_RES" name="ResponseMsg" xmlns:ns118="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="MultiAuthorizeFS">
+<part element="ns119:MULTIAUTHORIZE_FSFS_REQ" name="RequestMsg" xmlns:ns119="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="MultiAuthorizeFSResponse">
+<part element="ns120:MULTIAUTHORIZE_FSFS_RES" name="ResponseMsg" xmlns:ns120="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteSingleJrnlFS">
+<part element="ns121:DELETESINGLEJRNL_FSFS_REQ" name="RequestMsg" xmlns:ns121="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteSingleJrnlFSResponse">
+<part element="ns122:DELETESINGLEJRNL_FSFS_RES" name="ResponseMsg" xmlns:ns122="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReopenDEBranchRestFS">
+<part element="ns123:REOPENDEBRANCHREST_FSFS_REQ" name="RequestMsg" xmlns:ns123="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReopenDEBranchRestFSResponse">
+<part element="ns124:REOPENDEBRANCHREST_FSFS_RES" name="ResponseMsg" xmlns:ns124="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeMjrnlbookFS">
+<part element="ns125:AUTHORIZEMJRNLBOOK_FSFS_REQ" name="RequestMsg" xmlns:ns125="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeMjrnlbookFSResponse">
+<part element="ns126:AUTHORIZEMJRNLBOOK_FSFS_RES" name="ResponseMsg" xmlns:ns126="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEBranchRestIO">
+<part element="ns127:DELETEDEBRANCHREST_IOPK_REQ" name="RequestMsg" xmlns:ns127="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEBranchRestIOResponse">
+<part element="ns128:DELETEDEBRANCHREST_IOPK_RES" name="ResponseMsg" xmlns:ns128="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteTellerFS">
+<part element="ns129:DELETETELLER_FSFS_REQ" name="RequestMsg" xmlns:ns129="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteTellerFSResponse">
+<part element="ns130:DELETETELLER_FSFS_RES" name="ResponseMsg" xmlns:ns130="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyMjrnlTemplateFS">
+<part element="ns131:MODIFYMJRNLTEMPLATE_FSFS_REQ" name="RequestMsg" xmlns:ns131="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyMjrnlTemplateFSResponse">
+<part element="ns132:MODIFYMJRNLTEMPLATE_FSFS_RES" name="ResponseMsg" xmlns:ns132="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QueryDEBranchRestIO">
+<part element="ns133:QUERYDEBRANCHREST_IOFS_REQ" name="RequestMsg" xmlns:ns133="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QueryDEBranchRestIOResponse">
+<part element="ns134:QUERYDEBRANCHREST_IOFS_RES" name="ResponseMsg" xmlns:ns134="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QueryTellerIO">
+<part element="ns135:QUERYTELLER_IOFS_REQ" name="RequestMsg" xmlns:ns135="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QueryTellerIOResponse">
+<part element="ns136:QUERYTELLER_IOFS_RES" name="ResponseMsg" xmlns:ns136="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteMjrnlTemplateIO">
+<part element="ns137:DELETEMJRNLTEMPLATE_IOPK_REQ" name="RequestMsg" xmlns:ns137="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteMjrnlTemplateIOResponse">
+<part element="ns138:DELETEMJRNLTEMPLATE_IOPK_RES" name="ResponseMsg" xmlns:ns138="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEMultiOffsetIO">
+<part element="ns139:AUTHORIZEDEMULTIOFFSET_IOPK_REQ" name="RequestMsg" xmlns:ns139="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEMultiOffsetIOResponse">
+<part element="ns140:AUTHORIZEDEMULTIOFFSET_IOPK_RES" name="ResponseMsg" xmlns:ns140="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateDEDraftIssuerMaintIO">
+<part element="ns141:CREATEDEDRAFTISSUERMAINT_IOPK_REQ" name="RequestMsg" xmlns:ns141="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateDEDraftIssuerMaintIOResponse">
+<part element="ns142:CREATEDEDRAFTISSUERMAINT_IOPK_RES" name="ResponseMsg" xmlns:ns142="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteTellerIO">
+<part element="ns143:DELETETELLER_IOPK_REQ" name="RequestMsg" xmlns:ns143="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteTellerIOResponse">
+<part element="ns144:DELETETELLER_IOPK_RES" name="ResponseMsg" xmlns:ns144="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEBatchBrowserFS">
+<part element="ns145:DELETEDEBATCHBROWSER_FSFS_REQ" name="RequestMsg" xmlns:ns145="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEBatchBrowserFSResponse">
+<part element="ns146:DELETEDEBATCHBROWSER_FSFS_RES" name="ResponseMsg" xmlns:ns146="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReverseCommonReversalIO">
+<part element="ns147:REVERSECOMMONREVERSAL_IOPK_REQ" name="RequestMsg" xmlns:ns147="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReverseCommonReversalIOResponse">
+<part element="ns148:REVERSECOMMONREVERSAL_IOPK_RES" name="ResponseMsg" xmlns:ns148="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CloseDEDraftIssuerMaintFS">
+<part element="ns149:CLOSEDEDRAFTISSUERMAINT_FSFS_REQ" name="RequestMsg" xmlns:ns149="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CloseDEDraftIssuerMaintFSResponse">
+<part element="ns150:CLOSEDEDRAFTISSUERMAINT_FSFS_RES" name="ResponseMsg" xmlns:ns150="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeSingleJrnlIO">
+<part element="ns151:AUTHORIZESINGLEJRNL_IOPK_REQ" name="RequestMsg" xmlns:ns151="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeSingleJrnlIOResponse">
+<part element="ns152:AUTHORIZESINGLEJRNL_IOPK_RES" name="ResponseMsg" xmlns:ns152="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CloseDEBranchRestFS">
+<part element="ns153:CLOSEDEBRANCHREST_FSFS_REQ" name="RequestMsg" xmlns:ns153="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CloseDEBranchRestFSResponse">
+<part element="ns154:CLOSEDEBRANCHREST_FSFS_RES" name="ResponseMsg" xmlns:ns154="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyMjrnlbookIO">
+<part element="ns155:MODIFYMJRNLBOOK_IOPK_REQ" name="RequestMsg" xmlns:ns155="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ModifyMjrnlbookIOResponse">
+<part element="ns156:MODIFYMJRNLBOOK_IOPK_RES" name="ResponseMsg" xmlns:ns156="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReverseTellerIO">
+<part element="ns157:REVERSETELLER_IOPK_REQ" name="RequestMsg" xmlns:ns157="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="ReverseTellerIOResponse">
+<part element="ns158:REVERSETELLER_IOPK_RES" name="ResponseMsg" xmlns:ns158="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="MultiDeleteIO">
+<part element="ns159:MULTIDELETE_IOPK_REQ" name="RequestMsg" xmlns:ns159="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="MultiDeleteIOResponse">
+<part element="ns160:MULTIDELETE_IOPK_RES" name="ResponseMsg" xmlns:ns160="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="SingleAuthorizeFS">
+<part element="ns161:SINGLEAUTHORIZE_FSFS_REQ" name="RequestMsg" xmlns:ns161="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="SingleAuthorizeFSResponse">
+<part element="ns162:SINGLEAUTHORIZE_FSFS_RES" name="ResponseMsg" xmlns:ns162="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateDEBranchRestFS">
+<part element="ns163:CREATEDEBRANCHREST_FSFS_REQ" name="RequestMsg" xmlns:ns163="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateDEBranchRestFSResponse">
+<part element="ns164:CREATEDEBRANCHREST_FSFS_RES" name="ResponseMsg" xmlns:ns164="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QueryMjrnlTemplateIO">
+<part element="ns165:QUERYMJRNLTEMPLATE_IOFS_REQ" name="RequestMsg" xmlns:ns165="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="QueryMjrnlTemplateIOResponse">
+<part element="ns166:QUERYMJRNLTEMPLATE_IOFS_RES" name="ResponseMsg" xmlns:ns166="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteMjrnlTemplateFS">
+<part element="ns167:DELETEMJRNLTEMPLATE_FSFS_REQ" name="RequestMsg" xmlns:ns167="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteMjrnlTemplateFSResponse">
+<part element="ns168:DELETEMJRNLTEMPLATE_FSFS_RES" name="ResponseMsg" xmlns:ns168="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateDEMultiOffsetFS">
+<part element="ns169:CREATEDEMULTIOFFSET_FSFS_REQ" name="RequestMsg" xmlns:ns169="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="CreateDEMultiOffsetFSResponse">
+<part element="ns170:CREATEDEMULTIOFFSET_FSFS_RES" name="ResponseMsg" xmlns:ns170="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteMjrnlbookFS">
+<part element="ns171:DELETEMJRNLBOOK_FSFS_REQ" name="RequestMsg" xmlns:ns171="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteMjrnlbookFSResponse">
+<part element="ns172:DELETEMJRNLBOOK_FSFS_RES" name="ResponseMsg" xmlns:ns172="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="BatchTotDeleteFS">
+<part element="ns173:BATCHTOTDELETE_FSFS_REQ" name="RequestMsg" xmlns:ns173="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="BatchTotDeleteFSResponse">
+<part element="ns174:BATCHTOTDELETE_FSFS_RES" name="ResponseMsg" xmlns:ns174="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEBranchRestFS">
+<part element="ns175:DELETEDEBRANCHREST_FSFS_REQ" name="RequestMsg" xmlns:ns175="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="DeleteDEBranchRestFSResponse">
+<part element="ns176:DELETEDEBRANCHREST_FSFS_RES" name="ResponseMsg" xmlns:ns176="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="MultiAuthorizeIO">
+<part element="ns177:MULTIAUTHORIZE_IOPK_REQ" name="RequestMsg" xmlns:ns177="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="MultiAuthorizeIOResponse">
+<part element="ns178:MULTIAUTHORIZE_IOPK_RES" name="ResponseMsg" xmlns:ns178="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEBranchRestIO">
+<part element="ns179:AUTHORIZEDEBRANCHREST_IOPK_REQ" name="RequestMsg" xmlns:ns179="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="AuthorizeDEBranchRestIOResponse">
+<part element="ns180:AUTHORIZEDEBRANCHREST_IOPK_RES" name="ResponseMsg" xmlns:ns180="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="BatchAuthorizeIO">
+<part element="ns181:BATCHAUTHORIZE_IOPK_REQ" name="RequestMsg" xmlns:ns181="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<message name="BatchAuthorizeIOResponse">
+<part element="ns182:BATCHAUTHORIZE_IOPK_RES" name="ResponseMsg" xmlns:ns182="http://fcubs.ofss.com/service/FCUBSDEService"/>
+</message>
+<portType name="FCUBSDEServiceSEI">
+<operation name="DeleteSingleJrnlIO">
+<input message="tns:DeleteSingleJrnlIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteSingleJrnlIORequest"/>
+<output message="tns:DeleteSingleJrnlIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteSingleJrnlIOResponse"/>
+</operation>
+<operation name="ReopenDEDraftIssuerMaintFS">
+<input message="tns:ReopenDEDraftIssuerMaintFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReopenDEDraftIssuerMaintFSRequest"/>
+<output message="tns:ReopenDEDraftIssuerMaintFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReopenDEDraftIssuerMaintFSResponse"/>
+</operation>
+<operation name="AuthorizeMjrnlbookIO">
+<input message="tns:AuthorizeMjrnlbookIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeMjrnlbookIORequest"/>
+<output message="tns:AuthorizeMjrnlbookIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeMjrnlbookIOResponse"/>
+</operation>
+<operation name="ModifyMjrnlTemplateIO">
+<input message="tns:ModifyMjrnlTemplateIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyMjrnlTemplateIORequest"/>
+<output message="tns:ModifyMjrnlTemplateIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyMjrnlTemplateIOResponse"/>
+</operation>
+<operation name="ReopenDEBranchRestIO">
+<input message="tns:ReopenDEBranchRestIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReopenDEBranchRestIORequest"/>
+<output message="tns:ReopenDEBranchRestIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReopenDEBranchRestIOResponse"/>
+</operation>
+<operation name="QuerySingleJrnlIO">
+<input message="tns:QuerySingleJrnlIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QuerySingleJrnlIORequest"/>
+<output message="tns:QuerySingleJrnlIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QuerySingleJrnlIOResponse"/>
+</operation>
+<operation name="MultiNewIO">
+<input message="tns:MultiNewIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/MultiNewIORequest"/>
+<output message="tns:MultiNewIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/MultiNewIOResponse"/>
+</operation>
+<operation name="ModifyMjrnlbookFS">
+<input message="tns:ModifyMjrnlbookFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyMjrnlbookFSRequest"/>
+<output message="tns:ModifyMjrnlbookFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyMjrnlbookFSResponse"/>
+</operation>
+<operation name="AuthorizeDEBatchBrowserIO">
+<input message="tns:AuthorizeDEBatchBrowserIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEBatchBrowserIORequest"/>
+<output message="tns:AuthorizeDEBatchBrowserIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEBatchBrowserIOResponse"/>
+</operation>
+<operation name="QueryMjrnlbookIO">
+<input message="tns:QueryMjrnlbookIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QueryMjrnlbookIORequest"/>
+<output message="tns:QueryMjrnlbookIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QueryMjrnlbookIOResponse"/>
+</operation>
+<operation name="SingleNewIO">
+<input message="tns:SingleNewIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/SingleNewIORequest"/>
+<output message="tns:SingleNewIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/SingleNewIOResponse"/>
+</operation>
+<operation name="DeleteDEMultiOffsetIO">
+<input message="tns:DeleteDEMultiOffsetIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEMultiOffsetIORequest"/>
+<output message="tns:DeleteDEMultiOffsetIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEMultiOffsetIOResponse"/>
+</operation>
+<operation name="SingleDeleteIO">
+<input message="tns:SingleDeleteIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/SingleDeleteIORequest"/>
+<output message="tns:SingleDeleteIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/SingleDeleteIOResponse"/>
+</operation>
+<operation name="CreateMjrnlTemplateIO">
+<input message="tns:CreateMjrnlTemplateIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateMjrnlTemplateIORequest"/>
+<output message="tns:CreateMjrnlTemplateIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateMjrnlTemplateIOResponse"/>
+</operation>
+<operation name="ModifyDEBranchRestFS">
+<input message="tns:ModifyDEBranchRestFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyDEBranchRestFSRequest"/>
+<output message="tns:ModifyDEBranchRestFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyDEBranchRestFSResponse"/>
+</operation>
+<operation name="MultiDeleteFS">
+<input message="tns:MultiDeleteFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/MultiDeleteFSRequest"/>
+<output message="tns:MultiDeleteFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/MultiDeleteFSResponse"/>
+</operation>
+<operation name="ModifyDEDraftIssuerMaintFS">
+<input message="tns:ModifyDEDraftIssuerMaintFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyDEDraftIssuerMaintFSRequest"/>
+<output message="tns:ModifyDEDraftIssuerMaintFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyDEDraftIssuerMaintFSResponse"/>
+</operation>
+<operation name="BatchAuthorizeFS">
+<input message="tns:BatchAuthorizeFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/BatchAuthorizeFSRequest"/>
+<output message="tns:BatchAuthorizeFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/BatchAuthorizeFSResponse"/>
+</operation>
+<operation name="AuthorizeMjrnlTemplateFS">
+<input message="tns:AuthorizeMjrnlTemplateFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeMjrnlTemplateFSRequest"/>
+<output message="tns:AuthorizeMjrnlTemplateFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeMjrnlTemplateFSResponse"/>
+</operation>
+<operation name="SingleAuthorizeIO">
+<input message="tns:SingleAuthorizeIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/SingleAuthorizeIORequest"/>
+<output message="tns:SingleAuthorizeIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/SingleAuthorizeIOResponse"/>
+</operation>
+<operation name="BatchTotDeleteIO">
+<input message="tns:BatchTotDeleteIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/BatchTotDeleteIORequest"/>
+<output message="tns:BatchTotDeleteIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/BatchTotDeleteIOResponse"/>
+</operation>
+<operation name="CloseMjrnlTemplateFS">
+<input message="tns:CloseMjrnlTemplateFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CloseMjrnlTemplateFSRequest"/>
+<output message="tns:CloseMjrnlTemplateFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CloseMjrnlTemplateFSResponse"/>
+</operation>
+<operation name="QueryDEBatchBrowserIO">
+<input message="tns:QueryDEBatchBrowserIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QueryDEBatchBrowserIORequest"/>
+<output message="tns:QueryDEBatchBrowserIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QueryDEBatchBrowserIOResponse"/>
+</operation>
+<operation name="AuthorizeTellerFS">
+<input message="tns:AuthorizeTellerFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeTellerFSRequest"/>
+<output message="tns:AuthorizeTellerFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeTellerFSResponse"/>
+</operation>
+<operation name="AuthorizeMjrnlTemplateIO">
+<input message="tns:AuthorizeMjrnlTemplateIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeMjrnlTemplateIORequest"/>
+<output message="tns:AuthorizeMjrnlTemplateIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeMjrnlTemplateIOResponse"/>
+</operation>
+<operation name="AuthorizeTellerIO">
+<input message="tns:AuthorizeTellerIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeTellerIORequest"/>
+<output message="tns:AuthorizeTellerIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeTellerIOResponse"/>
+</operation>
+<operation name="CreateTellerIO">
+<input message="tns:CreateTellerIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateTellerIORequest"/>
+<output message="tns:CreateTellerIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateTellerIOResponse"/>
+</operation>
+<operation name="CreateMjrnlbookIO">
+<input message="tns:CreateMjrnlbookIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateMjrnlbookIORequest"/>
+<output message="tns:CreateMjrnlbookIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateMjrnlbookIOResponse"/>
+</operation>
+<operation name="DeleteDEDraftIssuerMaintIO">
+<input message="tns:DeleteDEDraftIssuerMaintIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEDraftIssuerMaintIORequest"/>
+<output message="tns:DeleteDEDraftIssuerMaintIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEDraftIssuerMaintIOResponse"/>
+</operation>
+<operation name="CreateDEBranchRestIO">
+<input message="tns:CreateDEBranchRestIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateDEBranchRestIORequest"/>
+<output message="tns:CreateDEBranchRestIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateDEBranchRestIOResponse"/>
+</operation>
+<operation name="ReopenDEDraftIssuerMaintIO">
+<input message="tns:ReopenDEDraftIssuerMaintIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReopenDEDraftIssuerMaintIORequest"/>
+<output message="tns:ReopenDEDraftIssuerMaintIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReopenDEDraftIssuerMaintIOResponse"/>
+</operation>
+<operation name="AuthorizeDEDraftIssuerMaintIO">
+<input message="tns:AuthorizeDEDraftIssuerMaintIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEDraftIssuerMaintIORequest"/>
+<output message="tns:AuthorizeDEDraftIssuerMaintIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEDraftIssuerMaintIOResponse"/>
+</operation>
+<operation name="AuthorizeSingleJrnlFS">
+<input message="tns:AuthorizeSingleJrnlFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeSingleJrnlFSRequest"/>
+<output message="tns:AuthorizeSingleJrnlFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeSingleJrnlFSResponse"/>
+</operation>
+<operation name="MultiNewFS">
+<input message="tns:MultiNewFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/MultiNewFSRequest"/>
+<output message="tns:MultiNewFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/MultiNewFSResponse"/>
+</operation>
+<operation name="CreateSingleJrnlIO">
+<input message="tns:CreateSingleJrnlIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateSingleJrnlIORequest"/>
+<output message="tns:CreateSingleJrnlIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateSingleJrnlIOResponse"/>
+</operation>
+<operation name="QueryDEMultiOffsetIO">
+<input message="tns:QueryDEMultiOffsetIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QueryDEMultiOffsetIORequest"/>
+<output message="tns:QueryDEMultiOffsetIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QueryDEMultiOffsetIOResponse"/>
+</operation>
+<operation name="CreateMjrnlTemplateFS">
+<input message="tns:CreateMjrnlTemplateFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateMjrnlTemplateFSRequest"/>
+<output message="tns:CreateMjrnlTemplateFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateMjrnlTemplateFSResponse"/>
+</operation>
+<operation name="ModifyDEBranchRestIO">
+<input message="tns:ModifyDEBranchRestIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyDEBranchRestIORequest"/>
+<output message="tns:ModifyDEBranchRestIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyDEBranchRestIOResponse"/>
+</operation>
+<operation name="DeleteDEMultiOffsetFS">
+<input message="tns:DeleteDEMultiOffsetFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEMultiOffsetFSRequest"/>
+<output message="tns:DeleteDEMultiOffsetFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEMultiOffsetFSResponse"/>
+</operation>
+<operation name="ModifyDEDraftIssuerMaintIO">
+<input message="tns:ModifyDEDraftIssuerMaintIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyDEDraftIssuerMaintIORequest"/>
+<output message="tns:ModifyDEDraftIssuerMaintIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyDEDraftIssuerMaintIOResponse"/>
+</operation>
+<operation name="CloseDEDraftIssuerMaintIO">
+<input message="tns:CloseDEDraftIssuerMaintIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CloseDEDraftIssuerMaintIORequest"/>
+<output message="tns:CloseDEDraftIssuerMaintIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CloseDEDraftIssuerMaintIOResponse"/>
+</operation>
+<operation name="CreateTellerFS">
+<input message="tns:CreateTellerFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateTellerFSRequest"/>
+<output message="tns:CreateTellerFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateTellerFSResponse"/>
+</operation>
+<operation name="DeleteDEDraftIssuerMaintFS">
+<input message="tns:DeleteDEDraftIssuerMaintFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEDraftIssuerMaintFSRequest"/>
+<output message="tns:DeleteDEDraftIssuerMaintFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEDraftIssuerMaintFSResponse"/>
+</operation>
+<operation name="CloseDEBranchRestIO">
+<input message="tns:CloseDEBranchRestIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CloseDEBranchRestIORequest"/>
+<output message="tns:CloseDEBranchRestIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CloseDEBranchRestIOResponse"/>
+</operation>
+<operation name="CreateMjrnlbookFS">
+<input message="tns:CreateMjrnlbookFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateMjrnlbookFSRequest"/>
+<output message="tns:CreateMjrnlbookFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateMjrnlbookFSResponse"/>
+</operation>
+<operation name="DeleteDEBatchBrowserIO">
+<input message="tns:DeleteDEBatchBrowserIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEBatchBrowserIORequest"/>
+<output message="tns:DeleteDEBatchBrowserIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEBatchBrowserIOResponse"/>
+</operation>
+<operation name="ReverseTellerFS">
+<input message="tns:ReverseTellerFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReverseTellerFSRequest"/>
+<output message="tns:ReverseTellerFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReverseTellerFSResponse"/>
+</operation>
+<operation name="AuthorizeDEDraftIssuerMaintFS">
+<input message="tns:AuthorizeDEDraftIssuerMaintFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEDraftIssuerMaintFSRequest"/>
+<output message="tns:AuthorizeDEDraftIssuerMaintFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEDraftIssuerMaintFSResponse"/>
+</operation>
+<operation name="AuthorizeDEMultiOffsetFS">
+<input message="tns:AuthorizeDEMultiOffsetFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEMultiOffsetFSRequest"/>
+<output message="tns:AuthorizeDEMultiOffsetFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEMultiOffsetFSResponse"/>
+</operation>
+<operation name="CloseMjrnlTemplateIO">
+<input message="tns:CloseMjrnlTemplateIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CloseMjrnlTemplateIORequest"/>
+<output message="tns:CloseMjrnlTemplateIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CloseMjrnlTemplateIOResponse"/>
+</operation>
+<operation name="SingleDeleteFS">
+<input message="tns:SingleDeleteFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/SingleDeleteFSRequest"/>
+<output message="tns:SingleDeleteFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/SingleDeleteFSResponse"/>
+</operation>
+<operation name="ReverseCommonReversalFS">
+<input message="tns:ReverseCommonReversalFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReverseCommonReversalFSRequest"/>
+<output message="tns:ReverseCommonReversalFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReverseCommonReversalFSResponse"/>
+</operation>
+<operation name="CreateDEDraftIssuerMaintFS">
+<input message="tns:CreateDEDraftIssuerMaintFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateDEDraftIssuerMaintFSRequest"/>
+<output message="tns:CreateDEDraftIssuerMaintFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateDEDraftIssuerMaintFSResponse"/>
+</operation>
+<operation name="CreateDEMultiOffsetIO">
+<input message="tns:CreateDEMultiOffsetIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateDEMultiOffsetIORequest"/>
+<output message="tns:CreateDEMultiOffsetIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateDEMultiOffsetIOResponse"/>
+</operation>
+<operation name="DeleteMjrnlbookIO">
+<input message="tns:DeleteMjrnlbookIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteMjrnlbookIORequest"/>
+<output message="tns:DeleteMjrnlbookIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteMjrnlbookIOResponse"/>
+</operation>
+<operation name="SingleNewFS">
+<input message="tns:SingleNewFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/SingleNewFSRequest"/>
+<output message="tns:SingleNewFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/SingleNewFSResponse"/>
+</operation>
+<operation name="AuthorizeDEBatchBrowserFS">
+<input message="tns:AuthorizeDEBatchBrowserFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEBatchBrowserFSRequest"/>
+<output message="tns:AuthorizeDEBatchBrowserFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEBatchBrowserFSResponse"/>
+</operation>
+<operation name="AuthorizeDEBranchRestFS">
+<input message="tns:AuthorizeDEBranchRestFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEBranchRestFSRequest"/>
+<output message="tns:AuthorizeDEBranchRestFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEBranchRestFSResponse"/>
+</operation>
+<operation name="CreateSingleJrnlFS">
+<input message="tns:CreateSingleJrnlFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateSingleJrnlFSRequest"/>
+<output message="tns:CreateSingleJrnlFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateSingleJrnlFSResponse"/>
+</operation>
+<operation name="MultiAuthorizeFS">
+<input message="tns:MultiAuthorizeFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/MultiAuthorizeFSRequest"/>
+<output message="tns:MultiAuthorizeFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/MultiAuthorizeFSResponse"/>
+</operation>
+<operation name="DeleteSingleJrnlFS">
+<input message="tns:DeleteSingleJrnlFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteSingleJrnlFSRequest"/>
+<output message="tns:DeleteSingleJrnlFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteSingleJrnlFSResponse"/>
+</operation>
+<operation name="ReopenDEBranchRestFS">
+<input message="tns:ReopenDEBranchRestFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReopenDEBranchRestFSRequest"/>
+<output message="tns:ReopenDEBranchRestFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReopenDEBranchRestFSResponse"/>
+</operation>
+<operation name="AuthorizeMjrnlbookFS">
+<input message="tns:AuthorizeMjrnlbookFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeMjrnlbookFSRequest"/>
+<output message="tns:AuthorizeMjrnlbookFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeMjrnlbookFSResponse"/>
+</operation>
+<operation name="DeleteDEBranchRestIO">
+<input message="tns:DeleteDEBranchRestIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEBranchRestIORequest"/>
+<output message="tns:DeleteDEBranchRestIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEBranchRestIOResponse"/>
+</operation>
+<operation name="DeleteTellerFS">
+<input message="tns:DeleteTellerFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteTellerFSRequest"/>
+<output message="tns:DeleteTellerFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteTellerFSResponse"/>
+</operation>
+<operation name="ModifyMjrnlTemplateFS">
+<input message="tns:ModifyMjrnlTemplateFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyMjrnlTemplateFSRequest"/>
+<output message="tns:ModifyMjrnlTemplateFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyMjrnlTemplateFSResponse"/>
+</operation>
+<operation name="QueryDEBranchRestIO">
+<input message="tns:QueryDEBranchRestIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QueryDEBranchRestIORequest"/>
+<output message="tns:QueryDEBranchRestIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QueryDEBranchRestIOResponse"/>
+</operation>
+<operation name="QueryTellerIO">
+<input message="tns:QueryTellerIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QueryTellerIORequest"/>
+<output message="tns:QueryTellerIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QueryTellerIOResponse"/>
+</operation>
+<operation name="DeleteMjrnlTemplateIO">
+<input message="tns:DeleteMjrnlTemplateIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteMjrnlTemplateIORequest"/>
+<output message="tns:DeleteMjrnlTemplateIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteMjrnlTemplateIOResponse"/>
+</operation>
+<operation name="AuthorizeDEMultiOffsetIO">
+<input message="tns:AuthorizeDEMultiOffsetIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEMultiOffsetIORequest"/>
+<output message="tns:AuthorizeDEMultiOffsetIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEMultiOffsetIOResponse"/>
+</operation>
+<operation name="CreateDEDraftIssuerMaintIO">
+<input message="tns:CreateDEDraftIssuerMaintIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateDEDraftIssuerMaintIORequest"/>
+<output message="tns:CreateDEDraftIssuerMaintIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateDEDraftIssuerMaintIOResponse"/>
+</operation>
+<operation name="DeleteTellerIO">
+<input message="tns:DeleteTellerIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteTellerIORequest"/>
+<output message="tns:DeleteTellerIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteTellerIOResponse"/>
+</operation>
+<operation name="DeleteDEBatchBrowserFS">
+<input message="tns:DeleteDEBatchBrowserFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEBatchBrowserFSRequest"/>
+<output message="tns:DeleteDEBatchBrowserFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEBatchBrowserFSResponse"/>
+</operation>
+<operation name="ReverseCommonReversalIO">
+<input message="tns:ReverseCommonReversalIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReverseCommonReversalIORequest"/>
+<output message="tns:ReverseCommonReversalIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReverseCommonReversalIOResponse"/>
+</operation>
+<operation name="CloseDEDraftIssuerMaintFS">
+<input message="tns:CloseDEDraftIssuerMaintFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CloseDEDraftIssuerMaintFSRequest"/>
+<output message="tns:CloseDEDraftIssuerMaintFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CloseDEDraftIssuerMaintFSResponse"/>
+</operation>
+<operation name="AuthorizeSingleJrnlIO">
+<input message="tns:AuthorizeSingleJrnlIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeSingleJrnlIORequest"/>
+<output message="tns:AuthorizeSingleJrnlIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeSingleJrnlIOResponse"/>
+</operation>
+<operation name="CloseDEBranchRestFS">
+<input message="tns:CloseDEBranchRestFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CloseDEBranchRestFSRequest"/>
+<output message="tns:CloseDEBranchRestFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CloseDEBranchRestFSResponse"/>
+</operation>
+<operation name="ModifyMjrnlbookIO">
+<input message="tns:ModifyMjrnlbookIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyMjrnlbookIORequest"/>
+<output message="tns:ModifyMjrnlbookIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ModifyMjrnlbookIOResponse"/>
+</operation>
+<operation name="ReverseTellerIO">
+<input message="tns:ReverseTellerIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReverseTellerIORequest"/>
+<output message="tns:ReverseTellerIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/ReverseTellerIOResponse"/>
+</operation>
+<operation name="MultiDeleteIO">
+<input message="tns:MultiDeleteIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/MultiDeleteIORequest"/>
+<output message="tns:MultiDeleteIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/MultiDeleteIOResponse"/>
+</operation>
+<operation name="SingleAuthorizeFS">
+<input message="tns:SingleAuthorizeFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/SingleAuthorizeFSRequest"/>
+<output message="tns:SingleAuthorizeFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/SingleAuthorizeFSResponse"/>
+</operation>
+<operation name="CreateDEBranchRestFS">
+<input message="tns:CreateDEBranchRestFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateDEBranchRestFSRequest"/>
+<output message="tns:CreateDEBranchRestFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateDEBranchRestFSResponse"/>
+</operation>
+<operation name="QueryMjrnlTemplateIO">
+<input message="tns:QueryMjrnlTemplateIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QueryMjrnlTemplateIORequest"/>
+<output message="tns:QueryMjrnlTemplateIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/QueryMjrnlTemplateIOResponse"/>
+</operation>
+<operation name="DeleteMjrnlTemplateFS">
+<input message="tns:DeleteMjrnlTemplateFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteMjrnlTemplateFSRequest"/>
+<output message="tns:DeleteMjrnlTemplateFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteMjrnlTemplateFSResponse"/>
+</operation>
+<operation name="CreateDEMultiOffsetFS">
+<input message="tns:CreateDEMultiOffsetFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateDEMultiOffsetFSRequest"/>
+<output message="tns:CreateDEMultiOffsetFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/CreateDEMultiOffsetFSResponse"/>
+</operation>
+<operation name="DeleteMjrnlbookFS">
+<input message="tns:DeleteMjrnlbookFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteMjrnlbookFSRequest"/>
+<output message="tns:DeleteMjrnlbookFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteMjrnlbookFSResponse"/>
+</operation>
+<operation name="BatchTotDeleteFS">
+<input message="tns:BatchTotDeleteFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/BatchTotDeleteFSRequest"/>
+<output message="tns:BatchTotDeleteFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/BatchTotDeleteFSResponse"/>
+</operation>
+<operation name="DeleteDEBranchRestFS">
+<input message="tns:DeleteDEBranchRestFS" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEBranchRestFSRequest"/>
+<output message="tns:DeleteDEBranchRestFSResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/DeleteDEBranchRestFSResponse"/>
+</operation>
+<operation name="MultiAuthorizeIO">
+<input message="tns:MultiAuthorizeIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/MultiAuthorizeIORequest"/>
+<output message="tns:MultiAuthorizeIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/MultiAuthorizeIOResponse"/>
+</operation>
+<operation name="AuthorizeDEBranchRestIO">
+<input message="tns:AuthorizeDEBranchRestIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEBranchRestIORequest"/>
+<output message="tns:AuthorizeDEBranchRestIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/AuthorizeDEBranchRestIOResponse"/>
+</operation>
+<operation name="BatchAuthorizeIO">
+<input message="tns:BatchAuthorizeIO" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/BatchAuthorizeIORequest"/>
+<output message="tns:BatchAuthorizeIOResponse" wsam:Action="http://FCUBSDEService.types.ws.gw.fcubs.ofss.com/FCUBSDEServiceSEI/BatchAuthorizeIOResponse"/>
+</operation>
+</portType>
+<binding name="FCUBSDEServiceSEIBinding" type="tns:FCUBSDEServiceSEI">
+<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+<operation name="DeleteSingleJrnlIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ReopenDEDraftIssuerMaintFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeMjrnlbookIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ModifyMjrnlTemplateIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ReopenDEBranchRestIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="QuerySingleJrnlIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="MultiNewIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ModifyMjrnlbookFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeDEBatchBrowserIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="QueryMjrnlbookIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="SingleNewIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteDEMultiOffsetIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="SingleDeleteIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateMjrnlTemplateIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ModifyDEBranchRestFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="MultiDeleteFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ModifyDEDraftIssuerMaintFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="BatchAuthorizeFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeMjrnlTemplateFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="SingleAuthorizeIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="BatchTotDeleteIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CloseMjrnlTemplateFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="QueryDEBatchBrowserIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeTellerFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeMjrnlTemplateIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeTellerIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateTellerIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateMjrnlbookIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteDEDraftIssuerMaintIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateDEBranchRestIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ReopenDEDraftIssuerMaintIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeDEDraftIssuerMaintIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeSingleJrnlFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="MultiNewFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateSingleJrnlIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="QueryDEMultiOffsetIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateMjrnlTemplateFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ModifyDEBranchRestIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteDEMultiOffsetFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ModifyDEDraftIssuerMaintIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CloseDEDraftIssuerMaintIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateTellerFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteDEDraftIssuerMaintFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CloseDEBranchRestIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateMjrnlbookFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteDEBatchBrowserIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ReverseTellerFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeDEDraftIssuerMaintFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeDEMultiOffsetFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CloseMjrnlTemplateIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="SingleDeleteFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ReverseCommonReversalFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateDEDraftIssuerMaintFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateDEMultiOffsetIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteMjrnlbookIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="SingleNewFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeDEBatchBrowserFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeDEBranchRestFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateSingleJrnlFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="MultiAuthorizeFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteSingleJrnlFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ReopenDEBranchRestFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeMjrnlbookFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteDEBranchRestIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteTellerFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ModifyMjrnlTemplateFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="QueryDEBranchRestIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="QueryTellerIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteMjrnlTemplateIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeDEMultiOffsetIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateDEDraftIssuerMaintIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteTellerIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteDEBatchBrowserFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ReverseCommonReversalIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CloseDEDraftIssuerMaintFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeSingleJrnlIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CloseDEBranchRestFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ModifyMjrnlbookIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ReverseTellerIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="MultiDeleteIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="SingleAuthorizeFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateDEBranchRestFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="QueryMjrnlTemplateIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteMjrnlTemplateFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateDEMultiOffsetFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteMjrnlbookFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="BatchTotDeleteFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteDEBranchRestFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="MultiAuthorizeIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeDEBranchRestIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="BatchAuthorizeIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+</binding>
+<service name="FCUBSDEService">
+<port binding="tns:FCUBSDEServiceSEIBinding" name="FCUBSDEServiceSEI">
+<soap:address location="http://172.30.1.29:7005/FCUBSDEService/FCUBSDEService"/>
+</port>
+</service>
+</definitions>
