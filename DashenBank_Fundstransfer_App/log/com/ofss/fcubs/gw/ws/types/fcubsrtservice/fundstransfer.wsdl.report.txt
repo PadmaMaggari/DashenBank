@@ -1,0 +1,96 @@
+
+
+Importing file: C:\Users\Administrator\git\DashenBank\DashenBank_Fundstransfer_App\fundstransfer.wsdl
+
+
+The following is a list of WS-I warning messages found when importing:
+XSD: There is no xmlns declaration for namespace 'http://fcubs.ofss.com/service/FCUBSRTService', Line: 4, Column: 1
+
+
+The WSDL import will proceed with bindings FCUBSRTServiceSEIBinding.
+Creating wsdl schema document for file:///C:/Users/Administrator/git/DashenBank/DashenBank_Fundstransfer_App/fundstransfer.wsdl.
+Parsing wsdl binding {http://FCUBSRTService.types.ws.gw.fcubs.ofss.com}FCUBSRTServiceSEIBinding.
+Parsing wsdl binding input AuthorizeTransactionFS.
+Parsing wsdl binding output AuthorizeTransactionFS.
+Parsing wsdl binding input ReverseTransactionFS.
+Parsing wsdl binding output ReverseTransactionFS.
+Parsing wsdl binding input ReopenBranchGroupIO.
+Parsing wsdl binding output ReopenBranchGroupIO.
+Parsing wsdl binding input QueryBranchGroupIO.
+Parsing wsdl binding output QueryBranchGroupIO.
+Parsing wsdl binding input CreateTransactionFS.
+Parsing wsdl binding output CreateTransactionFS.
+Parsing wsdl binding input QueryTransactionIO.
+Parsing wsdl binding output QueryTransactionIO.
+Parsing wsdl binding input ReopenBranchGroupFS.
+Parsing wsdl binding output ReopenBranchGroupFS.
+Parsing wsdl binding input ReverseTransactionIO.
+Parsing wsdl binding output ReverseTransactionIO.
+Parsing wsdl binding input ModifyBranchGroupFS.
+Parsing wsdl binding output ModifyBranchGroupFS.
+Parsing wsdl binding input AuthorizeBranchGroupFS.
+Parsing wsdl binding output AuthorizeBranchGroupFS.
+Parsing wsdl binding input CloseBranchGroupIO.
+Parsing wsdl binding output CloseBranchGroupIO.
+Parsing wsdl binding input RePrintAccPassbookIO.
+Parsing wsdl binding output RePrintAccPassbookIO.
+Parsing wsdl binding input CreateTransactionIO.
+Parsing wsdl binding output CreateTransactionIO.
+Parsing wsdl binding input ModifyBranchGroupIO.
+Parsing wsdl binding output ModifyBranchGroupIO.
+Parsing wsdl binding input AuthorizeBranchGroupIO.
+Parsing wsdl binding output AuthorizeBranchGroupIO.
+Parsing wsdl binding input CreateBranchGroupIO.
+Parsing wsdl binding output CreateBranchGroupIO.
+Parsing wsdl binding input CloseBranchGroupFS.
+Parsing wsdl binding output CloseBranchGroupFS.
+Parsing wsdl binding input DeleteBranchGroupIO.
+Parsing wsdl binding output DeleteBranchGroupIO.
+Parsing wsdl binding input AuthorizeTransactionIO.
+Parsing wsdl binding output AuthorizeTransactionIO.
+Parsing wsdl binding input CreateAccPassbookIO.
+Parsing wsdl binding output CreateAccPassbookIO.
+Parsing wsdl binding input QueryRTProductIO.
+Parsing wsdl binding output QueryRTProductIO.
+Parsing wsdl binding input CreateBranchGroupFS.
+Parsing wsdl binding output CreateBranchGroupFS.
+Parsing wsdl binding input DeleteBranchGroupFS.
+Parsing wsdl binding output DeleteBranchGroupFS.
+Parsing wsdl binding input UpdateAccPassbookIO.
+Parsing wsdl binding output UpdateAccPassbookIO.
+Processing doc style for operation AuthorizeTransactionFS.
+Processing doc style for operation ReverseTransactionFS.
+Processing doc style for operation ReopenBranchGroupIO.
+Processing doc style for operation QueryBranchGroupIO.
+Processing doc style for operation CreateTransactionFS.
+Processing doc style for operation QueryTransactionIO.
+Processing doc style for operation ReopenBranchGroupFS.
+Processing doc style for operation ReverseTransactionIO.
+Processing doc style for operation ModifyBranchGroupFS.
+Processing doc style for operation AuthorizeBranchGroupFS.
+Processing doc style for operation CloseBranchGroupIO.
+Processing doc style for operation RePrintAccPassbookIO.
+Processing doc style for operation CreateTransactionIO.
+Processing doc style for operation ModifyBranchGroupIO.
+Processing doc style for operation AuthorizeBranchGroupIO.
+Processing doc style for operation CreateBranchGroupIO.
+Processing doc style for operation CloseBranchGroupFS.
+Processing doc style for operation DeleteBranchGroupIO.
+Processing doc style for operation AuthorizeTransactionIO.
+Processing doc style for operation CreateAccPassbookIO.
+Processing doc style for operation QueryRTProductIO.
+Processing doc style for operation CreateBranchGroupFS.
+Processing doc style for operation DeleteBranchGroupFS.
+Processing doc style for operation UpdateAccPassbookIO.
+Populating WSDL schema fundstransfer.xsd.
+Creating file fundstransfer.xsd in the workspace.
+Creating file /DashenBank_Fundstransfer_App/DashenBank_Fundstransfer_App/RemoteFiles/xsd_1.xsd in the workspace.
+Copying source WSDL fundstransfer.wsdl to fundstransfer.wsdl.
+
+Elapsed time processing this message definition file: 0.472 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+
