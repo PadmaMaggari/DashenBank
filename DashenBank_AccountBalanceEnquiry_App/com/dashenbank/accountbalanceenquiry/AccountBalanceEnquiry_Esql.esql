@@ -156,90 +156,86 @@ CREATE COMPUTE MODULE ResponseToChannel
 		DECLARE outputheaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCBAL_IOFS_RES.FCUBS_HEADER;
 		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCBAL_IOFS_RES.FCUBS_BODY;
 
-		SET outputheaderRef.SOURCE = inputHeaderRef.*:SOURCE;
-		SET outputheaderRef.UBSCOMP = inputHeaderRef.*:UBSCOMP;
-		SET outputheaderRef.MSGID = inputHeaderRef.*:MSGID;
-		SET outputheaderRef.CORRELID = inputHeaderRef.*:CORRELID;
-		SET outputheaderRef.USERID = inputHeaderRef.*:USERID;
-		SET outputheaderRef.ENTITY = inputHeaderRef.*:ENTITY;
-		SET outputheaderRef.BRANCH = inputHeaderRef.*:BRANCH;
-		SET outputheaderRef.MODULEID = inputHeaderRef.*:MODULEID;
-		SET outputheaderRef.SERVICE = inputHeaderRef.*:SERVICE;
-		SET outputheaderRef.OPERATION = inputHeaderRef.*:OPERATION;
-		SET outputheaderRef.SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
-		SET outputheaderRef.SOURCE_USERID = inputHeaderRef.*:SOURCE_USERID;
-		SET outputheaderRef.DESTINATION = inputHeaderRef.*:DESTINATION;
-		SET outputheaderRef.MULTITRIPID = inputHeaderRef.*:MULTITRIPID;
-		SET outputheaderRef.FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
-		SET outputheaderRef.ACTION = inputHeaderRef.*:ACTION;
-		SET outputheaderRef.MSGSTAT = inputHeaderRef.*:MSGSTAT;
-		SET outputheaderRef.SNAPSHOTID = inputHeaderRef.*:SNAPSHOTID;
-		SET outputheaderRef.PASSWORD = inputHeaderRef.*:PASSWORD;
+		SET outputheaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
+		SET outputheaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
+		SET outputheaderRef.MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
+		SET outputheaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
+		SET outputheaderRef.USERID = NULLIF(inputHeaderRef.*:USERID,'');
+		SET outputheaderRef.ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
+		SET outputheaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
+		SET outputheaderRef.MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
+		SET outputheaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
+		SET outputheaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
+		SET outputheaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
+		SET outputheaderRef.SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
+		SET outputheaderRef.DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
+		SET outputheaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
+		SET outputheaderRef.FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
+		SET outputheaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
+		SET outputheaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
+		SET outputheaderRef.SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
+		SET outputheaderRef.PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
 
 		DECLARE I INTEGER 1;
-		DECLARE J INTEGER CARDINALITY(inputHeaderRef.*:ADDL.*:PARAM[]);
 		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
-		WHILE I<=J DO
-			SET outputheaderRef.ADDL.PARAM[I].*:NAME = inRef.*:NAME;
-			SET outputheaderRef.ADDL.PARAM[I].*:VALUE = inRef.*:VALUE;
+		WHILE LASTMOVE(inRef) DO
+			SET outputheaderRef.ADDL.PARAM[I].*:NAME = NULLIF(inRef.*:NAME,'');
+			SET outputheaderRef.ADDL.PARAM[I].*:VALUE = NULLIF(inRef.*:VALUE,'');
 			SET I = I + 1;
 			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;
 
-		SET outputbodyRef."ACC-Balance".ACC_BAL.BRANCH_CODE = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:BRANCH_CODE;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.CUST_AC_NO = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:CUST_AC_NO;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.CCY = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:CCY;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.TRNDT = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:TRNDT;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.OPNBAL = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:OPNBAL;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.CURBAL = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:CURBAL;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.AVLBAL = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:AVLBAL;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.UNCOLAMT = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:UNCOLAMT;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.AVLCR = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:AVLCR;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.MTDTOVCR = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:MTDTOVCR;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.MTDTOVDR = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:MTDTOVDR;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_BKD_AMT = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_BKD_AMT;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.ACCR_DR = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACCR_DR;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.ACCR_CR = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACCR_CR;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.SUBLIMIT = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:SUBLIMIT;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.TODLIMIT = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:TODLIMIT;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.TOD_ST_DT = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:TOD_ST_DT;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.TOD_EXP_DT = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:TOD_EXP_DT;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_TANK_CR = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_TANK_CR;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_TANK_DR = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_TANK_DR;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_TANK_UNCOL = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_TANK_UNCOL;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_UNAUTH_DR = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_UNAUTH_DR;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_DR = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_UNAUTH_TANK_DR;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_UNAUTH_CR = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_UNAUTH_CR;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_CR = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_UNAUTH_TANK_CR;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_UNAUTH_UNCOL = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_UNAUTH_UNCOL;
-		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_UNCOL = inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_UNAUTH_TANK_UNCOL;
+		SET outputbodyRef."ACC-Balance".ACC_BAL.BRANCH_CODE = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:BRANCH_CODE,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.CUST_AC_NO = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:CUST_AC_NO,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.CCY = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:CCY,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.TRNDT = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:TRNDT,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.OPNBAL = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:OPNBAL,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.CURBAL = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:CURBAL,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.AVLBAL = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:AVLBAL,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.UNCOLAMT = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:UNCOLAMT,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.AVLCR = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:AVLCR,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.MTDTOVCR = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:MTDTOVCR,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.MTDTOVDR = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:MTDTOVDR,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_BKD_AMT = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_BKD_AMT,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.ACCR_DR = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACCR_DR,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.ACCR_CR = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACCR_CR,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.SUBLIMIT = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:SUBLIMIT,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.TODLIMIT = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:TODLIMIT,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.TOD_ST_DT = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:TOD_ST_DT,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.TOD_EXP_DT = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:TOD_EXP_DT,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_TANK_CR = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_TANK_CR,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_TANK_DR = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_TANK_DR,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_TANK_UNCOL = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_TANK_UNCOL,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_UNAUTH_DR = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_UNAUTH_DR,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_DR = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_UNAUTH_TANK_DR,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_UNAUTH_CR = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_UNAUTH_CR,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_CR = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_UNAUTH_TANK_CR,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_UNAUTH_UNCOL = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_UNAUTH_UNCOL,'');
+		SET outputbodyRef."ACC-Balance".ACC_BAL.ACY_UNAUTH_TANK_UNCOL = NULLIF(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:ACY_UNAUTH_TANK_UNCOL,'');
 
 		SET I = 1;
-		SET J = CARDINALITY(inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:INTLIQD[]);
 		MOVE inRef TO inputBodyRef.*:"ACC-Balance".*:ACC_BAL.*:INTLIQD[>];
-		WHILE I<=J DO
-			SET outputbodyRef."ACC-Balance".ACC_BAL.INTLIQD[I].*:INTPRD = inRef.*:INTPRD;
-			SET outputbodyRef."ACC-Balance".ACC_BAL.INTLIQD[I].*:NXTLIQDT = inRef.*:NXTLIQDT;
+		WHILE LASTMOVE(inRef) DO
+			SET outputbodyRef."ACC-Balance".ACC_BAL.INTLIQD[I].*:INTPRD = NULLIF(inRef.*:INTPRD,'');
+			SET outputbodyRef."ACC-Balance".ACC_BAL.INTLIQD[I].*:NXTLIQDT = NULLIF(inRef.*:NXTLIQDT,'');
 			SET I = I + 1;
 			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;
 
 		SET I = 1;
-		SET J = CARDINALITY(inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[]);
 		MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
-		WHILE I<=J Do
-			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = inRef.*:ECODE;
-			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = inRef.*:EDESC;
+		WHILE LASTMOVE(inRef) Do
+			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = NULLIF(inRef.*:ECODE,'');
+			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = NULLIF(inRef.*:EDESC,'');
 			SET I = I + 1;
 			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;
 
 		SET I = 1;
-		SET J = CARDINALITY(inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[]);
 		MOVE inRef TO inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
-		WHILE I<=J Do
-			SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = inRef.*:WCODE;
-			SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = inRef.*:WDESC;
+		WHILE LASTMOVE(inRef) Do
+			SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
+			SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
 			SET I = I + 1;
 			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;

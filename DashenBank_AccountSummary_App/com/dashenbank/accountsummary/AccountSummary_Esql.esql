@@ -1,9 +1,5 @@
 
 
-
-
-
-
 BROKER SCHEMA com.dashenbank.accountsummary
 PATH com.dashenbank.genericfunctions;
 -- DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
@@ -83,9 +79,8 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		SET outputHeaderRef.ns:USERID = inputHeaderRef.*:USERID;
 
 		DECLARE I INTEGER 1;
-		DECLARE J INTEGER CARDINALITY(inputHeaderRef.*:ADDL[]);
 		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL[>];
-		WHILE I<=J DO
+		WHILE LASTMOVE(inRef) DO
 			SET outputHeaderRef.ns:ADDL[I].NAME = inRef.*:NAME;
 			SET outputHeaderRef.ns:ADDL[I].VALUE = inRef.*:VALUE;
 			SET I = I + 1;
@@ -160,77 +155,69 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		DECLARE outputheaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES.FCUBS_HEADER;
 		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES.FCUBS_BODY;
 
-		SET outputheaderRef.ACTION = inputHeaderRef.*:ACTION;
-		SET outputheaderRef.BRANCH = inputHeaderRef.*:BRANCH;
-		SET outputheaderRef.CORRELID = inputHeaderRef.*:CORRELID;
-		SET outputheaderRef.DESTINATION = inputHeaderRef.*:DESTINATION;
-		SET outputheaderRef.ENTITY = inputHeaderRef.*:ENTITY;
-		SET outputheaderRef.FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
-		SET outputheaderRef.MODULEID = inputHeaderRef.*:MODULEID;
-		SET outputheaderRef.MSGID = inputHeaderRef.*:MSGID;
-		SET outputheaderRef.MULTITRIPID = inputHeaderRef.*:MULTITRIPID;
-		SET outputheaderRef.OPERATION = inputHeaderRef.*:OPERATION;
-		SET outputheaderRef.SERVICE = inputHeaderRef.*:SERVICE;
-		SET outputheaderRef.SOURCE = inputHeaderRef.*:SOURCE;
-		SET outputheaderRef.SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
-		SET outputheaderRef.UBSCOMP = inputHeaderRef.*:UBSCOMP;
-		SET outputheaderRef.USERID = inputHeaderRef.*:USERID;
-		SET outputheaderRef.SOURCE_USERID = inputHeaderRef.*:SOURCE_USERID;
-		SET outputheaderRef.SNAPSHOTID = inputHeaderRef.*:SNAPSHOTID;
-		SET outputheaderRef.PASSWORD = inputHeaderRef.*:PASSWORD;
-		SET outputheaderRef.MSGSTAT = inputHeaderRef.*:MSGSTAT;
+		SET outputheaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
+		SET outputheaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
+		SET outputheaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
+		SET outputheaderRef.DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
+		SET outputheaderRef.ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
+		SET outputheaderRef.FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
+		SET outputheaderRef.MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
+		SET outputheaderRef.MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
+		SET outputheaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
+		SET outputheaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
+		SET outputheaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
+		SET outputheaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
+		SET outputheaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
+		SET outputheaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
+		SET outputheaderRef.USERID = NULLIF(inputHeaderRef.*:USERID,'');
+		SET outputheaderRef.SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
+		SET outputheaderRef.SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
+		SET outputheaderRef.PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
+		SET outputheaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
+
 		DECLARE I INTEGER 1;
-		DECLARE J INTEGER CARDINALITY(inputHeaderRef.*:ADDL.*:PARAM[]);
 		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
-		WHILE I<=J DO
-			SET outputheaderRef.ADDL.PARAM[I].NAME = inRef.*:NAME;
-			SET outputheaderRef.ADDL.PARAM[I].VALUE = inRef.*:VALUE;
+		WHILE LASTMOVE(inRef) DO
+			SET outputheaderRef.ADDL.PARAM[I].NAME = NULLIF(inRef.*:NAME,'');
+			SET outputheaderRef.ADDL.PARAM[I].VALUE = NULLIF(inRef.*:VALUE,'');
 			SET I = I + 1;
 			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;
 
-		IF inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO IS NOT NULL THEN
-			SET outputbodyRef."Stvw-Account-Sumary-IO".CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO;
-		END IF;
+		SET outputbodyRef."Stvw-Account-Sumary-IO".CUST_NO = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO,'');
 
-		IF inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO IS NOT NULL THEN
+		SET outputbodyRef."Stvw-Account-Sumary-Full".CUST_NO = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO,'');
 
-			SET outputbodyRef."Stvw-Account-Sumary-Full".CUST_NO = inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO;
-			DECLARE I INTEGER 1;
-			DECLARE J INTEGER CARDINALITY(inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A"[]);
-             DECLARE inRef REFERENCE TO inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A";
-			WHILE I<=J DO
-				SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A"[I].CUSTACNO = inRef.*:CUSTACNO;
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A"[I].BRANCH_CODE = inRef.*:BRANCH_CODE;
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A"[I].CCY = inRef.*:CCY;
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A"[I].CURRBAL = inRef.*:CURRBAL;
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A"[I].ACCOUNT_TYPE = inRef.*:ACCOUNT_TYPE;
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A"[I].CUSTOMER_NAME = inRef.*:CUSTOMER_NAME;
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A"[I].AC_DESC = inRef.*:AC_DESC;
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A"[I].ACCOUNT_CLASS = inRef.*:ACCOUNT_CLASS;
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary--A"[I].ACCLASSDESC = inRef.*:ACCLASSDESC;
+		SET I = 1;
+		MOVE inRef TO inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A";
+		WHILE LASTMOVE(inRef) DO
+			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].CUSTACNO = NULLIF(inRef.*:CUSTACNO,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].BRANCH_CODE = NULLIF(inRef.*:BRANCH_CODE,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].CCY = NULLIF(inRef.*:CCY,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].CURRBAL = NULLIF(inRef.*:CURRBAL,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].ACCOUNT_TYPE = NULLIF(inRef.*:ACCOUNT_TYPE,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].CUSTOMER_NAME = NULLIF(inRef.*:CUSTOMER_NAME,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].AC_DESC = NULLIF(inRef.*:AC_DESC,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].ACCOUNT_CLASS = NULLIF(inRef.*:ACCOUNT_CLASS,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].ACCLASSDESC = NULLIF(inRef.*:ACCLASSDESC,'');
 			SET I=I+1;
-				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-			END WHILE;
-			
-		END IF;
+			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+		END WHILE;
 
 		SET I = 1;
-		SET J = CARDINALITY(inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[]);
 		MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
-		WHILE I<=J Do
-			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = inRef.*:ECODE;
-			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = inRef.*:EDESC;
+		WHILE LASTMOVE(inRef) Do
+			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = NULLIF(inRef.*:ECODE,'');
+			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = NULLIF(inRef.*:EDESC,'');
 			SET I = I + 1;
 			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;
 
 		SET I = 1;
-		SET J = CARDINALITY(inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[]);
 		MOVE inRef TO inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
-		WHILE I<=J Do
-			SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = inRef.*:WCODE;
-			SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = inRef.*:WDESC;
+		WHILE LASTMOVE(inRef) Do
+			SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
+			SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
 			SET I = I + 1;
 			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;
