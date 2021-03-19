@@ -187,19 +187,20 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		SET outputbodyRef."Stvw-Account-Sumary-IO".CUST_NO = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO,'');
 
 		SET outputbodyRef."Stvw-Account-Sumary-Full".CUST_NO = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO,'');
-
+        
+        SET Environment.Summary = 'Stvw-Account-Sumary--A';
 		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A";
+		MOVE inRef TO inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A";
 		WHILE LASTMOVE(inRef) DO
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].CUSTACNO = NULLIF(inRef.*:CUSTACNO,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].BRANCH_CODE = NULLIF(inRef.*:BRANCH_CODE,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].CCY = NULLIF(inRef.*:CCY,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].CURRBAL = NULLIF(inRef.*:CURRBAL,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].ACCOUNT_TYPE = NULLIF(inRef.*:ACCOUNT_TYPE,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].CUSTOMER_NAME = NULLIF(inRef.*:CUSTOMER_NAME,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].AC_DESC = NULLIF(inRef.*:AC_DESC,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].ACCOUNT_CLASS = NULLIF(inRef.*:ACCOUNT_CLASS,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full"."Stvw-Account-Sumary --A"[I].ACCLASSDESC = NULLIF(inRef.*:ACCLASSDESC,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CUSTACNO = NULLIF(inRef.*:CUSTACNO,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].BRANCH_CODE = NULLIF(inRef.*:BRANCH_CODE,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CCY = NULLIF(inRef.*:CCY,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CURRBAL = NULLIF(inRef.*:CURRBAL,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].ACCOUNT_TYPE = NULLIF(inRef.*:ACCOUNT_TYPE,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CUSTOMER_NAME = NULLIF(inRef.*:CUSTOMER_NAME,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].AC_DESC = NULLIF(inRef.*:AC_DESC,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].ACCOUNT_CLASS = NULLIF(inRef.*:ACCOUNT_CLASS,'');
+			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].ACCLASSDESC = NULLIF(inRef.*:ACCLASSDESC,'');
 			SET I=I+1;
 			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;
