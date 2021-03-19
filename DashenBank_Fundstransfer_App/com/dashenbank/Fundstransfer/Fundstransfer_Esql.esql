@@ -51,39 +51,47 @@ CREATE COMPUTE MODULE RequestToBackend
 		----------------- Generating request to flexcube ----------------
 		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER;
 		DECLARE inputBodyref REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details";
-
+				
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
+		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
+		
+		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'CREATETRANSACTION_FSFS_RES';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES NAMESPACE ns NAME 'FCUBS_HEADER';		
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES NAMESPACE ns NAME 'FCUBS_BODY';
+		
+		DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES.ns:FCUBS_BODY;
+		DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES.ns:FCUBS_HEADER;
+		
+        SET outputHeaderRef.ns:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outputHeaderRef.ns:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outputHeaderRef.ns:MSGID = inputHeaderRef.*:MSGID;
+		SET outputHeaderRef.ns:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outputHeaderRef.ns:USERID = inputHeaderRef.*:USERID;
+		SET outputHeaderRef.ns:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outputHeaderRef.ns:MODULEID = inputHeaderRef.*:MODULEID;
+		SET outputHeaderRef.ns:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outputHeaderRef.ns:OPERATION = inputHeaderRef.*:OPERATION;
+		SET outputHeaderRef.ns:SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
+		SET outputHeaderRef.ns:MSGSTAT = inputHeaderRef.*:MSGSTAT;
 
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MSGID = inputHeaderRef.*:MSGID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MODULEID = inputHeaderRef.*:MODULEID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
-
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:XREF = inputBodyref.*:XREF;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:PRD = inputBodyref.*:PRD;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:BRN = inputBodyref.*:BRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNBRN = inputBodyref.*:TXNBRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNACC = inputBodyref.*:TXNACC;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNCCY = inputBodyref.*:TXNCCY;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNAMT = inputBodyref.*:TXNAMT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNTRN = inputBodyref.*:TXNTRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETBRN = inputBodyref.*:OFFSETBRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETACC = inputBodyref.*:OFFSETACC;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETCCY = inputBodyref.*:OFFSETCCY;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETAMT = inputBodyref.*:OFFSETAMT;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:OFFSETTRN = inputBodyref.*:OFFSETTRN;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:XRATE = inputBodyref.*:XRATE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:TXNDATE = inputBodyref.*:TXNDATE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:VALDATE = inputBodyref.*:VALDATE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details".*:NARRATIVE = inputBodyref.*:NARRATIVE;
+		SET outputBodyRef.ns:"Transaction-Details".ns:XREF = inputBodyref.*:XREF;
+		SET outputBodyRef.ns:"Transaction-Details".ns:PRD = inputBodyref.*:PRD;
+		SET outputBodyRef.ns:"Transaction-Details".ns:BRN = inputBodyref.*:BRN;
+		SET outputBodyRef.ns:"Transaction-Details".ns:TXNBRN = inputBodyref.*:TXNBRN;
+		SET outputBodyRef.ns:"Transaction-Details".ns:TXNACC = inputBodyref.*:TXNACC;
+		SET outputBodyRef.ns:"Transaction-Details".ns:TXNCCY = inputBodyref.*:TXNCCY;
+		SET outputBodyRef.ns:"Transaction-Details".ns:TXNAMT = inputBodyref.*:TXNAMT;
+		SET outputBodyRef.ns:"Transaction-Details".ns:TXNTRN = inputBodyref.*:TXNTRN;
+		SET outputBodyRef.ns:"Transaction-Details".ns:OFFSETBRN = inputBodyref.*:OFFSETBRN;
+		SET outputBodyRef.ns:"Transaction-Details".ns:OFFSETACC = inputBodyref.*:OFFSETACC;
+		SET outputBodyRef.ns:"Transaction-Details".ns:OFFSETCCY = inputBodyref.*:OFFSETCCY;
+		SET outputBodyRef.ns:"Transaction-Details".ns:OFFSETAMT = inputBodyref.*:OFFSETAMT;
+		SET outputBodyRef.ns:"Transaction-Details".ns:OFFSETTRN = inputBodyref.*:OFFSETTRN;
+		SET outputBodyRef.ns:"Transaction-Details".ns:XRATE = inputBodyref.*:XRATE;
+		SET outputBodyRef.ns:"Transaction-Details".ns:TXNDATE = inputBodyref.*:TXNDATE;
+		SET outputBodyRef.ns:"Transaction-Details".ns:VALDATE = inputBodyref.*:VALDATE;
+		SET outputBodyRef.ns:"Transaction-Details".ns:NARRATIVE = inputBodyref.*:NARRATIVE;
 		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------Response Logging-------------------------
 		MOVE domainDataRef TO OutputRoot.SOAP;
@@ -137,22 +145,45 @@ CREATE COMPUTE MODULE ResponseToChannel
 		DECLARE inputWarningRef REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING;
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP;
-
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SOURCE = inputHeaderRef.*:SOURCE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:CORRELID = inputHeaderRef.*:CORRELID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:USERID = inputHeaderRef.*:USERID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:BRANCH = inputHeaderRef.*:BRANCH;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MODULEID = inputHeaderRef.*:MODULEID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SERVICE = inputHeaderRef.*:SERVICE;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:OPERATION = inputHeaderRef.*:OPERATION;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:SOURCE_USERID = inputHeaderRef.*:SOURCE_USERID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:DESTINATION = inputHeaderRef.*:DESTINATION;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:ACTION = inputHeaderRef.*:ACTION;
-		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
-
+		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
+		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'CREATETRANSACTION_FSFS_RES';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES NAMESPACE ns NAME 'FCUBS_HEADER';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES NAMESPACE ns NAME 'FCUBS_BODY';
+		
+		DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER;
+		DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES.FCUBS_BODY;
+		
+		SET outputBodyRef.ns:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outputBodyRef.ns:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outputBodyRef.ns:MSGID = inputHeaderRef.*:MSGID;
+		SET outputBodyRef.ns:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outputBodyRef.ns:USERID = inputHeaderRef.*:USERID;
+		SET outputBodyRef.ns:ENTITY = inputHeaderRef.*:ENTITY;
+		SET outputBodyRef.ns:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outputBodyRef.ns:MODULEID = inputHeaderRef.*:MODULEID;
+		SET outputBodyRef.ns:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outputBodyRef.ns:OPERATION = inputHeaderRef.*:OPERATION;
+		SET outputBodyRef.ns:SOURCE_USERID = inputHeaderRef.*:SOURCE_USERID;
+		SET outputBodyRef.ns:DESTINATION = inputHeaderRef.*:DESTINATION;
+		SET outputBodyRef.ns:MULTITRIPID = inputHeaderRef.*:MULTITRIPID;
+		SET outputBodyRef.ns:FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
+		SET outputBodyRef.ns:ACTION = inputHeaderRef.*:ACTION;
+		SET outputBodyRef.ns:MSGSTAT = inputHeaderRef.*:MSGSTAT;
+		SET outputBodyRef.ns:SNAPSHOTID = inputHeaderRef.*:SNAPSHOTID;
+		SET outputBodyRef.ns:PASSWORD = inputHeaderRef.*:PASSWORD;
+		
+		DECLARE I INTEGER 1;
+		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
+		WHILE LASTMOVE(inRef) DO
+			SET outputBodyRef.ns:ADDL.ns:PARAM[I].NAME = inRef.NAME;
+			SET outputBodyRef.ns:ADDL.ns:PARAM[I].VALUE = inRef.VALUE;
+			SET I = I + 1;
+			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+		END WHILE;
+		
+		
+		
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:XREF = inputBodyRef.*:XREF;
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:CCREF = inputBodyRef.*:FCCREF;
 		SET outputbodyRef.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details".*:PRD = inputBodyRef.*:PRD;
