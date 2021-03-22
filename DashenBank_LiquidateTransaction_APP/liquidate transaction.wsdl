@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://schemas.xmlsoap.org/wsdl/" name="FCUBSDDService" targetNamespace="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsp1_2="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <documentation>
+    <appinfo source="WMQI_APPINFO">
+      <MRWSDLAppInfo imported="true">
+        <binding hasEncoding="false" imported="true" name="FCUBSDDServiceSEIBinding" originalBindingStyle="document"/>
+      </MRWSDLAppInfo>
+    </appinfo>
+  </documentation>
+<types>
+<xsd:schema>
+<xsd:import namespace="http://fcubs.ofss.com/service/FCUBSDDService" schemaLocation="RemoteFiles/xsd_1.xsd"/>
+</xsd:schema>
+</types>
+<message name="AuthorizeInstrumentTypeIO">
+<part element="ns1:AUTHORIZEINSTRUMENTTYPE_IOPK_REQ" name="RequestMsg" xmlns:ns1="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="AuthorizeInstrumentTypeIOResponse">
+<part element="ns2:AUTHORIZEINSTRUMENTTYPE_IOPK_RES" name="ResponseMsg" xmlns:ns2="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="AuthorizeTransactionFS">
+<part element="ns3:AUTHORIZETRANSACTION_FSFS_REQ" name="RequestMsg" xmlns:ns3="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="AuthorizeTransactionFSResponse">
+<part element="ns4:AUTHORIZETRANSACTION_FSFS_RES" name="ResponseMsg" xmlns:ns4="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="ReverseTransactionFS">
+<part element="ns5:REVERSETRANSACTION_FSFS_REQ" name="RequestMsg" xmlns:ns5="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="ReverseTransactionFSResponse">
+<part element="ns6:REVERSETRANSACTION_FSFS_RES" name="ResponseMsg" xmlns:ns6="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CreateInstrumentTypeFS">
+<part element="ns7:CREATEINSTRUMENTTYPE_FSFS_REQ" name="RequestMsg" xmlns:ns7="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CreateInstrumentTypeFSResponse">
+<part element="ns8:CREATEINSTRUMENTTYPE_FSFS_RES" name="ResponseMsg" xmlns:ns8="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="QueryInstrumentTypeIO">
+<part element="ns9:QUERYINSTRUMENTTYPE_IOFS_REQ" name="RequestMsg" xmlns:ns9="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="QueryInstrumentTypeIOResponse">
+<part element="ns10:QUERYINSTRUMENTTYPE_IOFS_RES" name="ResponseMsg" xmlns:ns10="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CloseInstrumentTypeFS">
+<part element="ns11:CLOSEINSTRUMENTTYPE_FSFS_REQ" name="RequestMsg" xmlns:ns11="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CloseInstrumentTypeFSResponse">
+<part element="ns12:CLOSEINSTRUMENTTYPE_FSFS_RES" name="ResponseMsg" xmlns:ns12="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="AuthTCDenominationsIO">
+<part element="ns13:AUTHTCDENOMINATIONS_IOPK_REQ" name="RequestMsg" xmlns:ns13="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="AuthTCDenominationsIOResponse">
+<part element="ns14:AUTHTCDENOMINATIONS_IOPK_RES" name="ResponseMsg" xmlns:ns14="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CreateTransactionIO">
+<part element="ns15:CREATETRANSACTION_IOPK_REQ" name="RequestMsg" xmlns:ns15="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CreateTransactionIOResponse">
+<part element="ns16:CREATETRANSACTION_IOPK_RES" name="ResponseMsg" xmlns:ns16="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CloseInstrumentTypeIO">
+<part element="ns17:CLOSEINSTRUMENTTYPE_IOPK_REQ" name="RequestMsg" xmlns:ns17="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CloseInstrumentTypeIOResponse">
+<part element="ns18:CLOSEINSTRUMENTTYPE_IOPK_RES" name="ResponseMsg" xmlns:ns18="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="AuthTCDenominationsFS">
+<part element="ns19:AUTHTCDENOMINATIONS_FSFS_REQ" name="RequestMsg" xmlns:ns19="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="AuthTCDenominationsFSResponse">
+<part element="ns20:AUTHTCDENOMINATIONS_FSFS_RES" name="ResponseMsg" xmlns:ns20="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="ModifyInstrumentTypeIO">
+<part element="ns21:MODIFYINSTRUMENTTYPE_IOPK_REQ" name="RequestMsg" xmlns:ns21="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="ModifyInstrumentTypeIOResponse">
+<part element="ns22:MODIFYINSTRUMENTTYPE_IOPK_RES" name="ResponseMsg" xmlns:ns22="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="AuthorizeTransactionIO">
+<part element="ns23:AUTHORIZETRANSACTION_IOPK_REQ" name="RequestMsg" xmlns:ns23="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="AuthorizeTransactionIOResponse">
+<part element="ns24:AUTHORIZETRANSACTION_IOPK_RES" name="ResponseMsg" xmlns:ns24="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="DeleteInstrumentTypeFS">
+<part element="ns25:DELETEINSTRUMENTTYPE_FSFS_REQ" name="RequestMsg" xmlns:ns25="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="DeleteInstrumentTypeFSResponse">
+<part element="ns26:DELETEINSTRUMENTTYPE_FSFS_RES" name="ResponseMsg" xmlns:ns26="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="LiquidateTransactionFS">
+<part element="ns27:LIQUIDATETRANSACTION_FSFS_REQ" name="RequestMsg" xmlns:ns27="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="LiquidateTransactionFSResponse">
+<part element="ns28:LIQUIDATETRANSACTION_FSFS_RES" name="ResponseMsg" xmlns:ns28="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="ReopenInstrumentTypeFS">
+<part element="ns29:REOPENINSTRUMENTTYPE_FSFS_REQ" name="RequestMsg" xmlns:ns29="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="ReopenInstrumentTypeFSResponse">
+<part element="ns30:REOPENINSTRUMENTTYPE_FSFS_RES" name="ResponseMsg" xmlns:ns30="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="MultiCreateTransactionFS">
+<part element="ns31:MULTICREATETRANSACTION_FSFS_REQ" name="RequestMsg" xmlns:ns31="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="MultiCreateTransactionFSResponse">
+<part element="ns32:MULTICREATETRANSACTION_FSFS_RES" name="ResponseMsg" xmlns:ns32="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CreateTCDenominationsIO">
+<part element="ns33:CREATETCDENOMINATIONS_IOPK_REQ" name="RequestMsg" xmlns:ns33="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CreateTCDenominationsIOResponse">
+<part element="ns34:CREATETCDENOMINATIONS_IOPK_RES" name="ResponseMsg" xmlns:ns34="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="LiquidateTransactionIO">
+<part element="ns35:LIQUIDATETRANSACTION_IOPK_REQ" name="RequestMsg" xmlns:ns35="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="LiquidateTransactionIOResponse">
+<part element="ns36:LIQUIDATETRANSACTION_IOPK_RES" name="ResponseMsg" xmlns:ns36="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="MultiCreateTransactionIO">
+<part element="ns37:MULTICREATETRANSACTION_IOPK_REQ" name="RequestMsg" xmlns:ns37="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="MultiCreateTransactionIOResponse">
+<part element="ns38:MULTICREATETRANSACTION_IOPK_RES" name="ResponseMsg" xmlns:ns38="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="AuthorizeInstrumentTypeFS">
+<part element="ns39:AUTHORIZEINSTRUMENTTYPE_FSFS_REQ" name="RequestMsg" xmlns:ns39="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="AuthorizeInstrumentTypeFSResponse">
+<part element="ns40:AUTHORIZEINSTRUMENTTYPE_FSFS_RES" name="ResponseMsg" xmlns:ns40="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CreateTCDenominationsFS">
+<part element="ns41:CREATETCDENOMINATIONS_FSFS_REQ" name="RequestMsg" xmlns:ns41="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CreateTCDenominationsFSResponse">
+<part element="ns42:CREATETCDENOMINATIONS_FSFS_RES" name="ResponseMsg" xmlns:ns42="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CreateInstrumentTypeIO">
+<part element="ns43:CREATEINSTRUMENTTYPE_IOPK_REQ" name="RequestMsg" xmlns:ns43="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CreateInstrumentTypeIOResponse">
+<part element="ns44:CREATEINSTRUMENTTYPE_IOPK_RES" name="ResponseMsg" xmlns:ns44="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CreateTransactionFS">
+<part element="ns45:CREATETRANSACTION_FSFS_REQ" name="RequestMsg" xmlns:ns45="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="CreateTransactionFSResponse">
+<part element="ns46:CREATETRANSACTION_FSFS_RES" name="ResponseMsg" xmlns:ns46="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="QueryTransactionIO">
+<part element="ns47:QUERYTRANSACTION_IOFS_REQ" name="RequestMsg" xmlns:ns47="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="QueryTransactionIOResponse">
+<part element="ns48:QUERYTRANSACTION_IOFS_RES" name="ResponseMsg" xmlns:ns48="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="ReverseTransactionIO">
+<part element="ns49:REVERSETRANSACTION_IOPK_REQ" name="RequestMsg" xmlns:ns49="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="ReverseTransactionIOResponse">
+<part element="ns50:REVERSETRANSACTION_IOPK_RES" name="ResponseMsg" xmlns:ns50="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="DeleteInstrumentTypeIO">
+<part element="ns51:DELETEINSTRUMENTTYPE_IOPK_REQ" name="RequestMsg" xmlns:ns51="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="DeleteInstrumentTypeIOResponse">
+<part element="ns52:DELETEINSTRUMENTTYPE_IOPK_RES" name="ResponseMsg" xmlns:ns52="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="ReopenInstrumentTypeIO">
+<part element="ns53:REOPENINSTRUMENTTYPE_IOPK_REQ" name="RequestMsg" xmlns:ns53="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="ReopenInstrumentTypeIOResponse">
+<part element="ns54:REOPENINSTRUMENTTYPE_IOPK_RES" name="ResponseMsg" xmlns:ns54="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="QueryTCDenominationsIO">
+<part element="ns55:QUERYTCDENOMINATIONS_IOFS_REQ" name="RequestMsg" xmlns:ns55="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="QueryTCDenominationsIOResponse">
+<part element="ns56:QUERYTCDENOMINATIONS_IOFS_RES" name="ResponseMsg" xmlns:ns56="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="ModifyInstrumentTypeFS">
+<part element="ns57:MODIFYINSTRUMENTTYPE_FSFS_REQ" name="RequestMsg" xmlns:ns57="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<message name="ModifyInstrumentTypeFSResponse">
+<part element="ns58:MODIFYINSTRUMENTTYPE_FSFS_RES" name="ResponseMsg" xmlns:ns58="http://fcubs.ofss.com/service/FCUBSDDService"/>
+</message>
+<portType name="FCUBSDDServiceSEI">
+<operation name="AuthorizeInstrumentTypeIO">
+<input message="tns:AuthorizeInstrumentTypeIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/AuthorizeInstrumentTypeIORequest"/>
+<output message="tns:AuthorizeInstrumentTypeIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/AuthorizeInstrumentTypeIOResponse"/>
+</operation>
+<operation name="AuthorizeTransactionFS">
+<input message="tns:AuthorizeTransactionFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/AuthorizeTransactionFSRequest"/>
+<output message="tns:AuthorizeTransactionFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/AuthorizeTransactionFSResponse"/>
+</operation>
+<operation name="ReverseTransactionFS">
+<input message="tns:ReverseTransactionFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/ReverseTransactionFSRequest"/>
+<output message="tns:ReverseTransactionFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/ReverseTransactionFSResponse"/>
+</operation>
+<operation name="CreateInstrumentTypeFS">
+<input message="tns:CreateInstrumentTypeFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CreateInstrumentTypeFSRequest"/>
+<output message="tns:CreateInstrumentTypeFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CreateInstrumentTypeFSResponse"/>
+</operation>
+<operation name="QueryInstrumentTypeIO">
+<input message="tns:QueryInstrumentTypeIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/QueryInstrumentTypeIORequest"/>
+<output message="tns:QueryInstrumentTypeIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/QueryInstrumentTypeIOResponse"/>
+</operation>
+<operation name="CloseInstrumentTypeFS">
+<input message="tns:CloseInstrumentTypeFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CloseInstrumentTypeFSRequest"/>
+<output message="tns:CloseInstrumentTypeFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CloseInstrumentTypeFSResponse"/>
+</operation>
+<operation name="AuthTCDenominationsIO">
+<input message="tns:AuthTCDenominationsIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/AuthTCDenominationsIORequest"/>
+<output message="tns:AuthTCDenominationsIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/AuthTCDenominationsIOResponse"/>
+</operation>
+<operation name="CreateTransactionIO">
+<input message="tns:CreateTransactionIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CreateTransactionIORequest"/>
+<output message="tns:CreateTransactionIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CreateTransactionIOResponse"/>
+</operation>
+<operation name="CloseInstrumentTypeIO">
+<input message="tns:CloseInstrumentTypeIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CloseInstrumentTypeIORequest"/>
+<output message="tns:CloseInstrumentTypeIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CloseInstrumentTypeIOResponse"/>
+</operation>
+<operation name="AuthTCDenominationsFS">
+<input message="tns:AuthTCDenominationsFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/AuthTCDenominationsFSRequest"/>
+<output message="tns:AuthTCDenominationsFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/AuthTCDenominationsFSResponse"/>
+</operation>
+<operation name="ModifyInstrumentTypeIO">
+<input message="tns:ModifyInstrumentTypeIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/ModifyInstrumentTypeIORequest"/>
+<output message="tns:ModifyInstrumentTypeIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/ModifyInstrumentTypeIOResponse"/>
+</operation>
+<operation name="AuthorizeTransactionIO">
+<input message="tns:AuthorizeTransactionIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/AuthorizeTransactionIORequest"/>
+<output message="tns:AuthorizeTransactionIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/AuthorizeTransactionIOResponse"/>
+</operation>
+<operation name="DeleteInstrumentTypeFS">
+<input message="tns:DeleteInstrumentTypeFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/DeleteInstrumentTypeFSRequest"/>
+<output message="tns:DeleteInstrumentTypeFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/DeleteInstrumentTypeFSResponse"/>
+</operation>
+<operation name="LiquidateTransactionFS">
+<input message="tns:LiquidateTransactionFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/LiquidateTransactionFSRequest"/>
+<output message="tns:LiquidateTransactionFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/LiquidateTransactionFSResponse"/>
+</operation>
+<operation name="ReopenInstrumentTypeFS">
+<input message="tns:ReopenInstrumentTypeFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/ReopenInstrumentTypeFSRequest"/>
+<output message="tns:ReopenInstrumentTypeFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/ReopenInstrumentTypeFSResponse"/>
+</operation>
+<operation name="MultiCreateTransactionFS">
+<input message="tns:MultiCreateTransactionFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/MultiCreateTransactionFSRequest"/>
+<output message="tns:MultiCreateTransactionFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/MultiCreateTransactionFSResponse"/>
+</operation>
+<operation name="CreateTCDenominationsIO">
+<input message="tns:CreateTCDenominationsIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CreateTCDenominationsIORequest"/>
+<output message="tns:CreateTCDenominationsIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CreateTCDenominationsIOResponse"/>
+</operation>
+<operation name="LiquidateTransactionIO">
+<input message="tns:LiquidateTransactionIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/LiquidateTransactionIORequest"/>
+<output message="tns:LiquidateTransactionIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/LiquidateTransactionIOResponse"/>
+</operation>
+<operation name="MultiCreateTransactionIO">
+<input message="tns:MultiCreateTransactionIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/MultiCreateTransactionIORequest"/>
+<output message="tns:MultiCreateTransactionIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/MultiCreateTransactionIOResponse"/>
+</operation>
+<operation name="AuthorizeInstrumentTypeFS">
+<input message="tns:AuthorizeInstrumentTypeFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/AuthorizeInstrumentTypeFSRequest"/>
+<output message="tns:AuthorizeInstrumentTypeFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/AuthorizeInstrumentTypeFSResponse"/>
+</operation>
+<operation name="CreateTCDenominationsFS">
+<input message="tns:CreateTCDenominationsFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CreateTCDenominationsFSRequest"/>
+<output message="tns:CreateTCDenominationsFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CreateTCDenominationsFSResponse"/>
+</operation>
+<operation name="CreateInstrumentTypeIO">
+<input message="tns:CreateInstrumentTypeIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CreateInstrumentTypeIORequest"/>
+<output message="tns:CreateInstrumentTypeIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CreateInstrumentTypeIOResponse"/>
+</operation>
+<operation name="CreateTransactionFS">
+<input message="tns:CreateTransactionFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CreateTransactionFSRequest"/>
+<output message="tns:CreateTransactionFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/CreateTransactionFSResponse"/>
+</operation>
+<operation name="QueryTransactionIO">
+<input message="tns:QueryTransactionIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/QueryTransactionIORequest"/>
+<output message="tns:QueryTransactionIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/QueryTransactionIOResponse"/>
+</operation>
+<operation name="ReverseTransactionIO">
+<input message="tns:ReverseTransactionIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/ReverseTransactionIORequest"/>
+<output message="tns:ReverseTransactionIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/ReverseTransactionIOResponse"/>
+</operation>
+<operation name="DeleteInstrumentTypeIO">
+<input message="tns:DeleteInstrumentTypeIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/DeleteInstrumentTypeIORequest"/>
+<output message="tns:DeleteInstrumentTypeIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/DeleteInstrumentTypeIOResponse"/>
+</operation>
+<operation name="ReopenInstrumentTypeIO">
+<input message="tns:ReopenInstrumentTypeIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/ReopenInstrumentTypeIORequest"/>
+<output message="tns:ReopenInstrumentTypeIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/ReopenInstrumentTypeIOResponse"/>
+</operation>
+<operation name="QueryTCDenominationsIO">
+<input message="tns:QueryTCDenominationsIO" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/QueryTCDenominationsIORequest"/>
+<output message="tns:QueryTCDenominationsIOResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/QueryTCDenominationsIOResponse"/>
+</operation>
+<operation name="ModifyInstrumentTypeFS">
+<input message="tns:ModifyInstrumentTypeFS" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/ModifyInstrumentTypeFSRequest"/>
+<output message="tns:ModifyInstrumentTypeFSResponse" wsam:Action="http://FCUBSDDService.types.ws.gw.fcubs.ofss.com/FCUBSDDServiceSEI/ModifyInstrumentTypeFSResponse"/>
+</operation>
+</portType>
+<binding name="FCUBSDDServiceSEIBinding" type="tns:FCUBSDDServiceSEI">
+<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+<operation name="AuthorizeInstrumentTypeIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeTransactionFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ReverseTransactionFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateInstrumentTypeFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="QueryInstrumentTypeIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CloseInstrumentTypeFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthTCDenominationsIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateTransactionIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CloseInstrumentTypeIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthTCDenominationsFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ModifyInstrumentTypeIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeTransactionIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteInstrumentTypeFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="LiquidateTransactionFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ReopenInstrumentTypeFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="MultiCreateTransactionFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateTCDenominationsIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="LiquidateTransactionIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="MultiCreateTransactionIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="AuthorizeInstrumentTypeFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateTCDenominationsFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateInstrumentTypeIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="CreateTransactionFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="QueryTransactionIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ReverseTransactionIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="DeleteInstrumentTypeIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ReopenInstrumentTypeIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="QueryTCDenominationsIO">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="ModifyInstrumentTypeFS">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+</binding>
+<service name="FCUBSDDService">
+<port binding="tns:FCUBSDDServiceSEIBinding" name="FCUBSDDServiceSEI">
+<soap:address location="http://172.30.1.29:7005/FCUBSDDService/FCUBSDDService"/>
+</port>
+</service>
+</definitions>

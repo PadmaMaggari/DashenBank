@@ -1,0 +1,111 @@
+
+
+Importing file: C:\Users\Administrator\git\DashenBank\DashenBank_LiquidateTransaction_APP\liquidate transaction.wsdl
+
+
+The following is a list of WS-I warning messages found when importing:
+XSD: There is no xmlns declaration for namespace 'http://fcubs.ofss.com/service/FCUBSDDService', Line: 4, Column: 1
+
+
+The WSDL import will proceed with bindings FCUBSDDServiceSEIBinding.
+Creating wsdl schema document for file:///C:/Users/Administrator/git/DashenBank/DashenBank_LiquidateTransaction_APP/liquidate transaction.wsdl.
+Parsing wsdl binding {http://FCUBSDDService.types.ws.gw.fcubs.ofss.com}FCUBSDDServiceSEIBinding.
+Parsing wsdl binding input AuthorizeInstrumentTypeIO.
+Parsing wsdl binding output AuthorizeInstrumentTypeIO.
+Parsing wsdl binding input AuthorizeTransactionFS.
+Parsing wsdl binding output AuthorizeTransactionFS.
+Parsing wsdl binding input ReverseTransactionFS.
+Parsing wsdl binding output ReverseTransactionFS.
+Parsing wsdl binding input CreateInstrumentTypeFS.
+Parsing wsdl binding output CreateInstrumentTypeFS.
+Parsing wsdl binding input QueryInstrumentTypeIO.
+Parsing wsdl binding output QueryInstrumentTypeIO.
+Parsing wsdl binding input CloseInstrumentTypeFS.
+Parsing wsdl binding output CloseInstrumentTypeFS.
+Parsing wsdl binding input AuthTCDenominationsIO.
+Parsing wsdl binding output AuthTCDenominationsIO.
+Parsing wsdl binding input CreateTransactionIO.
+Parsing wsdl binding output CreateTransactionIO.
+Parsing wsdl binding input CloseInstrumentTypeIO.
+Parsing wsdl binding output CloseInstrumentTypeIO.
+Parsing wsdl binding input AuthTCDenominationsFS.
+Parsing wsdl binding output AuthTCDenominationsFS.
+Parsing wsdl binding input ModifyInstrumentTypeIO.
+Parsing wsdl binding output ModifyInstrumentTypeIO.
+Parsing wsdl binding input AuthorizeTransactionIO.
+Parsing wsdl binding output AuthorizeTransactionIO.
+Parsing wsdl binding input DeleteInstrumentTypeFS.
+Parsing wsdl binding output DeleteInstrumentTypeFS.
+Parsing wsdl binding input LiquidateTransactionFS.
+Parsing wsdl binding output LiquidateTransactionFS.
+Parsing wsdl binding input ReopenInstrumentTypeFS.
+Parsing wsdl binding output ReopenInstrumentTypeFS.
+Parsing wsdl binding input MultiCreateTransactionFS.
+Parsing wsdl binding output MultiCreateTransactionFS.
+Parsing wsdl binding input CreateTCDenominationsIO.
+Parsing wsdl binding output CreateTCDenominationsIO.
+Parsing wsdl binding input LiquidateTransactionIO.
+Parsing wsdl binding output LiquidateTransactionIO.
+Parsing wsdl binding input MultiCreateTransactionIO.
+Parsing wsdl binding output MultiCreateTransactionIO.
+Parsing wsdl binding input AuthorizeInstrumentTypeFS.
+Parsing wsdl binding output AuthorizeInstrumentTypeFS.
+Parsing wsdl binding input CreateTCDenominationsFS.
+Parsing wsdl binding output CreateTCDenominationsFS.
+Parsing wsdl binding input CreateInstrumentTypeIO.
+Parsing wsdl binding output CreateInstrumentTypeIO.
+Parsing wsdl binding input CreateTransactionFS.
+Parsing wsdl binding output CreateTransactionFS.
+Parsing wsdl binding input QueryTransactionIO.
+Parsing wsdl binding output QueryTransactionIO.
+Parsing wsdl binding input ReverseTransactionIO.
+Parsing wsdl binding output ReverseTransactionIO.
+Parsing wsdl binding input DeleteInstrumentTypeIO.
+Parsing wsdl binding output DeleteInstrumentTypeIO.
+Parsing wsdl binding input ReopenInstrumentTypeIO.
+Parsing wsdl binding output ReopenInstrumentTypeIO.
+Parsing wsdl binding input QueryTCDenominationsIO.
+Parsing wsdl binding output QueryTCDenominationsIO.
+Parsing wsdl binding input ModifyInstrumentTypeFS.
+Parsing wsdl binding output ModifyInstrumentTypeFS.
+Processing doc style for operation AuthorizeInstrumentTypeIO.
+Processing doc style for operation AuthorizeTransactionFS.
+Processing doc style for operation ReverseTransactionFS.
+Processing doc style for operation CreateInstrumentTypeFS.
+Processing doc style for operation QueryInstrumentTypeIO.
+Processing doc style for operation CloseInstrumentTypeFS.
+Processing doc style for operation AuthTCDenominationsIO.
+Processing doc style for operation CreateTransactionIO.
+Processing doc style for operation CloseInstrumentTypeIO.
+Processing doc style for operation AuthTCDenominationsFS.
+Processing doc style for operation ModifyInstrumentTypeIO.
+Processing doc style for operation AuthorizeTransactionIO.
+Processing doc style for operation DeleteInstrumentTypeFS.
+Processing doc style for operation LiquidateTransactionFS.
+Processing doc style for operation ReopenInstrumentTypeFS.
+Processing doc style for operation MultiCreateTransactionFS.
+Processing doc style for operation CreateTCDenominationsIO.
+Processing doc style for operation LiquidateTransactionIO.
+Processing doc style for operation MultiCreateTransactionIO.
+Processing doc style for operation AuthorizeInstrumentTypeFS.
+Processing doc style for operation CreateTCDenominationsFS.
+Processing doc style for operation CreateInstrumentTypeIO.
+Processing doc style for operation CreateTransactionFS.
+Processing doc style for operation QueryTransactionIO.
+Processing doc style for operation ReverseTransactionIO.
+Processing doc style for operation DeleteInstrumentTypeIO.
+Processing doc style for operation ReopenInstrumentTypeIO.
+Processing doc style for operation QueryTCDenominationsIO.
+Processing doc style for operation ModifyInstrumentTypeFS.
+Populating WSDL schema liquidate transaction.xsd.
+Creating file liquidate transaction.xsd in the workspace.
+Creating file /DashenBank_LiquidateTransaction_App/DashenBank_LiquidateTransaction_App/RemoteFiles/xsd_1.xsd in the workspace.
+Copying source WSDL liquidate transaction.wsdl to liquidate transaction.wsdl.
+
+Elapsed time processing this message definition file: 0.537 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+
