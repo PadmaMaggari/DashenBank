@@ -140,117 +140,115 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RESP data  is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		-------------- Generating response to channel ---------------
-		
+
 		IF InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:MSGSTAT IS NULL OR FIELDVALUE(InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:MSGSTAT) IS NULL THEN
 			SET OutputRoot = InputRoot;
 
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 			PROPAGATE TO TERMINAL 'out' DELETE NONE;
 		ELSE
+			SET OutputRoot.Properties = InputRoot.Properties;
+			SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
 			CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 
-		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER;
-		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY;
+			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER;
+			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY;
 
-		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
+			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
-		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'QUERYACCSUMM_IOFS_RES';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES NAME 'FCUBS_HEADER';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES NAME 'FCUBS_BODY';
+			CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'QUERYACCSUMM_IOFS_RES';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES NAME 'FCUBS_HEADER';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES NAME 'FCUBS_BODY';
 
-		DECLARE outputheaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES.FCUBS_HEADER;
-		DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES.FCUBS_BODY;
+			DECLARE outputheaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES.FCUBS_HEADER;
+			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES.FCUBS_BODY;
 
-		SET outputheaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
-		SET outputheaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
-		SET outputheaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
-		SET outputheaderRef.DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
-		SET outputheaderRef.ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
-		SET outputheaderRef.FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
-		SET outputheaderRef.MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
-		SET outputheaderRef.MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
-		SET outputheaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
-		SET outputheaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
-		SET outputheaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
-		SET outputheaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
-		SET outputheaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
-		SET outputheaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
-		SET outputheaderRef.USERID = NULLIF(inputHeaderRef.*:USERID,'');
-		SET outputheaderRef.SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
-		SET outputheaderRef.SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
-		SET outputheaderRef.PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
-		SET outputheaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
+			SET outputheaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
+			SET outputheaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
+			SET outputheaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
+			SET outputheaderRef.DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
+			SET outputheaderRef.ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
+			SET outputheaderRef.FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
+			SET outputheaderRef.MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
+			SET outputheaderRef.MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
+			SET outputheaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
+			SET outputheaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
+			SET outputheaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
+			SET outputheaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
+			SET outputheaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
+			SET outputheaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
+			SET outputheaderRef.USERID = NULLIF(inputHeaderRef.*:USERID,'');
+			SET outputheaderRef.SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
+			SET outputheaderRef.SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
+			SET outputheaderRef.PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
+			SET outputheaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
 
-		DECLARE I INTEGER 1;
-		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputheaderRef.ADDL.PARAM[I].NAME = NULLIF(inRef.*:NAME,'');
-			SET outputheaderRef.ADDL.PARAM[I].VALUE = NULLIF(inRef.*:VALUE,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			DECLARE I INTEGER 1;
+			DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputheaderRef.ADDL.PARAM[I].NAME = NULLIF(inRef.*:NAME,'');
+				SET outputheaderRef.ADDL.PARAM[I].VALUE = NULLIF(inRef.*:VALUE,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
 
-		SET outputbodyRef."Stvw-Account-Sumary-IO".CUST_NO = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO,'');
+			SET outputbodyRef."Stvw-Account-Sumary-IO".CUST_NO = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO,'');
 
-		SET outputbodyRef."Stvw-Account-Sumary-Full".CUST_NO = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO,'');
-        
-        SET Environment.Summary = 'Stvw-Account-Sumary--A';
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary--A";
-		WHILE LASTMOVE(inRef) DO
-			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CUSTACNO = NULLIF(inRef.*:CUSTACNO,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].BRANCH_CODE = NULLIF(inRef.*:BRANCH_CODE,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CCY = NULLIF(inRef.*:CCY,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CURRBAL = NULLIF(inRef.*:CURRBAL,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].ACCOUNT_TYPE = NULLIF(inRef.*:ACCOUNT_TYPE,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CUSTOMER_NAME = NULLIF(inRef.*:CUSTOMER_NAME,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].AC_DESC = NULLIF(inRef.*:AC_DESC,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].ACCOUNT_CLASS = NULLIF(inRef.*:ACCOUNT_CLASS,'');
-			SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].ACCLASSDESC = NULLIF(inRef.*:ACCLASSDESC,'');
-			SET I=I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			SET outputbodyRef."Stvw-Account-Sumary-Full".CUST_NO = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO,'');
 
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
-		WHILE LASTMOVE(inRef) Do
-			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = NULLIF(inRef.*:ECODE,'');
-			SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = NULLIF(inRef.*:EDESC,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			SET Environment.Summary = 'Stvw-Account-Sumary --A';
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A";
+			WHILE LASTMOVE(inRef) DO
+				SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CUSTACNO = NULLIF(inRef.*:CUSTACNO,'');
+				SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].BRANCH_CODE = NULLIF(inRef.*:BRANCH_CODE,'');
+				SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CCY = NULLIF(inRef.*:CCY,'');
+				SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CURRBAL = NULLIF(inRef.*:CURRBAL,'');
+				SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].ACCOUNT_TYPE = NULLIF(inRef.*:ACCOUNT_TYPE,'');
+				SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CUSTOMER_NAME = NULLIF(inRef.*:CUSTOMER_NAME,'');
+				SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].AC_DESC = NULLIF(inRef.*:AC_DESC,'');
+				SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].ACCOUNT_CLASS = NULLIF(inRef.*:ACCOUNT_CLASS,'');
+				SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].ACCLASSDESC = NULLIF(inRef.*:ACCLASSDESC,'');
+				SET I=I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
 
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
-		WHILE LASTMOVE(inRef) Do
-			SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
-			SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-		
-		SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
+			WHILE LASTMOVE(inRef) Do
+				SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = NULLIF(inRef.*:ECODE,'');
+				SET outputbodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = NULLIF(inRef.*:EDESC,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
+			WHILE LASTMOVE(inRef) Do
+				SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
+				SET outputbodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 			PROPAGATE TO TERMINAL 'out' DELETE NONE;
 		END IF;
 
-		SET Environment.outputData = OutputRoot.SOAP;
+		SET Environment.outputData = OutputRoot;
 		----------------------------------------------------
 		---------------------- Response Logging -------------------------
-		MOVE domainDataRef TO Environment.outputData;
+		MOVE domainDataRef TO Environment.outputData.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		SET OutputRoot.HTTPResponseHeader = NULL;
 		SET OutputRoot.SOAP = NULL;
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		-- MOVE OutRef TO OutputRoot.XMLNSC;
 		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RESP',MessageFlowLabel,OutRef);
-		SET OutputRoot.Properties = InputRoot.Properties;
-		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
-		SET OutputRoot.SOAP = Environment.outputData;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||Environment.resPayload) INTO rc;
-
-		SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 
 	END;
 END MODULE;
