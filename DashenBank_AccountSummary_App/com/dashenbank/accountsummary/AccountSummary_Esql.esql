@@ -117,7 +117,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		CALL GenerateResToFrontend();
-		RETURN TRUE;
+		RETURN FALSE;
 	END;
 
 	CREATE PROCEDURE GenerateResToFrontend() BEGIN
@@ -140,7 +140,14 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RESP data  is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		-------------- Generating response to channel ---------------
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		
+		IF InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:MSGSTAT IS NULL OR FIELDVALUE(InputRoot.SOAP.*:Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER.*:MSGSTAT) IS NULL THEN
+			SET OutputRoot = InputRoot;
+
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
+		ELSE
+			CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 
 		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_HEADER;
 		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:QUERYACCSUMM_IOFS_RES.*:FCUBS_BODY;
@@ -222,6 +229,10 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 			SET I = I + 1;
 			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 		END WHILE;
+		
+		SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
+		END IF;
 
 		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------------------------------------
