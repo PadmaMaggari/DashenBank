@@ -3,13 +3,13 @@
     xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" nsURI="com/dashenbank/LiquidateTransaction/LiquidateTransaction_Flow.msgflow" nsPrefix="com_dashenbank_LiquidateTransaction_LiquidateTransaction_Flow.msgflow">
   <eClassifiers xmi:type="eflow:FCMComposite" name="FCMComposite_1">
     <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_CONFIG_PATH" name="LOG4J_CONFIG_PATH" defaultValueLiteral="C:\DashenBank\Log4j\broker.xml">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_CONFIG_PATH" name="LOG4J_CONFIG_PATH" defaultValueLiteral="C:\Log4J\broker.xml">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOG4J_ERROR_MSG" name="LOG4J_ERROR_MSG" defaultValueLiteral="Log4j Initialization Error.">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://192.168.2.39:7800/Backend_Simulator">
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.BACKEND_URL" name="BACKEND_URL" defaultValueLiteral="http://172.30.1.29:7005/FCUBSDDService/FCUBSDDService">
       <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     </eStructuralFeatures>
     <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.LOGGER_NAME" name="LOGGER_NAME" defaultValueLiteral="LiquidateTransaction_Log">
@@ -22,29 +22,29 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_LiquidateTransaction_App/icons/full/obj16/LiquidateTransaction_Flow.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_LiquidateTransaction_App/icons/full/obj30/LiquidateTransaction_Flow.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="479,111" computeExpression="esql://routine/com.dashenbank.LiquidateTransaction#ResponseToChannel.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="450,120" computeExpression="esql://routine/com.dashenbank.LiquidateTransaction#ResponseToChannel.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="ResponseToChannel "/>
       </nodes>
-      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_2" location="282,29">
-        <translation xmi:type="utility:ConstantString" string="ExceptionHandlerSubFlow"/>
+      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_2" location="386,189">
+        <translation xmi:type="utility:ConstantString" string="ExceptionHandler"/>
       </nodes>
-      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="391,215" rotation="TOP_TO_BOTTOM" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
+      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="381,6" rotation="BOTTOM_TO_TOP" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
         <translation xmi:type="utility:ConstantString" string="PayloadLogging"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="65,107" wsdlOperationMode="gateway" useHTTPTransport="true" urlSelector="/ESB_LiquidateTransaction" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
-        <translation xmi:type="utility:ConstantString" string="LiquidateTransaction_Request"/>
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="22,129" wsdlOperationMode="gateway" useHTTPTransport="true" urlSelector="/ESB_LiquidateTransaction" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+        <translation xmi:type="utility:ConstantString" string="Service_Request"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="351,112" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://192.168.2.63:7800/Backend_Simulator" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
-        <translation xmi:type="utility:ConstantString" string="BackEndSystemCall"/>
+      <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="313,110" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://192.168.2.63:7800/Backend_Simulator" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+        <translation xmi:type="utility:ConstantString" string="BackendSystem_Call"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="234,107" computeExpression="esql://routine/com.dashenbank.LiquidateTransaction#RequestToBackend.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="168,118" computeExpression="esql://routine/com.dashenbank.LiquidateTransaction#RequestToBackend.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="RequestToBackend"/>
       </nodes>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="441,29" computeExpression="esql://routine/com.dashenbank.LiquidateTransaction#BuildExceptionResponse.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="531,174" computeExpression="esql://routine/com.dashenbank.LiquidateTransaction#BuildExceptionResponse.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="BuildBusinessError"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="605,107">
-        <translation xmi:type="utility:ConstantString" string="LiquidateTransaction_Response"/>
+      <nodes xmi:type="ComIbmSOAPReply.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="622,119">
+        <translation xmi:type="utility:ConstantString" string="Service_Response"/>
       </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out1" targetTerminalName="InTerminal.in"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_8" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
