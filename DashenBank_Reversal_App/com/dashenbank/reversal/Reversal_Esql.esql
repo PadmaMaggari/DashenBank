@@ -1,10 +1,16 @@
 
 
+
+
+
+
+
+
+
 BROKER SCHEMA com.dashenbank.reversal
 PATH com.dashenbank.genericfunctions;
-DECLARE ns NAMESPACE 'http://www.example.org/Reversal/';
-DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/';
-DECLARE esb NAMESPACE 'http://www.dashenbank.org/ESB_ReversalService/';
+DECLARE ns NAMESPACE 'http://fcubs.ofss.com/service/FCUBSRTService';
+
 DECLARE LOG4J_CONFIG_PATH EXTERNAL CHARACTER '';
 DECLARE LOG4J_ERROR_MSG EXTERNAL CHARACTER '';
 DECLARE LOGGER_NAME EXTERNAL CHARACTER '';
@@ -32,7 +38,7 @@ CREATE COMPUTE MODULE RequestToFlexcube
 	END;
 
 	CREATE PROCEDURE GenerateReqToFlexcube() BEGIN
-		DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:*;
+		--DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:*;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
@@ -42,20 +48,8 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		SET Environment.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET Environment.REQUEST_PAYLOAD = Environment.reqPayload;
-		-- SET TRANSACTION_STATUS = 'Request Received from Channel';
-		-- SET CREATED_BY = 'ACE USER';
-		-- SET SERVICE_NAME = inRef.*:FCUBS_HEADER.*:SERVICE;
-		-- SET OPERATION_NAME = inRef.*:FCUBS_HEADER.*:OPERATION;
-		-- SET MSG_ID = inRef.*:FCUBS_HEADER.*:MSGID;
-		-- SET Environment.MSG_ID = MSG_ID;
-		-- SET Environment.ID[] = PASSTHRU('SELECT TRANSACTION_LOG_SEQ.NEXTVAL FROM DUAL');
-		-- SET SEQ_ID = CAST(Environment.ID[1].NEXTVAL AS INTEGER);
-		----------------------Request Logging-------------------------
-		--INSERT INTO Database.TRANSACTION_LOG(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY)
-		--VALUES(SEQ_ID.NEXTVAL,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY);
-		-- PASSTHRU 'INSERT INTO TRANSACTION_LOG (SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CREATED_ON,CREATED_BY) VALUES(?,?,?,?,?,?,?)'
-		-- TO Database.DBDSN VALUES(SEQ_ID,MSG_ID,SERVICE_NAME,OPERATION_NAME,TRANSACTION_STATUS,CURRENT_TIMESTAMP,'ACE-USER');
-		-- COMMIT;
+
+
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
 		CALL PayloadLogging(MSG_ID,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
@@ -63,9 +57,49 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.reqPayload) INTO rc;
 		----------------------------------------------------
 		-------------Business Logic-------------------------
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Preparing business logic ------') INTO rc;
-		SET OutputRoot.SOAP = InputRoot.SOAP;
-		SET OutputRoot.SOAP.Body.ns:Header.REQ_IDENTIFIER = MSG_ID;
+
+		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:REVERSETRANSACTION_IOPK_REQ.*:FCUBS_HEADER;
+		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:REVERSETRANSACTION_IOPK_REQ.*:FCUBS_BODY;
+
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'REVERSETRANSACTION_IOPK_REQ';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:REVERSETRANSACTION_IOPK_REQ NAMESPACE ns NAME 'FCUBS_HEADER';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:REVERSETRANSACTION_IOPK_REQ NAMESPACE ns NAME 'FCUBS_BODY';
+
+		DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:REVERSETRANSACTION_IOPK_REQ.ns:FCUBS_HEADER;
+		DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:REVERSETRANSACTION_IOPK_REQ.ns:FCUBS_BODY;
+
+		SET outputHeaderRef.ns:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outputHeaderRef.ns:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outputHeaderRef.ns:MSGID = inputHeaderRef.*:MSGID;
+		SET outputHeaderRef.ns:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outputHeaderRef.ns:USERID = inputHeaderRef.*:USERID;
+		SET outputHeaderRef.ns:ENTITY = inputHeaderRef.*:ENTITY;
+		SET outputHeaderRef.ns:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outputHeaderRef.ns:MODULEID = inputHeaderRef.*:MODULEID;
+		SET outputHeaderRef.ns:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outputHeaderRef.ns:OPERATION = inputHeaderRef.*:OPERATION;
+		SET outputHeaderRef.ns:SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
+		SET outputHeaderRef.ns:SOURCE_USERID = inputHeaderRef.*:SOURCE_USERID;
+		SET outputHeaderRef.ns:DESTINATION = inputHeaderRef.*:DESTINATION;
+		SET outputHeaderRef.ns:MULTITRIPID = inputHeaderRef.*:MULTITRIPID;
+		SET outputHeaderRef.ns:FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
+		SET outputHeaderRef.ns:ACTION = inputHeaderRef.*:ACTION;
+		SET outputHeaderRef.ns:MSGSTAT = inputHeaderRef.*:MSGSTAT;
+		SET outputHeaderRef.ns:SNAPSHOTID = inputHeaderRef.*:SNAPSHOTID;
+		SET outputHeaderRef.ns:PASSWORD = inputHeaderRef.*:PASSWORD;
+		DECLARE I INTEGER 1;
+		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
+		WHILE LASTMOVE(inRef) DO
+			SET outputHeaderRef.ns:ADDL.ns:PARAM[I].ns:NAME = inRef.NAME;
+			SET outputHeaderRef.ns:ADDL.ns:PARAM[I].ns:VALUE = inRef.VALUE;
+			SET I = I + 1;
+			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+		END WHILE;
+
+		SET outputBodyRef.ns:"Transaction-Details-IO".ns:XREF = inputBodyRef.*:"Transaction-Details-IO".*:XREF;
+		SET outputBodyRef.ns:"Transaction-Details-IO".ns:FCCREF = inputBodyRef.*:"Transaction-Details-IO".*:FCCREF;
 		----------------------------------------------------
 		----------------------Response Logging-------------------------
 		-- SET TRANSACTION_STATUS = 'Request Sent to Flexcube';
@@ -83,7 +117,7 @@ CREATE COMPUTE MODULE RequestToFlexcube
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = 'http://'||IP||':'||PORT||baseURL;
 	END;
 END MODULE;
-
+-----------------------------------------------------------------------------------------------------------------------------
 CREATE COMPUTE MODULE ResponseToFrontEnd
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
@@ -92,7 +126,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 	END;
 
 	CREATE PROCEDURE GenerateResToFrontEnd() BEGIN
-		DECLARE inRef REFERENCE TO InputRoot.SOAP;
+		-- DECLARE inRef REFERENCE TO InputRoot.SOAP;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
@@ -118,9 +152,68 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.reqPayload) INTO rc;
 		----------------------------------------------------
 		-------------Business Logic-------------------------
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ Preparing Business Logic ------') INTO rc;
-		SET OutputRoot.SOAP = InputRoot.SOAP;
-		SET OutputRoot.SOAP.Body.ns:Header.REQ_IDENTIFIER = MSG_ID;
+		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:REVERSETRANSACTION_IOPK_RES.*:FCUBS_HEADER;
+		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:REVERSETRANSACTION_IOPK_RES.*:FCUBS_BODY;
+
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'REVERSETRANSACTION_IOPK_RES';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:REVERSETRANSACTION_IOPK_RES NAME 'FCUBS_HEADER';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:REVERSETRANSACTION_IOPK_RES NAME 'FCUBS_BODY';
+
+		DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:REVERSETRANSACTION_IOPK_RES.FCUBS_HEADER;
+		DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:REVERSETRANSACTION_IOPK_RES.FCUBS_BODY;
+
+		SET outputHeaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
+		SET outputHeaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
+		SET outputHeaderRef.MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
+		SET outputHeaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
+		SET outputHeaderRef.USERID = NULLIF(inputHeaderRef.*:USERID,'');
+		SET outputHeaderRef.ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
+		SET outputHeaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
+		SET outputHeaderRef.MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
+		SET outputHeaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
+		SET outputHeaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
+		SET outputHeaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
+		SET outputHeaderRef.SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
+		SET outputHeaderRef.DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
+		SET outputHeaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
+		SET outputHeaderRef.FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
+		SET outputHeaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
+		SET outputHeaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
+		SET outputHeaderRef.SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
+		SET outputHeaderRef.PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
+
+		DECLARE I INTEGER 1;
+		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
+		WHILE LASTMOVE(inRef) DO
+			SET outputHeaderRef.ns:ADDL.ns:PARAM[I].ns:NAME = inRef.*:NAME;
+			SET outputHeaderRef.ns:ADDL.ns:PARAM[I].ns:VALUE = inRef.*:VALUE;
+			SET I = I + 1;
+			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+		END WHILE;
+
+		SET outputBodyRef."Transaction-Details-PK".XREF = NULLIF(outputBodyRef.*:"Transaction-Details-PK".*:XREF,'');
+		SET outputBodyRef."Transaction-Details-PK".FCCREF = NULLIF(outputBodyRef.*:"Transaction-Details-PK".*:FCCREF,'');
+
+		SET I = 1;
+		MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
+		WHILE LASTMOVE(inRef) DO
+			SET outputBodyRef.FCUBS_ERROR_RESP.ERROR.ECODE = NULLIF(inRef.*:ECODE,'');
+			SET outputBodyRef.FCUBS_ERROR_RESP.ERROR.EDESC = NULLIF(inRef.*:EDESC,'');
+			SET I = I + 1;
+			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+		END WHILE;
+
+		SET I = 1;
+		MOVE inRef TO inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
+		WHILE LASTMOVE(inRef) DO
+			SET outputBodyRef.FCUBS_WARNING_RESP.WARNING.WCODE = NULLIF(inRef.*:WCODE,'');
+			SET outputBodyRef.FCUBS_WARNING_RESP.WARNING.WDESC = NULLIF(inRef.*:WDESC,'');
+			SET I = I + 1;
+			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+		END WHILE;	
+			
 		----------------------------------------------------
 		----------------------Response Logging-------------------------
 		-- SET TRANSACTION_STATUS = 'Response Sent to Channel';
