@@ -1,6 +1,10 @@
 
+
 BROKER SCHEMA com.dashenbank.Unfreeze
 PATH com.dashenbank.genericfunctions;
+
+DECLARE ns NAMESPACE 'http://fcubs.ofss.com/service/FCUBSCustomerService';
+
 DECLARE LOG4J_CONFIG_PATH, LOG4J_ERROR_MSG, BACKEND_URL, LOGGER_NAME, LOG_TYPE EXTERNAL CHARACTER;
 --------Global Variables----------
 DECLARE rc BOOLEAN TRUE;
@@ -12,7 +16,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		IF ( rc = TRUE ) THEN
 			CALL RequestToBackend();
 		ELSE
-			SET Environment.Variables.Log4j.ErrorMsg = LOG4J_ERROR_MSG;
+			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR_MSG;
 		END IF;
 
 		RETURN TRUE;
@@ -21,49 +25,106 @@ CREATE COMPUTE MODULE RequestToBackend
 	CREATE PROCEDURE RequestToBackend() BEGIN
 
 		SET Environment.domainDataRef = InputRoot.SOAP;
+		DECLARE ccidRef, encodeRef INTEGER;
 		DECLARE envRef REFERENCE TO Environment.Variables;
 		CREATE LASTCHILD OF Environment AS envRef NAME 'Variables';
 
-		SET Environment.domainDataRef = InputRoot.SOAP;
-		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
-		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
+		SET ccidRef = InputRoot.Properties.CodedCharSetId;
+		SET encodeRef = InputRoot.Properties.Encoding;
 		SET envRef.Encoding = encodeRef;
 		SET envRef.CodedCharSetId = ccidRef;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 
-		SET envRef.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
+		SET envRef.RequestIdentifier = CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
+		SET envRef.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-
-		SET envRef.id = CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
-		----------------------------------------------------
+		SET envRef.id = InputRoot.SOAP.*:Body.*:CLOSEAMTBLK_FSFS_REQ.*:FCUBS_HEADER.*:MSGID;
 		----------------------Request Logging-------------------------
-	--	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-	--	DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-	--	CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
+		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		-- DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'**********************************************************************') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.reqPayload) INTO rc;
-		----------------------------------------------------
-		-------------Business Logic-------------------------
-		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_HEADER";
-		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_BODY";
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
+		-------------- Generating request to backend -------------
+		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:CLOSEAMTBLK_FSFS_REQ.*:FCUBS_HEADER;
+		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:CLOSEAMTBLK_FSFS_REQ.*:FCUBS_BODY;
+
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-		DECLARE outputRef REFERENCE TO OutputRoot.SOAP;
 
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_HEADER".*:"Source" = inputHeaderRef.*:"Source";
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_HEADER".*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_HEADER".*:USERID = inputHeaderRef.*:USERID;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_HEADER".*:BRANCH = inputHeaderRef.*:BRANCH;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_HEADER".*:SERVICE = inputHeaderRef.*:SERVICE;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_HEADER".*:OPERATION = inputHeaderRef.*:OPERATION;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_HEADER".*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
+		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_BODY".*:"Amount-Blocks-Full".ACC = inputBodyRef.*:"Amount-Blocks-Full".ACC;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_BODY".*:"Amount-Blocks-Full".AMTBLKNO = inputBodyRef.*:"Amount-Blocks-Full".AMTBLKNO;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_BODY".*:"Amount-Blocks-Full".AMT = inputBodyRef.*:"Amount-Blocks-Full".AMT;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_BODY".*:"Amount-Blocks-Full".ABLKTYPE = inputBodyRef.*:"Amount-Blocks-Full".ABLKTYPE;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_BODY".*:"Amount-Blocks-Full".HOLDDESC = inputBodyRef.*:"Amount-Blocks-Full".HOLDDESC;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFS.*:"Unblocking_BODY".*:"Amount-Blocks-Full".BRANCH = inputBodyRef.*:"Amount-Blocks-Full".BRANCH;
+		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'CLOSEAMTBLK_FSFS_REQ';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS_REQ NAMESPACE ns NAME 'FCUBS_HEADER';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS_REQ NAMESPACE ns NAME 'FCUBS_BODY';
+
+		DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS_REQ.ns:FCUBS_HEADER ;
+		DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS_REQ.ns:FCUBS_BODY ;
+
+		SET outputHeaderRef.ns:SOURCE = inputHeaderRef.*:SOURCE;
+		SET outputHeaderRef.ns:UBSCOMP = inputHeaderRef.*:UBSCOMP;
+		SET outputHeaderRef.ns:MSGID = inputHeaderRef.*:MSGID;
+		SET outputHeaderRef.ns:CORRELID = inputHeaderRef.*:CORRELID;
+		SET outputHeaderRef.ns:USERID = inputHeaderRef.*:USERID;
+		SET outputHeaderRef.ns:ENTITY = inputHeaderRef.*:ENTITY;
+		SET outputHeaderRef.ns:BRANCH = inputHeaderRef.*:BRANCH;
+		SET outputHeaderRef.ns:MODULEID = inputHeaderRef.*:MODULEID;
+		SET outputHeaderRef.ns:SERVICE = inputHeaderRef.*:SERVICE;
+		SET outputHeaderRef.ns:OPERATION = inputHeaderRef.*:OPERATION;
+		SET outputHeaderRef.ns:SOURCE_OPERATION = inputHeaderRef.*:SOURCE_OPERATION;
+		SET outputHeaderRef.ns:SOURCE_USERID = inputHeaderRef.*:SOURCE_USERID;
+		SET outputHeaderRef.ns:DESTINATION = inputHeaderRef.*:DESTINATION;
+		SET outputHeaderRef.ns:MULTITRIPID= inputHeaderRef.*:MULTITRIPID;
+		SET outputHeaderRef.ns:FUNCTIONID = inputHeaderRef.*:FUNCTIONID;
+		SET outputHeaderRef.ns:ACTION = inputHeaderRef.*:ACTION;
+		SET outputHeaderRef.ns:MSGSTAT = inputHeaderRef.*:MSGSTAT;
+		SET outputHeaderRef.ns:SNAPSHOTID = inputHeaderRef.*:SNAPSHOTID;
+		SET outputHeaderRef.ns:PASSWORD = inputHeaderRef.*:PASSWORD;
+
+		DECLARE I INTEGER 1;
+		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
+		WHILE LASTMOVE(inRef) DO
+			SET outputHeaderRef.ns:ADDL.ns:PARAM[I].ns:NAME = inRef.*:NAME;
+			SET outputHeaderRef.ns:ADDL.ns:PARAM[I].ns:VALUE = inRef.*:VALUE;
+			SET I = I + 1;
+			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+		END WHILE;
+
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:ACC = inputBodyRef.*:"Amount-Blocks-Full".*:ACC;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:AMTBLKNO = inputBodyRef.*:"Amount-Blocks-Full".*:AMTBLKNO;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:AMT = inputBodyRef.*:"Amount-Blocks-Full".*:AMT;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:EXPDATE = inputBodyRef.*:"Amount-Blocks-Full".*:EXPDATE;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:REM = inputBodyRef.*:"Amount-Blocks-Full".*:REM;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:ABLKTYPE = inputBodyRef.*:"Amount-Blocks-Full".*:ABLKTYPE;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:REFERENCE_NO = inputBodyRef.*:"Amount-Blocks-Full".*:REFERENCE_NO;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:HPCODE = inputBodyRef.*:"Amount-Blocks-Full".*:HPCODE;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:EFFDATE = inputBodyRef.*:"Amount-Blocks-Full".*:EFFDATE;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:HOLDDESC = inputBodyRef.*:"Amount-Blocks-Full".*:HOLDDESC;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:BRANCH = inputBodyRef.*:"Amount-Blocks-Full".*:BRANCH;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:BENEFICIARY_EMAIL_ID = inputBodyRef.*:"Amount-Blocks-Full".*:BENEFICIARY_EMAIL_ID;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:BENEFICIARY_FACEBOOK_ID = inputBodyRef.*:"Amount-Blocks-Full".*:BENEFICIARY_FACEBOOK_ID;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:BENEFICIARY_TELEPHONE = inputBodyRef.*:"Amount-Blocks-Full".*:BENEFICIARY_TELEPHONE;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:VERIFY_AVL_BAL = inputBodyRef.*:"Amount-Blocks-Full".*:VERIFY_AVL_BAL;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:SOURCE_CODE = inputBodyRef.*:"Amount-Blocks-Full".*:SOURCE_CODE;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:MAKER = inputBodyRef.*:"Amount-Blocks-Full".*:MAKER;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:MAKERSTAMP = inputBodyRef.*:"Amount-Blocks-Full".*:MAKERSTAMP;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:CHECKER = inputBodyRef.*:"Amount-Blocks-Full".*:CHECKER;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:CHECKERSTAMP = inputBodyRef.*:"Amount-Blocks-Full".*:CHECKERSTAMP;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:MODNO = inputBodyRef.*:"Amount-Blocks-Full".*:MODNO;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:TXNSTAT = inputBodyRef.*:"Amount-Blocks-Full".*:TXNSTAT;
+		SET outputBodyRef.ns:"Amount-Blocks-Full".ns:AUTHSTAT = inputBodyRef.*:"Amount-Blocks-Full".*:AUTHSTAT;
+
+		SET I = 1;
+		MOVE inRef TO inputBodyRef.*:"Amount-Blocks-Full".*:UDFDETAILS[>];
+		WHILE LASTMOVE(inRef) DO
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:UDFDETAILS[I].ns:FLDNAM =inRef.*:FLDNAM;
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:UDFDETAILS[I].ns:FLDVAL =inRef.*:FLDVAL;
+			SET I = I +1 ;
+			MOVE inRef NEXTSIBLING REPEAT TYPE NAME ;
+		END WHILE ;
 
 		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------------------------------------
@@ -71,11 +132,12 @@ CREATE COMPUTE MODULE RequestToBackend
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-	--	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-	--	MOVE OutRef TO OutputRoot.XMLNSC;
-	--	CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
+		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		-- MOVE OutRef TO OutputRoot.XMLNSC;
+		-- CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.HTTPInputHeader = InputRoot.HTTPInputHeader;
 		SET OutputRoot.SOAP = Environment.outputData;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_REQ ------') INTO rc;
@@ -92,85 +154,150 @@ CREATE COMPUTE MODULE ResponseToChannel
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		CALL ResponseToChannel();
-		RETURN TRUE;
+		RETURN FALSE;
 	END;
 
 	CREATE PROCEDURE ResponseToChannel() BEGIN
 
 		SET Environment.domainDataRef = InputRoot.SOAP;
+		DECLARE ccidRef, encodeRef INTEGER;
 		DECLARE envRef REFERENCE TO Environment.Variables;
-		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
-		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
+
+		SET ccidRef = InputRoot.Properties.CodedCharSetId;
+		SET encodeRef = InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
-
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		----------------------------------------------------
 		----------------------Request Logging-------------------------
-	--	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-	--	DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-	--	CALL PayloadLogging(envRef.id,Environment.reqPayload,'BACKEND_RES',MessageFlowLabel,OutRef);
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_RES ------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.reqPayload) INTO rc;
-		----------------------------------------------------
-		-------------Business Logic-------------------------
+		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		-- DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'BACKEND_RESP',ApplicationLabel,OutRef);
 
-		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER";
-		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY";
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-		DECLARE outputRef REFERENCE TO OutputRoot.SOAP;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- BACKEND_RESP -------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RESP data is: '||Environment.reqPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
+		-------------- Generating response to channel ---------------
+		IF InputRoot.SOAP.*:Body.*:CLOSEAMTBLK_FSFS_RES.*:FCUBS_HEADER.*:MSGSTAT IS NULL OR FIELDVALUE(InputRoot.SOAP.*:Body.*:CLOSEAMTBLK_FSFS_RES.*:FCUBS_HEADER.*:MSGSTAT) IS NULL THEN
+			SET OutputRoot = InputRoot;
 
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER".*:SOURCE = inputHeaderRef.*:SOURCE;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER".*:UBSCOMP = inputHeaderRef.*:UBSCOMP;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER".*:USERID = inputHeaderRef.*:USERID;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER".*:BRANCH = inputHeaderRef.*:BRANCH;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER".*:SERVICE = inputHeaderRef.*:SERVICE;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER".*:OPERATION = inputHeaderRef.*:OPERATION;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER".*:MSGSTAT = inputHeaderRef.*:MSGSTAT;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER".*:MSGID = inputHeaderRef.*:MSGID;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER".*:DESTINATION = inputHeaderRef.*:DESTINATION;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER".*:CORRELID = inputHeaderRef.*:CORRELID;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER".*:ACTION = inputHeaderRef.*:ACTION;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_HEADER".*:ENTITY = inputHeaderRef.*:ENTITY;
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
+		ELSE
 
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".ACC = inputBodyRef.*:"Amount-Blocks-Full".ACC;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".AMTBLKNO = inputBodyRef.*:"Amount-Blocks-Full".AMTBLKNO;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".AMT = inputBodyRef.*:"Amount-Blocks-Full".AMT;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".ABLKTYPE = inputBodyRef.*:"Amount-Blocks-Full".ABLKTYPE;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".EFFDATE = inputBodyRef.*:"Amount-Blocks-Full".EFFDATE;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".BRANCH = inputBodyRef.*:"Amount-Blocks-Full".BRANCH;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".VERIFY_AVL_BAL = inputBodyRef.*:"Amount-Blocks-Full".VERIFY_AVL_BAL;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".SOURCE_CODE = inputBodyRef.*:"Amount-Blocks-Full".SOURCE_CODE;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".MAKER = inputBodyRef.*:"Amount-Blocks-Full".MAKER;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".MAKERSTAMP = inputBodyRef.*:"Amount-Blocks-Full".MAKERSTAMP;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".CHECKER = inputBodyRef.*:"Amount-Blocks-Full".CHECKER;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".CHECKERSTAMP = inputBodyRef.*:"Amount-Blocks-Full".CHECKERSTAMP;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".MODNO = inputBodyRef.*:"Amount-Blocks-Full".MODNO;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".TXNSTAT = inputBodyRef.*:"Amount-Blocks-Full".TXNSTAT;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Amount-Blocks-Full".AUTHSTAT = inputBodyRef.*:"Amount-Blocks-Full".AUTHSTAT;
+			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:CLOSEAMTBLK_FSFS_RES.*:FCUBS_HEADER;
+			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:CLOSEAMTBLK_FSFS_RES.*:FCUBS_BODY;
 
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Unblocking_WARNING_RESP".WARNING.WCODE = inputBodyRef.*:"Unblocking_WARNING_RESP".WARNING.WCODE;
-		SET outputRef.*:Body.*:CLOSEAMTBLK_FSFSResponse.*:"Unblocking_BODY".*:"Unblocking_WARNING_RESP".WARNING.WDESC = inputBodyRef.*:"Unblocking_WARNING_RESP".WARNING.WDESC;
+			SET OutputRoot.Properties = InputRoot.Properties;
+			SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+			CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 
-		SET Environment.outputData = OutputRoot.SOAP;
+			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
+
+			CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'CLOSEAMTBLK_FSFS_RES';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS_RES NAMESPACE ns NAME 'FCUBS_HEADER';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS_RES NAMESPACE ns NAME 'FCUBS_BODY';
+
+			DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS_RES.ns:FCUBS_HEADER;
+			DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:CLOSEAMTBLK_FSFS_RES.ns:FCUBS_BODY;
+
+			SET outputHeaderRef.ns:SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
+			SET outputHeaderRef.ns:UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
+			SET outputHeaderRef.ns:MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
+			SET outputHeaderRef.ns:CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
+			SET outputHeaderRef.ns:USERID = NULLIF(inputHeaderRef.*:USERID,'');
+			SET outputHeaderRef.ns:ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
+			SET outputHeaderRef.ns:BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
+			SET outputHeaderRef.ns:MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
+			SET outputHeaderRef.ns:SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
+			SET outputHeaderRef.ns:OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
+			SET outputHeaderRef.ns:SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
+			SET outputHeaderRef.ns:SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
+			SET outputHeaderRef.ns:DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
+			SET outputHeaderRef.ns:MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
+			SET outputHeaderRef.ns:FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
+			SET outputHeaderRef.ns:ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
+			SET outputHeaderRef.ns:MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
+			SET outputHeaderRef.ns:SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
+			SET outputHeaderRef.ns:PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
+
+			DECLARE I INTEGER 1;
+			DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputHeaderRef.ns:ADDL.ns:PARAM[I].ns:NAME = NULLIF(inRef.*:NAME,'');
+				SET outputHeaderRef.ns:ADDL.ns:PARAM[I].ns:VALUE = NULLIF(inRef.*:VALUE,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:ACC = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:ACC,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:AMTBLKNO = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:AMTBLKNO,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:AMT = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:AMT,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:EXPDATE = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:EXPDATE,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:REM = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:REM,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:ABLKTYPE = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:ABLKTYPE,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:REFERENCE_NO = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:REFERENCE_NO,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:HPCODE = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:HPCODE,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:EFFDATE = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:EFFDATE,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:HOLDDESC = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:HOLDDESC,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:BRANCH = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:BRANCH,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:BENEFICIARY_EMAIL_ID = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:BENEFICIARY_EMAIL_ID,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:BENEFICIARY_FACEBOOK_ID = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:BENEFICIARY_FACEBOOK_ID,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:BENEFICIARY_TELEPHONE = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:BENEFICIARY_TELEPHONE,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:VERIFY_AVL_BAL = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:VERIFY_AVL_BAL,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:SOURCE_CODE = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:SOURCE_CODE,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:MAKER = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:MAKER,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:MAKERSTAMP = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:MAKERSTAMP,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:CHECKER = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:CHECKER,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:CHECKERSTAMP = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:CHECKERSTAMP,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:MODNO = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:MODNO,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:TXNSTAT = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:TXNSTAT,'');
+			SET outputBodyRef.ns:"Amount-Blocks-Full".ns:AUTHSTAT = NULLIF(inputBodyRef.*:"Amount-Blocks-Full".*:AUTHSTAT,'');
+
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Amount-Blocks-Full".*:UDFDETAILS[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef.ns:"Amount-Blocks-Full".ns:UDFDETAILS[I].ns:FLDNAM = NULLIF(inRef.*:FLDNAM,'');
+				SET outputBodyRef.ns:"Amount-Blocks-Full".ns:UDFDETAILS[I].ns:FLDVAL = NULLIF(inRef.*:FLDVAL,'');
+				SET I = I +1 ;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME ;
+			END WHILE ;
+
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef.ns:FCUBS_ERROR_RESP.ns:ERROR[I].ns:ECODE = NULLIF(inRef.*:ECODE,'');
+				SET outputBodyRef.ns:FCUBS_ERROR_RESP.ns:ERROR[I].ns:EDESC = NULLIF(inRef.*:EDESC,'');
+				SET I = I +1 ;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME ;
+			END WHILE ;
+
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef.ns:FCUBS_WARNING_RESP.ns:WARNING[I].ns:WCODE = NULLIF(inRef.*:WCODE,'');
+				SET outputBodyRef.ns:FCUBS_WARNING_RESP.ns:WARNING[I].ns:WDESC = NULLIF(inRef.*:WDESC,'');
+				SET I = I +1 ;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME ;
+			END WHILE ;
+
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
+		END IF;
+
+		SET Environment.outputData = OutputRoot;
 		----------------------------------------------------
 		----------------------Response Logging-------------------------
-		MOVE domainDataRef TO OutputRoot.SOAP;
+		MOVE domainDataRef TO Environment.outputData.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-	--	CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-	--	MOVE OutRef TO OutputRoot.XMLNSC;
+		SET OutputRoot.HTTPResponseHeader = NULL;
 		SET OutputRoot.SOAP = NULL;
-
-	--	CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
-
-		SET OutputRoot.Properties = InputRoot.Properties;
-		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
-		SET OutputRoot.SOAP = Environment.outputData;
+		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		-- MOVE OutRef TO OutputRoot.XMLNSC;
+		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_RES ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.resPayload) INTO rc;
-
-		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = envRef.RequestIdentifier;
 
 	END;
 END MODULE;
@@ -184,7 +311,6 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		CALL BuildExceptionResponse();
 		RETURN TRUE;
 	END;
-
 
 	CREATE PROCEDURE BuildExceptionResponse() BEGIN
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
