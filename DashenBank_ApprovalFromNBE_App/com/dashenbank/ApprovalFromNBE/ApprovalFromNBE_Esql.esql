@@ -9,7 +9,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		IF (rc = TRUE) THEN
 			CALL CopyEntireMessage();
 		ELSE
-			SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR_MSG;
+			 SET OutputRoot.XMLNSC.Log.Message = LOG4J_ERROR_MSG;
 		END IF;
 		RETURN TRUE;
 	END;
