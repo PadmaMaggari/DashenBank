@@ -1,24 +1,5 @@
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 BROKER SCHEMA com.dashenbank.LiquidateTransaction
 PATH com.dashenbank.genericfunctions;
 DECLARE ns NAMESPACE 'http://fcubs.ofss.com/service/FCUBSDDService';
@@ -38,12 +19,12 @@ CREATE COMPUTE MODULE RequestToBackend
 		END IF;
 		RETURN TRUE;
 	END;
+
 	CREATE PROCEDURE GenerateReqToBackend() BEGIN
 		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment.Variables;
 		CREATE LASTCHILD OF Environment AS envRef NAME 'Variables';
 
-		SET Environment.domainDataRef = InputRoot.SOAP;
 		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
 		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
 		SET envRef.Encoding = encodeRef;
@@ -51,27 +32,28 @@ CREATE COMPUTE MODULE RequestToBackend
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
 
-		SET envRef.RequestIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
+		SET envRef.RequestIdentifier = CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
+		SET envRef.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		-- DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:LIQUIDATETRANSACTION_FSFS_REQ;
 		SET envRef.id = CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
-		----------------------------------------------------
 		----------------------Request Logging-------------------------
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_REQ',MessageFlowLabel,OutRef);
+		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		-- DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_REQ',ApplicationLabel,OutRef);
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'**********************************************************************') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.reqPayload) INTO rc;
-		----------------------------------------------------
-		-------------Business Logic-------------------------
-		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER;
-		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
+		------------------- Generating request to Backend ---------------------
+		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER;
+		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:LIQUIDATETRANSACTION_FSFS_REQ.*:FCUBS_BODY;
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
 		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'LIQUIDATETRANSACTION_FSFS_REQ';
 		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:LIQUIDATETRANSACTION_FSFS_REQ NAMESPACE ns NAME 'FCUBS_HEADER';
 		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:LIQUIDATETRANSACTION_FSFS_REQ NAMESPACE ns NAME 'FCUBS_BODY';
+
 		DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:LIQUIDATETRANSACTION_FSFS_REQ.ns:FCUBS_HEADER;
 		DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:LIQUIDATETRANSACTION_FSFS_REQ.ns:FCUBS_BODY;
 
@@ -429,18 +411,19 @@ CREATE COMPUTE MODULE RequestToBackend
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		MOVE OutRef TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
+		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		-- MOVE OutRef TO OutputRoot.XMLNSC;
+		-- CALL PayloadLogging(envRef.id,Environment.resPayload,'BACKEND_REQ',MessageFlowLabel,OutRef);
 
 		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.HTTPInputHeader = InputRoot.HTTPInputHeader;
 		SET OutputRoot.SOAP = Environment.outputData;
 
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_REQ ------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Request data is: '||Environment.resPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_REQ data is: '||Environment.resPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
 
 		SET OutputLocalEnvironment.Destination.SOAP.Request.Transport.HTTP.WebServiceURL = BACKEND_URL;
-
 	END;
 END MODULE;
 ---------------------------------------------------------------------------------------------------------------------
@@ -449,406 +432,411 @@ CREATE COMPUTE MODULE ResponseToChannel
 	CREATE FUNCTION Main() RETURNS BOOLEAN
 	BEGIN
 		CALL GenerateResToFrontend();
-		RETURN TRUE;
+		RETURN FALSE;
 	END;
 	CREATE PROCEDURE GenerateResToFrontend() BEGIN
 
 		SET Environment.domainDataRef = InputRoot.SOAP;
+		DECLARE ccidRef, encodeRef INTEGER;
 		DECLARE envRef REFERENCE TO Environment.Variables;
-		-- DECLARE inRef REFERENCE TO InputRoot.SOAP.*:Body.*:LIQUIDATETRANSACTION_FSFS_RES;
-		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
-		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
+
+		SET ccidRef = InputRoot.Properties.CodedCharSetId;
+		SET encodeRef = InputRoot.Properties.Encoding;
 		DECLARE domainDataRef REFERENCE TO InputRoot.SOAP;
 		DECLARE domainName CHARACTER FIELDNAME(InputBody);
-
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		----------------------------------------------------
 		----------------------Request Logging-------------------------
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
-		CALL PayloadLogging(envRef.id,Environment.reqPayload,'BACKEND_RES',MessageFlowLabel,OutRef);
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ BACKEND_RES ------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.reqPayload) INTO rc;
-		----------------------------------------------------
-		-------------Business Logic-------------------------
-		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER;
-		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY;
+		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		-- DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
+		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'BACKEND_RESP',ApplicationLabel,OutRef);
 
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
-		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'LIQUIDATETRANSACTION_FSFS_RES';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:LIQUIDATETRANSACTION_FSFS_RES NAME 'FCUBS_HEADER';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:LIQUIDATETRANSACTION_FSFS_RES NAME 'FCUBS_BODY';
-		DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:LIQUIDATETRANSACTION_FSFS_RES.FCUBS_HEADER;
-		DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:LIQUIDATETRANSACTION_FSFS_RES.FCUBS_BODY;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------- BACKEND_RESP -------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RESP data  is: '||Environment.reqPayload) INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
+		-------------- Generating response to channel ---------------
+		IF InputRoot.SOAP.*:Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MSGSTAT IS NULL OR FIELDVALUE(InputRoot.SOAP.*:Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER.*:MSGSTAT) IS NULL THEN
+			SET OutputRoot = InputRoot;
 
-		SET outputHeaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
-		SET outputHeaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
-		SET outputHeaderRef.MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
-		SET outputHeaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
-		SET outputHeaderRef.USERID = NULLIF(inputHeaderRef.*:USERID,'');
-		SET outputHeaderRef.ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
-		SET outputHeaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
-		SET outputHeaderRef.MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
-		SET outputHeaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
-		SET outputHeaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
-		SET outputHeaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
-		SET outputHeaderRef.SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
-		SET outputHeaderRef.DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
-		SET outputHeaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
-		SET outputHeaderRef.FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
-		SET outputHeaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
-		SET outputHeaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
-		SET outputHeaderRef.SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
-		SET outputHeaderRef.PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
+		ELSE
 
-		DECLARE I INTEGER 1;
-		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputHeaderRef.ADDL.PARAM[I].NAME = NULLIF(inRef.*:NAME,'');
-			SET outputHeaderRef.ADDL.PARAM[I].VALUE = NULLIF(inRef.*:VALUE,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_HEADER;
+			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:LIQUIDATETRANSACTION_FSFS_RES.*:FCUBS_BODY;
 
-		SET outputBodyRef."Transaction-Details".XREF = NULLIF(inputBodyRef.*:"Transaction-Details".*:XREF,'');
-		SET outputBodyRef."Transaction-Details".PRODUCTCODE = NULLIF(inputBodyRef.*:"Transaction-Details".*:PRODUCTCODE,'');
-		SET outputBodyRef."Transaction-Details".FCCREF = NULLIF(inputBodyRef.*:"Transaction-Details".*:FCCREF,'');
-		SET outputBodyRef."Transaction-Details".VERNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:VERNO,'');
-		SET outputBodyRef."Transaction-Details".ESN = NULLIF(inputBodyRef.*:"Transaction-Details".*:ESN,'');
-		SET outputBodyRef."Transaction-Details".INSTRTYPE = NULLIF(inputBodyRef.*:"Transaction-Details".*:INSTRTYPE,'');
-		SET outputBodyRef."Transaction-Details".ISSBRN = NULLIF(inputBodyRef.*:"Transaction-Details".*:ISSBRN,'');
-		SET outputBodyRef."Transaction-Details".INSTRSTAT = NULLIF(inputBodyRef.*:"Transaction-Details".*:INSTRSTAT,'');
-		SET outputBodyRef."Transaction-Details".PAYBANK = NULLIF(inputBodyRef.*:"Transaction-Details".*:PAYBANK,'');
-		SET outputBodyRef."Transaction-Details".PAYBRN = NULLIF(inputBodyRef.*:"Transaction-Details".*:PAYBRN,'');
-		SET outputBodyRef."Transaction-Details".DDMICRNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:DDMICRNO,'');
-		SET outputBodyRef."Transaction-Details".ORGDFTNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:ORGDFTNO,'');
-		SET outputBodyRef."Transaction-Details".DISCDAYS = NULLIF(inputBodyRef.*:"Transaction-Details".*:DISCDAYS,'');
-		SET outputBodyRef."Transaction-Details".REISSDDFTNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:REISSDDFTNO,'');
-		SET outputBodyRef."Transaction-Details".EXPDT = NULLIF(inputBodyRef.*:"Transaction-Details".*:EXPDT,'');
-		SET outputBodyRef."Transaction-Details".SSN = NULLIF(inputBodyRef.*:"Transaction-Details".*:SSN,'');
-		SET outputBodyRef."Transaction-Details".RELCUST = NULLIF(inputBodyRef.*:"Transaction-Details".*:RELCUST,'');
-		SET outputBodyRef."Transaction-Details".ACBRN = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACBRN,'');
-		SET outputBodyRef."Transaction-Details".ACNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACNO,'');
-		SET outputBodyRef."Transaction-Details".CHEQUENO = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHEQUENO,'');
-		SET outputBodyRef."Transaction-Details".RESSRMKS = NULLIF(inputBodyRef.*:"Transaction-Details".*:RESSRMKS,'');
-		SET outputBodyRef."Transaction-Details".REISSUED = NULLIF(inputBodyRef.*:"Transaction-Details".*:REISSUED,'');
-		SET outputBodyRef."Transaction-Details".BENFNM = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENFNM,'');
-		SET outputBodyRef."Transaction-Details".BENFADDR1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENFADDR1,'');
-		SET outputBodyRef."Transaction-Details".BENFADDR2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENFADDR2,'');
-		SET outputBodyRef."Transaction-Details".BENFADDR3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENFADDR3,'');
-		SET outputBodyRef."Transaction-Details".BENFADDR4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENFADDR4,'');
-		SET outputBodyRef."Transaction-Details".BENFADDR5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENFADDR5,'');
-		SET outputBodyRef."Transaction-Details".BENACC = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENACC,'');
-		SET outputBodyRef."Transaction-Details".BENCUST = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENCUST,'');
-		SET outputBodyRef."Transaction-Details".BENCCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENCCY,'');
-		SET outputBodyRef."Transaction-Details".INSTRNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:INSTRNO,'');
-		SET outputBodyRef."Transaction-Details".INSTRDATE = NULLIF(inputBodyRef.*:"Transaction-Details".*:INSTRDATE,'');
-		SET outputBodyRef."Transaction-Details".INSTRCCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:INSTRCCY,'');
-		SET outputBodyRef."Transaction-Details".INSTRAMT = NULLIF(inputBodyRef.*:"Transaction-Details".*:INSTRAMT,'');
-		SET outputBodyRef."Transaction-Details".EXCHRATE = NULLIF(inputBodyRef.*:"Transaction-Details".*:EXCHRATE,'');
-		SET outputBodyRef."Transaction-Details".ACCCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACCCY,'');
-		SET outputBodyRef."Transaction-Details".OFSCCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:OFSCCY,'');
-		SET outputBodyRef."Transaction-Details".OFSAMT = NULLIF(inputBodyRef.*:"Transaction-Details".*:OFSAMT,'');
-		SET outputBodyRef."Transaction-Details".IDENTIFIERNM1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERNM1,'');
-		SET outputBodyRef."Transaction-Details".IDENTIFIERNM2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERNM2,'');
-		SET outputBodyRef."Transaction-Details".IDENTIFIERNM3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERNM3,'');
-		SET outputBodyRef."Transaction-Details".IDENTIFIERNM4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERNM4,'');
-		SET outputBodyRef."Transaction-Details".IDENTIFIERNM5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERNM5,'');
-		SET outputBodyRef."Transaction-Details".IDENTIFIERNM6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERNM6,'');
-		SET outputBodyRef."Transaction-Details".IDENTIFIERVL1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERVL1,'');
-		SET outputBodyRef."Transaction-Details".IDENTIFIERVL2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERVL2,'');
-		SET outputBodyRef."Transaction-Details".IDENTIFIERVL3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERVL3,'');
-		SET outputBodyRef."Transaction-Details".IDENTIFIERVL4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERVL4,'');
-		SET outputBodyRef."Transaction-Details".IDENTIFIERVL5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERVL5,'');
-		SET outputBodyRef."Transaction-Details".XIDENTIFIERVL6REF = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERVL6,'');
-		SET outputBodyRef."Transaction-Details".PRNSTAT = NULLIF(inputBodyRef.*:"Transaction-Details".*:PRNSTAT,'');
-		SET outputBodyRef."Transaction-Details".PRNCPY = NULLIF(inputBodyRef.*:"Transaction-Details".*:PRNCPY,'');
-		SET outputBodyRef."Transaction-Details".NARRATIVE = NULLIF(inputBodyRef.*:"Transaction-Details".*:NARRATIVE,'');
-		SET outputBodyRef."Transaction-Details".CHGACC = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACC,'');
-		SET outputBodyRef."Transaction-Details".THEIRACC = NULLIF(inputBodyRef.*:"Transaction-Details".*:THEIRACC,'');
-		SET outputBodyRef."Transaction-Details".THEIRACC1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:THEIRACC1,'');
-		SET outputBodyRef."Transaction-Details".THEIRACC2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:THEIRACC2,'');
-		SET outputBodyRef."Transaction-Details".THEIRACC3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:THEIRACC3,'');
-		SET outputBodyRef."Transaction-Details".THEIRACC4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:THEIRACC4,'');
-		SET outputBodyRef."Transaction-Details".CHGACY = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACY,'');
-		SET outputBodyRef."Transaction-Details".CHGACY1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACY1,'');
-		SET outputBodyRef."Transaction-Details".CHGACY2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACY2,'');
-		SET outputBodyRef."Transaction-Details".CHGACY3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACY3,'');
-		SET outputBodyRef."Transaction-Details".CHGACY4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACY4,'');
-		SET outputBodyRef."Transaction-Details".CHGLCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGLCY,'');
-		SET outputBodyRef."Transaction-Details".CHGACYRATE = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACYRATE,'');
-		SET outputBodyRef."Transaction-Details".ACYLCYRATE = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACYLCYRATE,'');
-		SET outputBodyRef."Transaction-Details".CHGACYRATE1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACYRATE1,'');
-		SET outputBodyRef."Transaction-Details".ACYLCYRATE1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACYLCYRATE1,'');
-		SET outputBodyRef."Transaction-Details".CHGLCY2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGLCY2,'');
-		SET outputBodyRef."Transaction-Details".CHGACYRATE2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACYRATE2,'');
-		SET outputBodyRef."Transaction-Details".ACYLCYRATE2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACYLCYRATE2,'');
-		SET outputBodyRef."Transaction-Details".CHGLCY3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGLCY3,'');
-		SET outputBodyRef."Transaction-Details".CHGACYRATE3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACYRATE3,'');
-		SET outputBodyRef."Transaction-Details".ACYLCYRATE3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACYLCYRATE3,'');
-		SET outputBodyRef."Transaction-Details".CHGLCY4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGLCY4,'');
-		SET outputBodyRef."Transaction-Details".CHGACYRATE4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACYRATE4,'');
-		SET outputBodyRef."Transaction-Details".ACYLCYRATE4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACYLCYRATE4,'');
-		SET outputBodyRef."Transaction-Details".MAKERID = NULLIF(inputBodyRef.*:"Transaction-Details".*:MAKERID,'');
-		SET outputBodyRef."Transaction-Details".MAKERSTAMP = NULLIF(inputBodyRef.*:"Transaction-Details".*:MAKERSTAMP,'');
-		SET outputBodyRef."Transaction-Details".CHECKERID = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHECKERID,'');
-		SET outputBodyRef."Transaction-Details".CHECKERSTAMP = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHECKERSTAMP,'');
-		SET outputBodyRef."Transaction-Details".CONTSTAT = NULLIF(inputBodyRef.*:"Transaction-Details".*:CONTSTAT,'');
-		SET outputBodyRef."Transaction-Details".AUTHSTAT = NULLIF(inputBodyRef.*:"Transaction-Details".*:AUTHSTAT,'');
-		SET outputBodyRef."Transaction-Details".MODNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:MODNO,'');
-		SET outputBodyRef."Transaction-Details".ONCEAUTH = NULLIF(inputBodyRef.*:"Transaction-Details".*:ONCEAUTH,'');
-		SET outputBodyRef."Transaction-Details".SCODE = NULLIF(inputBodyRef.*:"Transaction-Details".*:SCODE,'');
-		SET outputBodyRef."Transaction-Details".BATCHNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:BATCHNO,'');
-		SET outputBodyRef."Transaction-Details".CALCHG = NULLIF(inputBodyRef.*:"Transaction-Details".*:CALCHG,'');
-		SET outputBodyRef."Transaction-Details".TXNDRCR = NULLIF(inputBodyRef.*:"Transaction-Details".*:TXNDRCR,'');
-		SET outputBodyRef."Transaction-Details".BOOKDATE = NULLIF(inputBodyRef.*:"Transaction-Details".*:BOOKDATE,'');
-		SET outputBodyRef."Transaction-Details".OFFSETLCYAMT = NULLIF(inputBodyRef.*:"Transaction-Details".*:OFFSETLCYAMT,'');
-		SET outputBodyRef."Transaction-Details".TRANCOUNT = NULLIF(inputBodyRef.*:"Transaction-Details".*:TRANCOUNT,'');
-		SET outputBodyRef."Transaction-Details".LCYTOTCHGAMT = NULLIF(inputBodyRef.*:"Transaction-Details".*:LCYTOTCHGAMT,'');
-		SET outputBodyRef."Transaction-Details".TCYTOTCHGAMT = NULLIF(inputBodyRef.*:"Transaction-Details".*:TCYTOTCHGAMT,'');
-		SET outputBodyRef."Transaction-Details".DENMCCY1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DENMCCY1,'');
-		SET outputBodyRef."Transaction-Details".DENMAMT1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DENMAMT1,'');
-		SET outputBodyRef."Transaction-Details".DENMCCY2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DENMCCY2,'');
-		SET outputBodyRef."Transaction-Details".DENMAMT2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DENMAMT2,'');
-		SET outputBodyRef."Transaction-Details".ACCTITLE = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACCTITLE,'');
-		SET outputBodyRef."Transaction-Details".ACTAMT = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACTAMT,'');
-		SET outputBodyRef."Transaction-Details".TXNDATE = NULLIF(inputBodyRef.*:"Transaction-Details".*:TXNDATE,'');
-		SET outputBodyRef."Transaction-Details".ACYAMOUNT = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACYAMOUNT,'');
-		SET outputBodyRef."Transaction-Details".OFSACC = NULLIF(inputBodyRef.*:"Transaction-Details".*:OFSACC,'');
-		SET outputBodyRef."Transaction-Details".LCYAMOUNT = NULLIF(inputBodyRef.*:"Transaction-Details".*:LCYAMOUNT,'');
-		SET outputBodyRef."Transaction-Details".CHGMODE = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGMODE,'');
-		SET outputBodyRef."Transaction-Details".MULCHGCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:MULCHGCY,'');
-		SET outputBodyRef."Transaction-Details".OFSBRANCH = NULLIF(inputBodyRef.*:"Transaction-Details".*:OFSBRANCH,'');
-		SET outputBodyRef."Transaction-Details".DELIVERY_ADD1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DELIVERY_ADD1,'');
-		SET outputBodyRef."Transaction-Details".DELIVERY_ADD2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DELIVERY_ADD2,'');
-		SET outputBodyRef."Transaction-Details".DELIVERY_ADD3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DELIVERY_ADD3,'');
-		SET outputBodyRef."Transaction-Details".DELIVERY_ADD4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DELIVERY_ADD4,'');
-		SET outputBodyRef."Transaction-Details".DELIVERY_MODE = NULLIF(inputBodyRef.*:"Transaction-Details".*:DELIVERY_MODE,'');
+			SET OutputRoot.Properties = InputRoot.Properties;
+			SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+			CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+			CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'LIQUIDATETRANSACTION_FSFS_RES';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:LIQUIDATETRANSACTION_FSFS_RES NAME 'FCUBS_HEADER';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:LIQUIDATETRANSACTION_FSFS_RES NAME 'FCUBS_BODY';
 
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Transaction-Details".*:"Charge-Details"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].CHGCOMP = NULLIF(inRef.*:CHGCOMP,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].WAIVER = NULLIF(inRef.*:WAIVER,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].CHGAMT = NULLIF(inRef.*:CHGAMT,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].CHGCCY = NULLIF(inRef.*:CHGCCY,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].MISHEAD = NULLIF(inRef.*:MISHEAD,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].TXNCODE = NULLIF(inRef.*:TXNCODE,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].NETTINGIND = NULLIF(inRef.*:NETTINGIND,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].CHGGL = NULLIF(inRef.*:CHGGL,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].TYPE = NULLIF(inRef.*:TYPE,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].LCYCHG = NULLIF(inRef.*:LCYCHG,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].XRATE = NULLIF(inRef.*:XRATE,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].TCYCHG = NULLIF(inRef.*:TCYCHG,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].TCYXRATE = NULLIF(inRef.*:TCYXRATE,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:LIQUIDATETRANSACTION_FSFS_RES.FCUBS_HEADER;
+			DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:LIQUIDATETRANSACTION_FSFS_RES.FCUBS_BODY;
 
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Transaction-Details".*:"Cheque-Details"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].SRNO = NULLIF(inRef.*:SRNO,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].PAYBRN = NULLIF(inRef.*:PAYBRN,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].CHQNO = NULLIF(inRef.*:CHQNO,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].STAT = NULLIF(inRef.*:STAT,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].EXPDT = NULLIF(inRef.*:EXPDT,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].BENFNAME = NULLIF(inRef.*:BENFNAME,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].BENFADDR1 = NULLIF(inRef.*:BENFADDR1,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].BENFADDR2 = NULLIF(inRef.*:BENFADDR2,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].BENFADDR3 = NULLIF(inRef.*:BENFADDR3,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].BENFADDR4 = NULLIF(inRef.*:BENFADDR4,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].CRNO = NULLIF(inRef.*:CRNO,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].ISB = NULLIF(inRef.*:ISB,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLS1 = NULLIF(inRef.*:OTHERDETLS1,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLSTYPE1 = NULLIF(inRef.*:OTHERDETLSTYPE1,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLS2 = NULLIF(inRef.*:OTHERDETLS2,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLSTYPE2 = NULLIF(inRef.*:OTHERDETLSTYPE2,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLS3 = NULLIF(inRef.*:OTHERDETLS3,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLSTYPE3 = NULLIF(inRef.*:OTHERDETLSTYPE3,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLS4 = NULLIF(inRef.*:OTHERDETLS4,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLSTYPE4 = NULLIF(inRef.*:OTHERDETLSTYPE4,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLS5 = NULLIF(inRef.*:OTHERDETLS5,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLSTYPE5 = NULLIF(inRef.*:OTHERDETLSTYPE5,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLS6 = NULLIF(inRef.*:OTHERDETLS6,'');
-			SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLSTYPE6 = NULLIF(inRef.*:OTHERDETLSTYPE6,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			SET outputHeaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
+			SET outputHeaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
+			SET outputHeaderRef.MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
+			SET outputHeaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
+			SET outputHeaderRef.USERID = NULLIF(inputHeaderRef.*:USERID,'');
+			SET outputHeaderRef.ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
+			SET outputHeaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
+			SET outputHeaderRef.MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
+			SET outputHeaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
+			SET outputHeaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
+			SET outputHeaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
+			SET outputHeaderRef.SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
+			SET outputHeaderRef.DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
+			SET outputHeaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
+			SET outputHeaderRef.FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
+			SET outputHeaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
+			SET outputHeaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
+			SET outputHeaderRef.SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
+			SET outputHeaderRef.PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
 
-		SET outputBodyRef."Transaction-Details"."Mis-Details".BRANCH = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:BRANCH,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".CUSTNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:CUSTNO,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".MISGRP = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:MISGRP,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".REL_REF = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REL_REF,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".REL_ACC = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REL_ACC,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".MISHD = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:MISHD,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".POOLCD = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:POOLCD,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".REFRT = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REFRT,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".REFRTTYPE = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REFRTTYPE,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".REFXRT = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REFXRT,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".CALCMETH = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:CALCMETH,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".MISGRPTXN = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:MISGRPTXN,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".REFRTCD = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REFRTCD,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".REFRTSPRD = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REFRTSPRD,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS1,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS2,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS3,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS4,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS5,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS6,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS7 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS7,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS8 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS8,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS9 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS9,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS10 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS10,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".MISGRPCOMP = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:MISGRPCOMP,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS1,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS2,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS3,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS4,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS5,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS6,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS7 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS7,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS8 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS8,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS9 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS9,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS10 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS10,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COSTCOD1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COSTCOD1,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COSTCOD2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COSTCOD2,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COSTCOD3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COSTCOD3,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COSTCOD4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COSTCOD4,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COSTCOD5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COSTCOD5,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".LINKGRP = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:LINKGRP,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".CCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:CCY,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".RTFLAG = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:RTFLAG,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".PROCFLG = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:PROCFLG,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS1,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS2,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS3,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS4,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS5,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS6,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS7 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS7,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS8 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS8,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS9 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS9,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS10 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS10,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS1LBL1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS1LBL1,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS2LBL2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS2LBL2,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS3LBL3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS3LBL3,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS4LBL4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS4LBL4,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS5LBL5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS5LBL5,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS6LBL6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS6LBL6,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS7LBL7 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS7LBL7,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS8LBL8 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS8LBL8,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS9LBL9 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS9LBL9,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS10LBL10 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS10LBL10,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS1LBL1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS1LBL1,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS2LBL2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS2LBL2,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS3LBL3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS3LBL3,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS4LBL4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS4LBL4,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS5LBL5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS5LBL5,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS6LBL6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS6LBL6,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS7LBL7 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS7LBL7,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS8LBL8 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS8LBL8,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS9LBL9 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS9LBL9,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS10LBL10 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS10LBL10,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS1LBL1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS1LBL1,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS2LBL2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS2LBL2,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS3LBL3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS3LBL3,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS4LBL4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS4LBL4,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS5LBL5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS5LBL5,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS6LBL6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS6LBL6,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS7LBL7 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS7LBL7,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS8LBL8 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS8LBL8,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS9LBL9 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS9LBL9,'');
-		SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS10LBL10 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS10LBL10,'');
+			DECLARE I INTEGER 1;
+			DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputHeaderRef.ADDL.PARAM[I].NAME = NULLIF(inRef.*:NAME,'');
+				SET outputHeaderRef.ADDL.PARAM[I].VALUE = NULLIF(inRef.*:VALUE,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
 
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Transaction-Details".*:"Udf-Details"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].FUNCTIONID = NULLIF(inRef.*:FUNCTIONID,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].FIELD_NAME = NULLIF(inRef.*:FIELD_NAME,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].DATATYPE = NULLIF(inRef.*:DATATYPE,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].FIELD_VALUE = NULLIF(inRef.*:FIELD_VALUE,'');
-			SET outputBodyRef."Transaction-Details"."Charge-Details"[I].VAL_TYPE = NULLIF(inRef.*:VAL_TYPE,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			SET outputBodyRef."Transaction-Details".XREF = NULLIF(inputBodyRef.*:"Transaction-Details".*:XREF,'');
+			SET outputBodyRef."Transaction-Details".PRODUCTCODE = NULLIF(inputBodyRef.*:"Transaction-Details".*:PRODUCTCODE,'');
+			SET outputBodyRef."Transaction-Details".FCCREF = NULLIF(inputBodyRef.*:"Transaction-Details".*:FCCREF,'');
+			SET outputBodyRef."Transaction-Details".VERNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:VERNO,'');
+			SET outputBodyRef."Transaction-Details".ESN = NULLIF(inputBodyRef.*:"Transaction-Details".*:ESN,'');
+			SET outputBodyRef."Transaction-Details".INSTRTYPE = NULLIF(inputBodyRef.*:"Transaction-Details".*:INSTRTYPE,'');
+			SET outputBodyRef."Transaction-Details".ISSBRN = NULLIF(inputBodyRef.*:"Transaction-Details".*:ISSBRN,'');
+			SET outputBodyRef."Transaction-Details".INSTRSTAT = NULLIF(inputBodyRef.*:"Transaction-Details".*:INSTRSTAT,'');
+			SET outputBodyRef."Transaction-Details".PAYBANK = NULLIF(inputBodyRef.*:"Transaction-Details".*:PAYBANK,'');
+			SET outputBodyRef."Transaction-Details".PAYBRN = NULLIF(inputBodyRef.*:"Transaction-Details".*:PAYBRN,'');
+			SET outputBodyRef."Transaction-Details".DDMICRNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:DDMICRNO,'');
+			SET outputBodyRef."Transaction-Details".ORGDFTNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:ORGDFTNO,'');
+			SET outputBodyRef."Transaction-Details".DISCDAYS = NULLIF(inputBodyRef.*:"Transaction-Details".*:DISCDAYS,'');
+			SET outputBodyRef."Transaction-Details".REISSDDFTNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:REISSDDFTNO,'');
+			SET outputBodyRef."Transaction-Details".EXPDT = NULLIF(inputBodyRef.*:"Transaction-Details".*:EXPDT,'');
+			SET outputBodyRef."Transaction-Details".SSN = NULLIF(inputBodyRef.*:"Transaction-Details".*:SSN,'');
+			SET outputBodyRef."Transaction-Details".RELCUST = NULLIF(inputBodyRef.*:"Transaction-Details".*:RELCUST,'');
+			SET outputBodyRef."Transaction-Details".ACBRN = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACBRN,'');
+			SET outputBodyRef."Transaction-Details".ACNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACNO,'');
+			SET outputBodyRef."Transaction-Details".CHEQUENO = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHEQUENO,'');
+			SET outputBodyRef."Transaction-Details".RESSRMKS = NULLIF(inputBodyRef.*:"Transaction-Details".*:RESSRMKS,'');
+			SET outputBodyRef."Transaction-Details".REISSUED = NULLIF(inputBodyRef.*:"Transaction-Details".*:REISSUED,'');
+			SET outputBodyRef."Transaction-Details".BENFNM = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENFNM,'');
+			SET outputBodyRef."Transaction-Details".BENFADDR1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENFADDR1,'');
+			SET outputBodyRef."Transaction-Details".BENFADDR2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENFADDR2,'');
+			SET outputBodyRef."Transaction-Details".BENFADDR3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENFADDR3,'');
+			SET outputBodyRef."Transaction-Details".BENFADDR4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENFADDR4,'');
+			SET outputBodyRef."Transaction-Details".BENFADDR5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENFADDR5,'');
+			SET outputBodyRef."Transaction-Details".BENACC = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENACC,'');
+			SET outputBodyRef."Transaction-Details".BENCUST = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENCUST,'');
+			SET outputBodyRef."Transaction-Details".BENCCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:BENCCY,'');
+			SET outputBodyRef."Transaction-Details".INSTRNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:INSTRNO,'');
+			SET outputBodyRef."Transaction-Details".INSTRDATE = NULLIF(inputBodyRef.*:"Transaction-Details".*:INSTRDATE,'');
+			SET outputBodyRef."Transaction-Details".INSTRCCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:INSTRCCY,'');
+			SET outputBodyRef."Transaction-Details".INSTRAMT = NULLIF(inputBodyRef.*:"Transaction-Details".*:INSTRAMT,'');
+			SET outputBodyRef."Transaction-Details".EXCHRATE = NULLIF(inputBodyRef.*:"Transaction-Details".*:EXCHRATE,'');
+			SET outputBodyRef."Transaction-Details".ACCCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACCCY,'');
+			SET outputBodyRef."Transaction-Details".OFSCCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:OFSCCY,'');
+			SET outputBodyRef."Transaction-Details".OFSAMT = NULLIF(inputBodyRef.*:"Transaction-Details".*:OFSAMT,'');
+			SET outputBodyRef."Transaction-Details".IDENTIFIERNM1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERNM1,'');
+			SET outputBodyRef."Transaction-Details".IDENTIFIERNM2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERNM2,'');
+			SET outputBodyRef."Transaction-Details".IDENTIFIERNM3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERNM3,'');
+			SET outputBodyRef."Transaction-Details".IDENTIFIERNM4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERNM4,'');
+			SET outputBodyRef."Transaction-Details".IDENTIFIERNM5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERNM5,'');
+			SET outputBodyRef."Transaction-Details".IDENTIFIERNM6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERNM6,'');
+			SET outputBodyRef."Transaction-Details".IDENTIFIERVL1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERVL1,'');
+			SET outputBodyRef."Transaction-Details".IDENTIFIERVL2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERVL2,'');
+			SET outputBodyRef."Transaction-Details".IDENTIFIERVL3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERVL3,'');
+			SET outputBodyRef."Transaction-Details".IDENTIFIERVL4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERVL4,'');
+			SET outputBodyRef."Transaction-Details".IDENTIFIERVL5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERVL5,'');
+			SET outputBodyRef."Transaction-Details".XIDENTIFIERVL6REF = NULLIF(inputBodyRef.*:"Transaction-Details".*:IDENTIFIERVL6,'');
+			SET outputBodyRef."Transaction-Details".PRNSTAT = NULLIF(inputBodyRef.*:"Transaction-Details".*:PRNSTAT,'');
+			SET outputBodyRef."Transaction-Details".PRNCPY = NULLIF(inputBodyRef.*:"Transaction-Details".*:PRNCPY,'');
+			SET outputBodyRef."Transaction-Details".NARRATIVE = NULLIF(inputBodyRef.*:"Transaction-Details".*:NARRATIVE,'');
+			SET outputBodyRef."Transaction-Details".CHGACC = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACC,'');
+			SET outputBodyRef."Transaction-Details".THEIRACC = NULLIF(inputBodyRef.*:"Transaction-Details".*:THEIRACC,'');
+			SET outputBodyRef."Transaction-Details".THEIRACC1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:THEIRACC1,'');
+			SET outputBodyRef."Transaction-Details".THEIRACC2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:THEIRACC2,'');
+			SET outputBodyRef."Transaction-Details".THEIRACC3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:THEIRACC3,'');
+			SET outputBodyRef."Transaction-Details".THEIRACC4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:THEIRACC4,'');
+			SET outputBodyRef."Transaction-Details".CHGACY = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACY,'');
+			SET outputBodyRef."Transaction-Details".CHGACY1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACY1,'');
+			SET outputBodyRef."Transaction-Details".CHGACY2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACY2,'');
+			SET outputBodyRef."Transaction-Details".CHGACY3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACY3,'');
+			SET outputBodyRef."Transaction-Details".CHGACY4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACY4,'');
+			SET outputBodyRef."Transaction-Details".CHGLCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGLCY,'');
+			SET outputBodyRef."Transaction-Details".CHGACYRATE = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACYRATE,'');
+			SET outputBodyRef."Transaction-Details".ACYLCYRATE = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACYLCYRATE,'');
+			SET outputBodyRef."Transaction-Details".CHGACYRATE1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACYRATE1,'');
+			SET outputBodyRef."Transaction-Details".ACYLCYRATE1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACYLCYRATE1,'');
+			SET outputBodyRef."Transaction-Details".CHGLCY2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGLCY2,'');
+			SET outputBodyRef."Transaction-Details".CHGACYRATE2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACYRATE2,'');
+			SET outputBodyRef."Transaction-Details".ACYLCYRATE2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACYLCYRATE2,'');
+			SET outputBodyRef."Transaction-Details".CHGLCY3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGLCY3,'');
+			SET outputBodyRef."Transaction-Details".CHGACYRATE3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACYRATE3,'');
+			SET outputBodyRef."Transaction-Details".ACYLCYRATE3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACYLCYRATE3,'');
+			SET outputBodyRef."Transaction-Details".CHGLCY4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGLCY4,'');
+			SET outputBodyRef."Transaction-Details".CHGACYRATE4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGACYRATE4,'');
+			SET outputBodyRef."Transaction-Details".ACYLCYRATE4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACYLCYRATE4,'');
+			SET outputBodyRef."Transaction-Details".MAKERID = NULLIF(inputBodyRef.*:"Transaction-Details".*:MAKERID,'');
+			SET outputBodyRef."Transaction-Details".MAKERSTAMP = NULLIF(inputBodyRef.*:"Transaction-Details".*:MAKERSTAMP,'');
+			SET outputBodyRef."Transaction-Details".CHECKERID = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHECKERID,'');
+			SET outputBodyRef."Transaction-Details".CHECKERSTAMP = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHECKERSTAMP,'');
+			SET outputBodyRef."Transaction-Details".CONTSTAT = NULLIF(inputBodyRef.*:"Transaction-Details".*:CONTSTAT,'');
+			SET outputBodyRef."Transaction-Details".AUTHSTAT = NULLIF(inputBodyRef.*:"Transaction-Details".*:AUTHSTAT,'');
+			SET outputBodyRef."Transaction-Details".MODNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:MODNO,'');
+			SET outputBodyRef."Transaction-Details".ONCEAUTH = NULLIF(inputBodyRef.*:"Transaction-Details".*:ONCEAUTH,'');
+			SET outputBodyRef."Transaction-Details".SCODE = NULLIF(inputBodyRef.*:"Transaction-Details".*:SCODE,'');
+			SET outputBodyRef."Transaction-Details".BATCHNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:BATCHNO,'');
+			SET outputBodyRef."Transaction-Details".CALCHG = NULLIF(inputBodyRef.*:"Transaction-Details".*:CALCHG,'');
+			SET outputBodyRef."Transaction-Details".TXNDRCR = NULLIF(inputBodyRef.*:"Transaction-Details".*:TXNDRCR,'');
+			SET outputBodyRef."Transaction-Details".BOOKDATE = NULLIF(inputBodyRef.*:"Transaction-Details".*:BOOKDATE,'');
+			SET outputBodyRef."Transaction-Details".OFFSETLCYAMT = NULLIF(inputBodyRef.*:"Transaction-Details".*:OFFSETLCYAMT,'');
+			SET outputBodyRef."Transaction-Details".TRANCOUNT = NULLIF(inputBodyRef.*:"Transaction-Details".*:TRANCOUNT,'');
+			SET outputBodyRef."Transaction-Details".LCYTOTCHGAMT = NULLIF(inputBodyRef.*:"Transaction-Details".*:LCYTOTCHGAMT,'');
+			SET outputBodyRef."Transaction-Details".TCYTOTCHGAMT = NULLIF(inputBodyRef.*:"Transaction-Details".*:TCYTOTCHGAMT,'');
+			SET outputBodyRef."Transaction-Details".DENMCCY1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DENMCCY1,'');
+			SET outputBodyRef."Transaction-Details".DENMAMT1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DENMAMT1,'');
+			SET outputBodyRef."Transaction-Details".DENMCCY2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DENMCCY2,'');
+			SET outputBodyRef."Transaction-Details".DENMAMT2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DENMAMT2,'');
+			SET outputBodyRef."Transaction-Details".ACCTITLE = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACCTITLE,'');
+			SET outputBodyRef."Transaction-Details".ACTAMT = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACTAMT,'');
+			SET outputBodyRef."Transaction-Details".TXNDATE = NULLIF(inputBodyRef.*:"Transaction-Details".*:TXNDATE,'');
+			SET outputBodyRef."Transaction-Details".ACYAMOUNT = NULLIF(inputBodyRef.*:"Transaction-Details".*:ACYAMOUNT,'');
+			SET outputBodyRef."Transaction-Details".OFSACC = NULLIF(inputBodyRef.*:"Transaction-Details".*:OFSACC,'');
+			SET outputBodyRef."Transaction-Details".LCYAMOUNT = NULLIF(inputBodyRef.*:"Transaction-Details".*:LCYAMOUNT,'');
+			SET outputBodyRef."Transaction-Details".CHGMODE = NULLIF(inputBodyRef.*:"Transaction-Details".*:CHGMODE,'');
+			SET outputBodyRef."Transaction-Details".MULCHGCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:MULCHGCY,'');
+			SET outputBodyRef."Transaction-Details".OFSBRANCH = NULLIF(inputBodyRef.*:"Transaction-Details".*:OFSBRANCH,'');
+			SET outputBodyRef."Transaction-Details".DELIVERY_ADD1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DELIVERY_ADD1,'');
+			SET outputBodyRef."Transaction-Details".DELIVERY_ADD2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DELIVERY_ADD2,'');
+			SET outputBodyRef."Transaction-Details".DELIVERY_ADD3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DELIVERY_ADD3,'');
+			SET outputBodyRef."Transaction-Details".DELIVERY_ADD4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:DELIVERY_ADD4,'');
+			SET outputBodyRef."Transaction-Details".DELIVERY_MODE = NULLIF(inputBodyRef.*:"Transaction-Details".*:DELIVERY_MODE,'');
 
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Transaction-Details".*:"Message-Details"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].TYPE = NULLIF(inRef.*:TYPE,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].TYPE = NULLIF(inRef.*:TYPE,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].OPERCD = NULLIF(inRef.*:OPERCD,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].INSTRCD = NULLIF(inRef.*:INSTRCD,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].TXNCD = NULLIF(inRef.*:TXNCD,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].VDATECR = NULLIF(inRef.*:VDATECR,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].ORDCUST1 = NULLIF(inRef.*:ORDCUST1,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].ORDCUST2 = NULLIF(inRef.*:ORDCUST3,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].ORDCUST4 = NULLIF(inRef.*:ORDCUST4,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].ORDCUST5 = NULLIF(inRef.*:ORDCUST5,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].RECEIVER = NULLIF(inRef.*:RECEIVER,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].PAYDET1 = NULLIF(inRef.*:PAYDET1,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].PAYDET2 = NULLIF(inRef.*:PAYDET2,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].PAYDET3 = NULLIF(inRef.*:PAYDET3,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].PAYDET4 = NULLIF(inRef.*:PAYDET4,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].SRI1 = NULLIF(inRef.*:SRI1,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].SRI2 = NULLIF(inRef.*:SRI2,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].SRI3 = NULLIF(inRef.*:SRI3,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].SRI4 = NULLIF(inRef.*:SRI4,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].SRI5 = NULLIF(inRef.*:SRI5,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].SRI6 = NULLIF(inRef.*:SRI6,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].CHGDET = NULLIF(inRef.*:CHGDET,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].REGREP1 = NULLIF(inRef.*:REGREP1,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].REGREP2 = NULLIF(inRef.*:REGREP2,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].REGREP3 = NULLIF(inRef.*:REGREP3,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].ECONT1 = NULLIF(inRef.*:ECONT1,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].ECONT2 = NULLIF(inRef.*:ECONT2,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].ECONT3 = NULLIF(inRef.*:ECONT3,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].ECONT4 = NULLIF(inRef.*:ECONT4,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].ECONT5 = NULLIF(inRef.*:ECONT5,'');
-			SET outputBodyRef."Transaction-Details"."Message-Details"[I].VDATEDR = NULLIF(inRef.*:VDATEDR,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Transaction-Details".*:"Charge-Details"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].CHGCOMP = NULLIF(inRef.*:CHGCOMP,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].WAIVER = NULLIF(inRef.*:WAIVER,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].CHGAMT = NULLIF(inRef.*:CHGAMT,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].CHGCCY = NULLIF(inRef.*:CHGCCY,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].MISHEAD = NULLIF(inRef.*:MISHEAD,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].TXNCODE = NULLIF(inRef.*:TXNCODE,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].NETTINGIND = NULLIF(inRef.*:NETTINGIND,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].CHGGL = NULLIF(inRef.*:CHGGL,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].TYPE = NULLIF(inRef.*:TYPE,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].LCYCHG = NULLIF(inRef.*:LCYCHG,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].XRATE = NULLIF(inRef.*:XRATE,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].TCYCHG = NULLIF(inRef.*:TCYCHG,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].TCYXRATE = NULLIF(inRef.*:TCYXRATE,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
 
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Transaction-Details".*:"TC-Denomination-Details"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].TYPE = NULLIF(inRef.*:TYPE,'');
-			SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].TCCOUNT = NULLIF(inRef.*:TCCOUNT,'');
-			SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].SYSCOUNT = NULLIF(inRef.*:SYSCOUNT,'');
-			SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].SNO = NULLIF(inRef.*:SNO,'');
-			SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].STARTNO = NULLIF(inRef.*:STARTNO,'');
-			SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].ENDNO = NULLIF(inRef.*:ENDNO,'');
-			SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].TCAMT = NULLIF(inRef.*:TCAMT,'');
-			SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].TCIDDENM = NULLIF(inRef.*:TCIDDENM,'');
-			SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].INOUTIND = NULLIF(inRef.*:INOUTIND,'');
-			SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].TCCCY = NULLIF(inRef.*:TCCCY,'');
-			SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].ISSCODE = NULLIF(inRef.*:ISSCODE,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Transaction-Details".*:"Cheque-Details"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].SRNO = NULLIF(inRef.*:SRNO,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].PAYBRN = NULLIF(inRef.*:PAYBRN,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].CHQNO = NULLIF(inRef.*:CHQNO,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].STAT = NULLIF(inRef.*:STAT,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].EXPDT = NULLIF(inRef.*:EXPDT,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].BENFNAME = NULLIF(inRef.*:BENFNAME,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].BENFADDR1 = NULLIF(inRef.*:BENFADDR1,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].BENFADDR2 = NULLIF(inRef.*:BENFADDR2,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].BENFADDR3 = NULLIF(inRef.*:BENFADDR3,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].BENFADDR4 = NULLIF(inRef.*:BENFADDR4,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].CRNO = NULLIF(inRef.*:CRNO,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].ISB = NULLIF(inRef.*:ISB,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLS1 = NULLIF(inRef.*:OTHERDETLS1,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLSTYPE1 = NULLIF(inRef.*:OTHERDETLSTYPE1,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLS2 = NULLIF(inRef.*:OTHERDETLS2,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLSTYPE2 = NULLIF(inRef.*:OTHERDETLSTYPE2,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLS3 = NULLIF(inRef.*:OTHERDETLS3,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLSTYPE3 = NULLIF(inRef.*:OTHERDETLSTYPE3,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLS4 = NULLIF(inRef.*:OTHERDETLS4,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLSTYPE4 = NULLIF(inRef.*:OTHERDETLSTYPE4,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLS5 = NULLIF(inRef.*:OTHERDETLS5,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLSTYPE5 = NULLIF(inRef.*:OTHERDETLSTYPE5,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLS6 = NULLIF(inRef.*:OTHERDETLS6,'');
+				SET outputBodyRef."Transaction-Details"."Cheque-Details"[I].OTHERDETLSTYPE6 = NULLIF(inRef.*:OTHERDETLSTYPE6,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
 
-		SET Environment.outputData = OutputRoot.SOAP;
-		----------------------------------------------------
-		----------------------Response Logging-------------------------
-		MOVE domainDataRef TO OutputRoot.SOAP;
+			SET outputBodyRef."Transaction-Details"."Mis-Details".BRANCH = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:BRANCH,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".CUSTNO = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:CUSTNO,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".MISGRP = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:MISGRP,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".REL_REF = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REL_REF,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".REL_ACC = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REL_ACC,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".MISHD = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:MISHD,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".POOLCD = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:POOLCD,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".REFRT = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REFRT,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".REFRTTYPE = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REFRTTYPE,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".REFXRT = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REFXRT,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".CALCMETH = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:CALCMETH,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".MISGRPTXN = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:MISGRPTXN,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".REFRTCD = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REFRTCD,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".REFRTSPRD = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:REFRTSPRD,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS1,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS2,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS3,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS4,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS5,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS6,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS7 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS7,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS8 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS8,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS9 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS9,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS10 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS10,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".MISGRPCOMP = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:MISGRPCOMP,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS1,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS2,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS3,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS4,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS5,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS6,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS7 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS7,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS8 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS8,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS9 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS9,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS10 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS10,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COSTCOD1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COSTCOD1,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COSTCOD2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COSTCOD2,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COSTCOD3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COSTCOD3,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COSTCOD4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COSTCOD4,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COSTCOD5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COSTCOD5,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".LINKGRP = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:LINKGRP,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".CCY = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:CCY,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".RTFLAG = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:RTFLAG,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".PROCFLG = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:PROCFLG,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS1,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS2,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS3,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS4,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS5,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS6,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS7 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS7,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS8 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS8,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS9 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS9,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS10 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS10,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS1LBL1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS1LBL1,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS2LBL2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS2LBL2,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS3LBL3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS3LBL3,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS4LBL4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS4LBL4,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS5LBL5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS5LBL5,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS6LBL6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS6LBL6,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS7LBL7 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS7LBL7,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS8LBL8 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS8LBL8,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS9LBL9 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS9LBL9,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".FUNDMIS10LBL10 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:FUNDMIS10LBL10,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS1LBL1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS1LBL1,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS2LBL2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS2LBL2,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS3LBL3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS3LBL3,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS4LBL4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS4LBL4,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS5LBL5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS5LBL5,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS6LBL6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS6LBL6,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS7LBL7 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS7LBL7,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS8LBL8 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS8LBL8,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS9LBL9 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS9LBL9,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".COMPMIS10LBL10 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:COMPMIS10LBL10,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS1LBL1 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS1LBL1,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS2LBL2 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS2LBL2,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS3LBL3 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS3LBL3,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS4LBL4 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS4LBL4,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS5LBL5 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS5LBL5,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS6LBL6 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS6LBL6,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS7LBL7 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS7LBL7,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS8LBL8 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS8LBL8,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS9LBL9 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS9LBL9,'');
+			SET outputBodyRef."Transaction-Details"."Mis-Details".TXNMIS10LBL10 = NULLIF(inputBodyRef.*:"Transaction-Details".*:"Mis-Details".*:TXNMIS10LBL10,'');
+
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Transaction-Details".*:"Udf-Details"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].FUNCTIONID = NULLIF(inRef.*:FUNCTIONID,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].FIELD_NAME = NULLIF(inRef.*:FIELD_NAME,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].DATATYPE = NULLIF(inRef.*:DATATYPE,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].FIELD_VALUE = NULLIF(inRef.*:FIELD_VALUE,'');
+				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].VAL_TYPE = NULLIF(inRef.*:VAL_TYPE,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Transaction-Details".*:"Message-Details"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].TYPE = NULLIF(inRef.*:TYPE,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].TYPE = NULLIF(inRef.*:TYPE,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].OPERCD = NULLIF(inRef.*:OPERCD,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].INSTRCD = NULLIF(inRef.*:INSTRCD,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].TXNCD = NULLIF(inRef.*:TXNCD,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].VDATECR = NULLIF(inRef.*:VDATECR,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].ORDCUST1 = NULLIF(inRef.*:ORDCUST1,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].ORDCUST2 = NULLIF(inRef.*:ORDCUST3,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].ORDCUST4 = NULLIF(inRef.*:ORDCUST4,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].ORDCUST5 = NULLIF(inRef.*:ORDCUST5,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].RECEIVER = NULLIF(inRef.*:RECEIVER,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].PAYDET1 = NULLIF(inRef.*:PAYDET1,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].PAYDET2 = NULLIF(inRef.*:PAYDET2,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].PAYDET3 = NULLIF(inRef.*:PAYDET3,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].PAYDET4 = NULLIF(inRef.*:PAYDET4,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].SRI1 = NULLIF(inRef.*:SRI1,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].SRI2 = NULLIF(inRef.*:SRI2,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].SRI3 = NULLIF(inRef.*:SRI3,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].SRI4 = NULLIF(inRef.*:SRI4,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].SRI5 = NULLIF(inRef.*:SRI5,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].SRI6 = NULLIF(inRef.*:SRI6,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].CHGDET = NULLIF(inRef.*:CHGDET,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].REGREP1 = NULLIF(inRef.*:REGREP1,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].REGREP2 = NULLIF(inRef.*:REGREP2,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].REGREP3 = NULLIF(inRef.*:REGREP3,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].ECONT1 = NULLIF(inRef.*:ECONT1,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].ECONT2 = NULLIF(inRef.*:ECONT2,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].ECONT3 = NULLIF(inRef.*:ECONT3,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].ECONT4 = NULLIF(inRef.*:ECONT4,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].ECONT5 = NULLIF(inRef.*:ECONT5,'');
+				SET outputBodyRef."Transaction-Details"."Message-Details"[I].VDATEDR = NULLIF(inRef.*:VDATEDR,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Transaction-Details".*:"TC-Denomination-Details"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].TYPE = NULLIF(inRef.*:TYPE,'');
+				SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].TCCOUNT = NULLIF(inRef.*:TCCOUNT,'');
+				SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].SYSCOUNT = NULLIF(inRef.*:SYSCOUNT,'');
+				SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].SNO = NULLIF(inRef.*:SNO,'');
+				SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].STARTNO = NULLIF(inRef.*:STARTNO,'');
+				SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].ENDNO = NULLIF(inRef.*:ENDNO,'');
+				SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].TCAMT = NULLIF(inRef.*:TCAMT,'');
+				SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].TCIDDENM = NULLIF(inRef.*:TCIDDENM,'');
+				SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].INOUTIND = NULLIF(inRef.*:INOUTIND,'');
+				SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].TCCCY = NULLIF(inRef.*:TCCCY,'');
+				SET outputBodyRef."Transaction-Details"."TC-Denomination-Details"[I].ISSCODE = NULLIF(inRef.*:ISSCODE,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
+		END IF;
+		SET Environment.outputData = OutputRoot;
+		---------------------- Response Logging -------------------------
+		MOVE domainDataRef TO Environment.outputData.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-		MOVE OutRef TO OutputRoot.XMLNSC;
+		SET OutputRoot.HTTPResponseHeader = NULL;
 		SET OutputRoot.SOAP = NULL;
+		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		-- MOVE OutRef TO OutputRoot.XMLNSC;
+		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RESP',MessageFlowLabel,OutRef);
 
-		CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RES',MessageFlowLabel,OutRef);
-
-		SET OutputRoot.Properties = InputRoot.Properties;
-		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
-		SET OutputRoot.SOAP = Environment.outputData;
-
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_RES ------') INTO rc;
-		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'Response data is: '||Environment.resPayload) INTO rc;
-
-		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = envRef.RequestIdentifier;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||Environment.resPayload) INTO rc;
 
 	END;
 END MODULE;
@@ -893,7 +881,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		SET outExcpRef.ExceptionDescription = inputRef.excpText;
 		SET outExcpRef.ActualExceptionText = inputRef.actualExcpText;
 
-		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = envRef.RequestIdentifier;
-		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
+		SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
 	END;
 END MODULE;
