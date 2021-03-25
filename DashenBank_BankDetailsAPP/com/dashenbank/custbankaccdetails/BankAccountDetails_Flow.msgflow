@@ -34,7 +34,7 @@
       <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="514,18" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
         <translation xmi:type="utility:ConstantString" string="PayloadLogging"/>
       </nodes>
-      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="68,136" wsdlOperationMode="gateway" wsdlFileName="bankaccountdetails.wsdl" selectedPortType="FCUBSAccServiceSEI" selectedBinding="FCUBSAccServiceSEIBinding" selectedPort="FCUBSAccServiceSEI" targetNamespace="http://FCUBSAccService.types.ws.gw.fcubs.ofss.com" useHTTPTransport="true" urlSelector="/ESB_BankAccountDetails" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
+      <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="66,152" wsdlOperationMode="gateway" wsdlFileName="bankaccountdetails.wsdl" selectedPortType="FCUBSAccServiceSEI" selectedBinding="FCUBSAccServiceSEIBinding" selectedPort="FCUBSAccServiceSEI" targetNamespace="http://FCUBSAccService.types.ws.gw.fcubs.ofss.com" useHTTPTransport="true" urlSelector="/ESB_BankAccountDetails" allowQueryWSDL="true" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Service_Request"/>
       </nodes>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_6" location="217,131" computeExpression="esql://routine/com.dashenbank.custbankaccdetails#BankAccountDetails_RequestToBackend.Main" computeMode="all">
