@@ -193,13 +193,14 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
 
-			SET outputbodyRef."Stvw-Account-Sumary-IO".CUST_NO = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-IO".*:CUST_NO,'');
+			SET outputbodyRef."Stvw-Account-Sumary-IO" = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-IO",'');
 
 			SET outputbodyRef."Stvw-Account-Sumary-Full".CUST_NO = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO,'');
-
-			SET Environment.Summary = 'Stvw-Account-Sumary --A';
+            
+            DECLARE Summary CHARACTER REPLACE('Stvw-Account-Sumary --A',' ','');
+			SET Environment.Summary = Summary;
 			SET I = 1;
-			MOVE inRef TO inputBodyRef.*:"Stvw-Account-Sumary-Full".*:"Stvw-Account-Sumary --A";
+			MOVE inRef TO InputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES.ns:FCUBS_BODY.ns:"Stvw-Account-Sumary-Full".ns:"Stvw-Account-Sumary--A"[>];
 			WHILE LASTMOVE(inRef) DO
 				SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].CUSTACNO = NULLIF(inRef.*:CUSTACNO,'');
 				SET outputbodyRef."Stvw-Account-Sumary-Full".{Environment.Summary}[I].BRANCH_CODE = NULLIF(inRef.*:BRANCH_CODE,'');
