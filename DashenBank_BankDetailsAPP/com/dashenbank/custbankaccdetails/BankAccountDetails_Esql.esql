@@ -504,7 +504,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			IF FIELDVALUE(outputBodyRef."Cust-Account-Full") IS NULL THEN
 				SET outputBodyRef."Cust-Account-Full" = NULL;
 			END IF;
-			IF FIELDVALUE(outputBodyRef."Cust-Account-IO") IS NULL THEN
+			IF FIELDVALUE(outputBodyRef."Cust-Account-IO".BRN) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-IO".ACC) IS NULL THEN
 				SET outputBodyRef."Cust-Account-IO" = NULL;
 			END IF;
 
