@@ -137,6 +137,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_HEADER;
 			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:"Cust-Account-Full";
+			DECLARE inputBodyRefer REFERENCE TO InputRoot.SOAP.*:Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY;
 
 			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
@@ -163,6 +164,8 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputHeaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
 			SET outputHeaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
 
+			SET outputBodyRef."Cust-Account-IO".BRN = NULLIF(inputBodyRefer.*:"Cust-Account-IO".*:BRN,'');
+			SET outputBodyRef."Cust-Account-IO".ACC = NULLIF(inputBodyRefer.*:"Cust-Account-IO".*:ACC,'');
 			SET outputBodyRef."Cust-Account-Full".BRN = NULLIF(inputBodyRef.*:BRN,'');
 			SET outputBodyRef."Cust-Account-Full".ACC = NULLIF(inputBodyRef.*:ACC,'');
 			SET outputBodyRef."Cust-Account-Full".CUSTNO = NULLIF(inputBodyRef.*:CUSTNO,'');
@@ -420,7 +423,6 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
 
-
 			SET I = 1;
 			MOVE inRef TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[>];
 			WHILE LASTMOVE(inRef) DO
@@ -429,82 +431,86 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I + 1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
-            
-            		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Provision-Main") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Provision-Main" = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Interim-Details") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Interim-Details" = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full".Acstatuslines) IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full".Acstatuslines = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full".Intdetails) IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full".Intdetails = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Tddetails") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full".Tddetails = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Amount-Dates".Turnovers) IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Amount-Dates".Turnovers = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Amount-Dates") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Amount-Dates" = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Amount-Dates".Turnovers = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn" = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn" = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr" = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full".CustAcc.Misdetails) IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full".CustAcc) IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full".CustAcc = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Svcacsig") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig" = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp" = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full".FCUBS_WARNING_RESP.WARNING) IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full".FCUBS_WARNING_RESP.WARNING = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full".FCUBS_WARNING_RESP) IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full".FCUBS_WARNING_RESP = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl" = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails) IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo" = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Customer-Acc") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc" = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Sw") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Sw" = NULL;
-		END IF;
-		IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Chnl") IS NULL THEN
-			SET outputBodyRef."Cust-Account-Full"."Acc-Chnl" = NULL;
-		END IF;
-            
+
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Provision-Main") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Provision-Main" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Interim-Details") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Interim-Details" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full".Acstatuslines) IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full".Acstatuslines = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full".Intdetails) IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full".Intdetails = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Tddetails") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full".Tddetails = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Amount-Dates".Turnovers) IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Amount-Dates".Turnovers = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Amount-Dates".Turnovers = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full".CustAcc.Misdetails) IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full".CustAcc) IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full".CustAcc = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full".FCUBS_WARNING_RESP.WARNING) IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full".FCUBS_WARNING_RESP.WARNING = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full".FCUBS_WARNING_RESP) IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full".FCUBS_WARNING_RESP = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails) IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Customer-Acc") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Sw") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Sw" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Chnl") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Acc-Chnl" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Amount-Dates") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Amount-Dates" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Svcacsig") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-Full") IS NULL THEN
+				SET outputBodyRef."Cust-Account-Full" = NULL;
+			END IF;
+			IF FIELDVALUE(outputBodyRef."Cust-Account-IO") IS NULL THEN
+				SET outputBodyRef."Cust-Account-IO" = NULL;
+			END IF;
+
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 			PROPAGATE TO TERMINAL 'out' DELETE NONE;
 		END IF;
-		
-		
 
 		SET Environment.outputData = OutputRoot;
 		---------------------- Response Logging -------------------------
