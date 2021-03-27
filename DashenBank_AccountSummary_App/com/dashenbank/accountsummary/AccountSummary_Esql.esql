@@ -163,7 +163,8 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 
 			DECLARE outputheaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES.FCUBS_HEADER;
 			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES.FCUBS_BODY;
-
+            
+            SET outputheaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
 			SET outputheaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
 			SET outputheaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
 			SET outputheaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
@@ -175,7 +176,6 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 			SET outputheaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
 			SET outputheaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
 			SET outputheaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
-			SET outputheaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
 			SET outputheaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
 			SET outputheaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
 			SET outputheaderRef.USERID = NULLIF(inputHeaderRef.*:USERID,'');
@@ -193,7 +193,7 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
 
-			SET outputbodyRef."Stvw-Account-Sumary-IO" = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-IO",'');
+			SET outputbodyRef."Stvw-Account-Sumary-IO" = inputBodyRef.*:"Stvw-Account-Sumary-IO";
 
 			SET outputbodyRef."Stvw-Account-Sumary-Full".CUST_NO = NULLIF(inputBodyRef.*:"Stvw-Account-Sumary-Full".*:CUST_NO,'');
             
@@ -232,6 +232,10 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 				SET I = I + 1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+			
+			IF FIELDNAME(inputBodyRef.*:"Stvw-Account-Sumary-Full".*[>]) IS NULL THEN
+				SET outputbodyRef."Stvw-Account-Sumary-Full" = NULL;
+			END IF;
 
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 			PROPAGATE TO TERMINAL 'out' DELETE NONE;
