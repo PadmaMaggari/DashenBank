@@ -165,24 +165,24 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 			DECLARE outputbodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYACCSUMM_IOFS_RES.FCUBS_BODY;
             
             SET outputheaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
-			SET outputheaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
-			SET outputheaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
-			SET outputheaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
-			SET outputheaderRef.DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
-			SET outputheaderRef.ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
-			SET outputheaderRef.FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
-			SET outputheaderRef.MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
-			SET outputheaderRef.MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
-			SET outputheaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
-			SET outputheaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
-			SET outputheaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
-			SET outputheaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
 			SET outputheaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
+			SET outputheaderRef.MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
+			SET outputheaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
 			SET outputheaderRef.USERID = NULLIF(inputHeaderRef.*:USERID,'');
+			SET outputheaderRef.ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
+			SET outputheaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
+			SET outputheaderRef.MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
+			SET outputheaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
+			SET outputheaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
+			SET outputheaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
 			SET outputheaderRef.SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
+			SET outputheaderRef.DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
+			SET outputheaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
+			SET outputheaderRef.FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
+			SET outputheaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
+			SET outputheaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
 			SET outputheaderRef.SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
 			SET outputheaderRef.PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
-			SET outputheaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
 
 			DECLARE I INTEGER 1;
 			DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
