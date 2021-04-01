@@ -1,5 +1,9 @@
 
 
+
+
+
+
 BROKER SCHEMA com.dashenbank.reversal
 PATH com.dashenbank.genericfunctions;
 DECLARE ns NAMESPACE 'http://fcubs.ofss.com/service/FCUBSRTService';
@@ -88,7 +92,10 @@ CREATE COMPUTE MODULE RequestToFlexcube
 
 		SET outputBodyRef.ns:"Transaction-Details-IO".ns:XREF = inputBodyRef.*:"Transaction-Details-IO".*:XREF;
 		SET outputBodyRef.ns:"Transaction-Details-IO".ns:FCCREF = inputBodyRef.*:"Transaction-Details-IO".*:FCCREF;
-		---------------------- Response Logging -------------------------
+
+		SET Environment.outputData = OutputRoot.SOAP;
+		----------------------------------------------------
+		----------------------Response Logging-------------------------
 		MOVE domainDataRef TO OutputRoot.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
 		SET OutputRoot.SOAP = NULL;
@@ -185,8 +192,8 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
 
-			SET outputBodyRef."Transaction-Details-PK".XREF = NULLIF(outputBodyRef.*:"Transaction-Details-PK".*:XREF,'');
-			SET outputBodyRef."Transaction-Details-PK".FCCREF = NULLIF(outputBodyRef.*:"Transaction-Details-PK".*:FCCREF,'');
+			SET outputBodyRef."Transaction-Details-PK".XREF = NULLIF(inputBodyRef.*:"Transaction-Details-PK".*:XREF,'');
+			SET outputBodyRef."Transaction-Details-PK".FCCREF = NULLIF(inputBodyRef.*:"Transaction-Details-PK".*:FCCREF,'');
 
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
@@ -206,9 +213,15 @@ CREATE COMPUTE MODULE ResponseToFrontEnd
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
 
+			IF FIELDNAME(inputBodyRef.*:"Transaction-Details-PK") IS NULL THEN
+				SET outputBodyRef."Transaction-Details-PK" = NULL;
+			END IF;
+
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 			PROPAGATE TO TERMINAL 'out' DELETE NONE;
+
 		END IF;
+
 		SET Environment.outputData = OutputRoot;
 		---------------------- Response Logging -------------------------
 		MOVE domainDataRef TO Environment.outputData.SOAP;

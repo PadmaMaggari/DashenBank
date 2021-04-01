@@ -1,5 +1,7 @@
 
 
+
+
 BROKER SCHEMA com.dashenbank.Freeze
 PATH com.dashenbank.genericfunctions;
 
@@ -195,84 +197,86 @@ CREATE COMPUTE MODULE RequestToChannel
 			DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATEAMTBLK_IOPK_RES.ns:FCUBS_HEADER;
 			DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATEAMTBLK_IOPK_RES.ns:FCUBS_BODY;
 
-
-			SET outputHeaderRef.ns:SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
-			SET outputHeaderRef.ns:UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
-			SET outputHeaderRef.ns:MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
-			SET outputHeaderRef.ns:CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
-			SET outputHeaderRef.ns:USERID = NULLIF(inputHeaderRef.*:USERID,'');
-			SET outputHeaderRef.ns:ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
-			SET outputHeaderRef.ns:BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
-			SET outputHeaderRef.ns:MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
-			SET outputHeaderRef.ns:SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
-			SET outputHeaderRef.ns:OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
-			SET outputHeaderRef.ns:SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
-			SET outputHeaderRef.ns:SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
-			SET outputHeaderRef.ns:DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
-			SET outputHeaderRef.ns:MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
-			SET outputHeaderRef.ns:FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
-			SET outputHeaderRef.ns:ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
-			SET outputHeaderRef.ns:MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
-			SET outputHeaderRef.ns:SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
-			SET outputHeaderRef.ns:PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
+			SET outputHeaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
+			SET outputHeaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
+			SET outputHeaderRef.MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
+			SET outputHeaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
+			SET outputHeaderRef.USERID = NULLIF(inputHeaderRef.*:USERID,'');
+			SET outputHeaderRef.ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
+			SET outputHeaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
+			SET outputHeaderRef.MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
+			SET outputHeaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
+			SET outputHeaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
+			SET outputHeaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
+			SET outputHeaderRef.SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
+			SET outputHeaderRef.DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
+			SET outputHeaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
+			SET outputHeaderRef.FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
+			SET outputHeaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
+			SET outputHeaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
+			SET outputHeaderRef.SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
+			SET outputHeaderRef.PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
 
 			DECLARE I INTEGER 1;
 			DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
 			WHILE LASTMOVE(inRef) DO
-				SET outputHeaderRef.ns:ADDL.ns:PARAM[I].ns:NAME = NULLIF(inRef.*:NAME,'');
-				SET outputHeaderRef.ns:ADDL.ns:PARAM[I].ns:VALUE = NULLIF(inRef.*:VALUE,'');
+				SET outputHeaderRef.ADDL.PARAM[I].NAME = NULLIF(inRef.*:NAME,'');
+				SET outputHeaderRef.ADDL.PARAM[I].VALUE = NULLIF(inRef.*:VALUE,'');
 				SET I = I + 1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
 
+			SET outputBodyRef."Amount-Blocks-PK".AMTBLKNO = NULLIF(inputBodyRef.*:"Amount-Blocks-PK".*:AMTBLKNO,'');
 
-			SET outputBodyRef.ns:"Amount-Blocks-PK".ns:AMTBLKNO = NULLIF(inputBodyRef.*:"Amount-Blocks-PK".*:AMTBLKNO,'');
-
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:ACC = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:ACC,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:AMTBLKNO = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:AMTBLKNO,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:AMT = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:AMT,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:EXPDATE = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:EXPDATE,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:REM = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:REM,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:ABLKTYPE = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:ABLKTYPE,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:REFERENCE_NO = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:REFERENCE_NO,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:HPCODE = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:HPCODE,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:EFFDATE = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:EFFDATE,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:HOLDDESC = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:HOLDDESC,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:BRANCH = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:BRANCH,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:BENEFICIARY_EMAIL_ID = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:BENEFICIARY_EMAIL_ID,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:BENEFICIARY_FACEBOOK_ID = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:BENEFICIARY_FACEBOOK_ID,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:BENEFICIARY_TELEPHONE = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:BENEFICIARY_TELEPHONE,'');
-			SET outputBodyRef.ns:"Amount-Blocks-IO".ns:VERIFY_AVL_BAL = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:VERIFY_AVL_BAL,'');
-
+			SET outputBodyRef."Amount-Blocks-IO".ACC = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:ACC,'');
+			SET outputBodyRef."Amount-Blocks-IO".AMTBLKNO = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:AMTBLKNO,'');
+			SET outputBodyRef."Amount-Blocks-IO".AMT = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:AMT,'');
+			SET outputBodyRef."Amount-Blocks-IO".EXPDATE = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:EXPDATE,'');
+			SET outputBodyRef."Amount-Blocks-IO".REM = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:REM,'');
+			SET outputBodyRef."Amount-Blocks-IO".ABLKTYPE = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:ABLKTYPE,'');
+			SET outputBodyRef."Amount-Blocks-IO".REFERENCE_NO = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:REFERENCE_NO,'');
+			SET outputBodyRef."Amount-Blocks-IO".HPCODE = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:HPCODE,'');
+			SET outputBodyRef."Amount-Blocks-IO".EFFDATE = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:EFFDATE,'');
+			SET outputBodyRef."Amount-Blocks-IO".HOLDDESC = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:HOLDDESC,'');
+			SET outputBodyRef."Amount-Blocks-IO".BRANCH = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:BRANCH,'');
+			SET outputBodyRef."Amount-Blocks-IO".BENEFICIARY_EMAIL_ID = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:BENEFICIARY_EMAIL_ID,'');
+			SET outputBodyRef."Amount-Blocks-IO".BENEFICIARY_FACEBOOK_ID = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:BENEFICIARY_FACEBOOK_ID,'');
+			SET outputBodyRef."Amount-Blocks-IO".BENEFICIARY_TELEPHONE = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:BENEFICIARY_TELEPHONE,'');
+			SET outputBodyRef."Amount-Blocks-IO".VERIFY_AVL_BAL = NULLIF(inputBodyRef.*:"Amount-Blocks-IO".*:VERIFY_AVL_BAL,'');
 
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Amount-Blocks-IO".*:UDFDETAILS[>];
 			WHILE LASTMOVE(inRef) DO
-				SET outputBodyRef.ns:"Amount-Blocks-IO".ns:UDFDETAILS[I].ns:FLDNAM = NULLIF(inRef.*:FLDNAM,'');
-				SET outputBodyRef.ns:"Amount-Blocks-IO".ns:UDFDETAILS[I].ns:FLDVAL = NULLIF(inRef.*:FLDVAL,'');
+				SET outputBodyRef."Amount-Blocks-IO".UDFDETAILS[I].FLDNAM = NULLIF(inRef.*:FLDNAM,'');
+				SET outputBodyRef."Amount-Blocks-IO".UDFDETAILS[I].FLDVAL = NULLIF(inRef.*:FLDVAL,'');
 				SET I = I +1 ;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME ;
-			END WHILE ;
-
+			END WHILE;
 
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
 			WHILE LASTMOVE(inRef) DO
-				SET outputBodyRef.ns:FCUBS_ERROR_RESP.ns:ERROR[I].ns:ECODE = NULLIF(inRef.*:ECODE,'');
-				SET outputBodyRef.ns:FCUBS_ERROR_RESP.ns:ERROR[I].ns:EDESC = NULLIF(inRef.*:EDESC,'');
+				SET outputBodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = NULLIF(inRef.*:ECODE,'');
+				SET outputBodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = NULLIF(inRef.*:EDESC,'');
 				SET I = I +1 ;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME ;
-			END WHILE ;
-
+			END WHILE;
 
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
 			WHILE LASTMOVE(inRef) DO
-				SET outputBodyRef.ns:FCUBS_WARNING_RESP.ns:WARNING[I].ns:WCODE = NULLIF(inRef.*:WCODE,'');
-				SET outputBodyRef.ns:FCUBS_WARNING_RESP.ns:WARNING[I].ns:WDESC = NULLIF(inRef.*:WDESC,'');
+				SET outputBodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
+				SET outputBodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
 				SET I = I +1 ;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME ;
-			END WHILE ;
+			END WHILE;
+			
+			IF FIELDNAME(inputBodyRef.*:"Amount-Blocks-PK") IS NULL THEN
+				SET outputBodyRef."Amount-Blocks-PK" = NULL;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:"Amount-Blocks-IO") IS NULL THEN
+				SET outputBodyRef."Amount-Blocks-IO" = NULL;
+			END IF;
 
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 			PROPAGATE TO TERMINAL 'out' DELETE NONE;

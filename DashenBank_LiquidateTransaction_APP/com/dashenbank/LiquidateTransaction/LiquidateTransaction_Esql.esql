@@ -1,5 +1,7 @@
 
 
+
+
 BROKER SCHEMA com.dashenbank.LiquidateTransaction
 PATH com.dashenbank.genericfunctions;
 DECLARE ns NAMESPACE 'http://fcubs.ofss.com/service/FCUBSDDService';
@@ -758,11 +760,11 @@ CREATE COMPUTE MODULE ResponseToChannel
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Transaction-Details".*:"Udf-Details"[>];
 			WHILE LASTMOVE(inRef) DO
-				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].FUNCTIONID = NULLIF(inRef.*:FUNCTIONID,'');
-				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].FIELD_NAME = NULLIF(inRef.*:FIELD_NAME,'');
-				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].DATATYPE = NULLIF(inRef.*:DATATYPE,'');
-				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].FIELD_VALUE = NULLIF(inRef.*:FIELD_VALUE,'');
-				SET outputBodyRef."Transaction-Details"."Charge-Details"[I].VAL_TYPE = NULLIF(inRef.*:VAL_TYPE,'');
+				SET outputBodyRef."Transaction-Details"."Udf-Details"[I].FUNCTIONID = NULLIF(inRef.*:FUNCTIONID,'');
+				SET outputBodyRef."Transaction-Details"."Udf-Details"[I].FIELD_NAME = NULLIF(inRef.*:FIELD_NAME,'');
+				SET outputBodyRef."Transaction-Details"."Udf-Details"[I].DATATYPE = NULLIF(inRef.*:DATATYPE,'');
+				SET outputBodyRef."Transaction-Details"."Udf-Details"[I].FIELD_VALUE = NULLIF(inRef.*:FIELD_VALUE,'');
+				SET outputBodyRef."Transaction-Details"."Udf-Details"[I].VAL_TYPE = NULLIF(inRef.*:VAL_TYPE,'');
 				SET I = I + 1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
@@ -822,6 +824,25 @@ CREATE COMPUTE MODULE ResponseToChannel
 				SET I = I + 1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
+			WHILE LASTMOVE(inRef) Do
+				SET outputBodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = inRef.*:ECODE;
+				SET outputBodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = inRef.*:EDESC;
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
+			WHILE LASTMOVE(inRef) Do
+				SET outputBodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = inRef.*:WCODE;
+				SET outputBodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = inRef.*:WDESC;
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 			PROPAGATE TO TERMINAL 'out' DELETE NONE;
 		END IF;
