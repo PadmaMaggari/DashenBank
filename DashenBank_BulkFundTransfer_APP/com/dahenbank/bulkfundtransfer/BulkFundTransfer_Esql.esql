@@ -2,6 +2,8 @@
 
 
 
+
+
 BROKER SCHEMA com.dahenbank.bulkfundtransfer
 PATH com.dashenbank.genericfunctions;
 DECLARE ns NAMESPACE 'http://fcubs.ofss.com/service/FCUBSDEService';
@@ -534,6 +536,12 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		CREATE LASTCHILD OF OutputRoot.XMLNSC NAME 'ExceptionDetails';
 		DECLARE outExcpRef REFERENCE TO OutputRoot.XMLNSC.ExceptionDetails;
+
+		DECLARE errMsg CHARACTER;
+		IF CONTAINS(outExcpRef.excpText,'connection refused') OR CONTAINS(outExcpRef.excpText,'SocketTimeoutException')THEN
+			SET errMsg = 'Backend System / Flexcube is down';
+		END IF;
+		
 		SET outExcpRef.Msg_Id = envRef.id;
 		SET outExcpRef.ExceptionType = inputRef.excpType;
 		SET outExcpRef.ExceptionNumber = inputRef.excpNumber;
