@@ -2,13 +2,6 @@
 
 
 
-
-
-
-
-
-
-
 BROKER SCHEMA com.dahenbank.bulkfundtransfer
 PATH com.dashenbank.genericfunctions;
 DECLARE ns NAMESPACE 'http://fcubs.ofss.com/service/FCUBSDEService';
@@ -44,7 +37,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET envRef.RequestIdentifier = CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
 		SET envRef.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		SET envRef.id = InputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:MSGID;
+		SET envRef.id = InputRoot.SOAP.*:Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER.*:MSGID;
 		----------------------Request Logging-------------------------
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		-- DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
@@ -55,8 +48,8 @@ CREATE COMPUTE MODULE RequestToBackend
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
 		-------------- Generating request to Backend -------------
 
-		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER;
-		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY;
+		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_HEADER;
+		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:CREATEMJRNLBOOK_IOPK_REQ.*:FCUBS_BODY;
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 
@@ -290,204 +283,211 @@ CREATE COMPUTE MODULE ResponseToChannel
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'BACKEND_RESP data  is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ----------------------------------------------------------------------') INTO rc;
 		-------------- Generating response to channel ---------------
-		SET OutputRoot.Properties = InputRoot.Properties;
-		SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
-		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
+		IF FIELDVALUE(InputRoot.SOAP.*:Body.*:CREATEMJRNLBOOK_IOPK_RES.*:FCUBS_HEADER.*:MSGSTAT) IS NULL OR InputRoot.SOAP.*:Body.*:CREATEMJRNLBOOK_IOPK_RES.*:FCUBS_HEADER.*:MSGSTAT IS NULL THEN
+			SET OutputRoot = InputRoot;
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
+		ELSE
 
-		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_RES.*:FCUBS_HEADER;
-		DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:CREATEMJRNLBOOK_IOPK_RES.*:FCUBS_BODY;
+			SET OutputRoot.Properties = InputRoot.Properties;
+			SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
+			CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 
-		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
+			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:CREATEMJRNLBOOK_IOPK_RES.*:FCUBS_HEADER;
+			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:CREATEMJRNLBOOK_IOPK_RES.*:FCUBS_BODY;
 
-		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'CREATEMJRNLBOOK_IOPK_RES';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATEMJRNLBOOK_IOPK_RES NAME 'FCUBS_HEADER';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATEMJRNLBOOK_IOPK_RES NAME 'FCUBS_BODY';
+			SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
-		DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATEMJRNLBOOK_IOPK_RES.FCUBS_HEADER;
-		DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATEMJRNLBOOK_IOPK_RES.FCUBS_BODY;
+			CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'CREATEMJRNLBOOK_IOPK_RES';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATEMJRNLBOOK_IOPK_RES NAME 'FCUBS_HEADER';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATEMJRNLBOOK_IOPK_RES NAME 'FCUBS_BODY';
 
-		SET outputHeaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
-		SET outputHeaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
-		SET outputHeaderRef.MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
-		SET outputHeaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
-		SET outputHeaderRef.USERID = NULLIF(inputHeaderRef.*:USERID,'');
-		SET outputHeaderRef.ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
-		SET outputHeaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
-		SET outputHeaderRef.MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
-		SET outputHeaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
-		SET outputHeaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
-		SET outputHeaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
-		SET outputHeaderRef.SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
-		SET outputHeaderRef.DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
-		SET outputHeaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
-		SET outputHeaderRef.FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
-		SET outputHeaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
-		SET outputHeaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
-		SET outputHeaderRef.SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
-		SET outputHeaderRef.PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
+			DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATEMJRNLBOOK_IOPK_RES.FCUBS_HEADER;
+			DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATEMJRNLBOOK_IOPK_RES.FCUBS_BODY;
 
-		DECLARE I INTEGER 1;
-		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputHeaderRef.ADDL.PARAM[I].NAME = NULLIF(inRef.*:NAME,'');
-			SET outputHeaderRef.ADDL.PARAM[I].VALUE = NULLIF(inRef.*:VALUE,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			SET outputHeaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
+			SET outputHeaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
+			SET outputHeaderRef.MSGID = NULLIF(inputHeaderRef.*:MSGID,'');
+			SET outputHeaderRef.CORRELID = NULLIF(inputHeaderRef.*:CORRELID,'');
+			SET outputHeaderRef.USERID = NULLIF(inputHeaderRef.*:USERID,'');
+			SET outputHeaderRef.ENTITY = NULLIF(inputHeaderRef.*:ENTITY,'');
+			SET outputHeaderRef.BRANCH = NULLIF(inputHeaderRef.*:BRANCH,'');
+			SET outputHeaderRef.MODULEID = NULLIF(inputHeaderRef.*:MODULEID,'');
+			SET outputHeaderRef.SERVICE = NULLIF(inputHeaderRef.*:SERVICE,'');
+			SET outputHeaderRef.OPERATION = NULLIF(inputHeaderRef.*:OPERATION,'');
+			SET outputHeaderRef.SOURCE_OPERATION = NULLIF(inputHeaderRef.*:SOURCE_OPERATION,'');
+			SET outputHeaderRef.SOURCE_USERID = NULLIF(inputHeaderRef.*:SOURCE_USERID,'');
+			SET outputHeaderRef.DESTINATION = NULLIF(inputHeaderRef.*:DESTINATION,'');
+			SET outputHeaderRef.MULTITRIPID = NULLIF(inputHeaderRef.*:MULTITRIPID,'');
+			SET outputHeaderRef.FUNCTIONID = NULLIF(inputHeaderRef.*:FUNCTIONID,'');
+			SET outputHeaderRef.ACTION = NULLIF(inputHeaderRef.*:ACTION,'');
+			SET outputHeaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
+			SET outputHeaderRef.SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
+			SET outputHeaderRef.PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
 
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-PK".REFERENCE_NO = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-PK".*:REFERENCE_NO,'');
+			DECLARE I INTEGER 1;
+			DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputHeaderRef.ADDL.PARAM[I].NAME = NULLIF(inRef.*:NAME,'');
+				SET outputHeaderRef.ADDL.PARAM[I].VALUE = NULLIF(inRef.*:VALUE,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
 
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".REFERENCE_NO = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:REFERENCE_NO,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".BATCH_NO = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:BATCH_NO,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".CURR_NO = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:CURR_NO,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".TEMPLATE_CODE = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:TEMPLATE_CODE,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".VALUE_DATE = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:VALUE_DATE,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".BRANCH_CODE = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:BRANCH_CODE,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".CCY = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:CCY,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".FUNDID = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:FUNDID,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-PK".REFERENCE_NO = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-PK".*:REFERENCE_NO,'');
 
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].SERIAL_NO = NULLIF(inRef.*:SERIAL_NO,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].USER_REF_NO = NULLIF(inRef.*:USER_REF_NO,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].DR_CR = NULLIF(inRef.*:DR_CR,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].BRANCH_CODE = NULLIF(inRef.*:BRANCH_CODE,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].ACCORGL = NULLIF(inRef.*:ACCORGL,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].ACCOUNT = NULLIF(inRef.*:ACCOUNT,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].CCY = NULLIF(inRef.*:CCY,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].AMOUNT = NULLIF(inRef.*:AMOUNT,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].TXN_CODE = NULLIF(inRef.*:TXN_CODE,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].INSTRUMENT_NO = NULLIF(inRef.*:INSTRUMENT_NO,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].LCY_AMOUNT = NULLIF(inRef.*:LCY_AMOUNT,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].ADDL_TEXT = NULLIF(inRef.*:ADDL_TEXT,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].ACDESC = NULLIF(inRef.*:ACDESC,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].CUSTOMER = NULLIF(inRef.*:CUSTOMER,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].EXCH_RATE = NULLIF(inRef.*:EXCH_RATE,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".REFERENCE_NO = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:REFERENCE_NO,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".BATCH_NO = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:BATCH_NO,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".CURR_NO = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:CURR_NO,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".TEMPLATE_CODE = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:TEMPLATE_CODE,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".VALUE_DATE = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:VALUE_DATE,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".BRANCH_CODE = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:BRANCH_CODE,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".CCY = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:CCY,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".FUNDID = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:FUNDID,'');
 
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".BATCH_NUMBER = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:BATCH_NUMBER,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".DESCRIPTION = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:DESCRIPTION,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".DEBIT = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:DEBIT,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".CREDIT = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:CREDIT,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".BALANCING = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:BALANCING,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:"Detbs-Jrnl-Txn-Detail"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].SERIAL_NO = NULLIF(inRef.*:SERIAL_NO,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].USER_REF_NO = NULLIF(inRef.*:USER_REF_NO,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].DR_CR = NULLIF(inRef.*:DR_CR,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].BRANCH_CODE = NULLIF(inRef.*:BRANCH_CODE,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].ACCORGL = NULLIF(inRef.*:ACCORGL,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].ACCOUNT = NULLIF(inRef.*:ACCOUNT,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].CCY = NULLIF(inRef.*:CCY,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].AMOUNT = NULLIF(inRef.*:AMOUNT,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].TXN_CODE = NULLIF(inRef.*:TXN_CODE,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].INSTRUMENT_NO = NULLIF(inRef.*:INSTRUMENT_NO,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].LCY_AMOUNT = NULLIF(inRef.*:LCY_AMOUNT,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].ADDL_TEXT = NULLIF(inRef.*:ADDL_TEXT,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].ACDESC = NULLIF(inRef.*:ACDESC,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].CUSTOMER = NULLIF(inRef.*:CUSTOMER,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail"[I].EXCH_RATE = NULLIF(inRef.*:EXCH_RATE,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
 
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.CONREFNO = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:CONREFNO,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.MISGRP = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRP,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.RELACC = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:RELACC,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.RELETED_REFERENCE = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:RELETED_REFERENCE,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.MISHEAD = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISHEAD,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.RATEFLG = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:RATEFLG,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.POOLCD = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:POOLCD,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.REFINANCE_RATE = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFINANCE_RATE,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.REFRATETYP = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFRATETYP,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.CALCMETH1 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:CALCMETH1,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.REFSPREAD = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFSPREAD,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.REFRATECD = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFRATECD,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COSTCD1 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD1,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COSTCD2 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD2,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COSTCD3 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD3,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COSTCD4 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD4,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COSTCD5 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD5,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_1 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_1,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_10 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_10,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_2 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_2,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_3 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_3,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_4 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_4,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_5 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_5,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_6 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_6,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_7 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_7,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_8 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_8,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_9 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_9,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.MISGRPCOMP = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRPCOMP,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.MISGRPTXN = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRPTXN,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_1 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_1,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_10 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_10,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_2 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_2,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_3 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_3,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_4 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_4,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_5 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_5,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_6 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_6,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_7 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_7,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_8 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_8,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_9 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_9,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_1 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_1,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_10 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_10,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_2 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_2,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_3 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_3,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_4 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_4,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_5 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_5,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_6 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_6,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_7 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_7,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_8 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_8,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_9 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_9,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.MISGRPFUN = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRPFUN,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".BATCH_NUMBER = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:BATCH_NUMBER,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".DESCRIPTION = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:DESCRIPTION,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".DEBIT = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:DEBIT,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".CREDIT = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:CREDIT,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".BALANCING = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:"Devws-Batch-Master".*:BALANCING,'');
 
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.Txnmisdetails = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Txnmisdetails,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.Compmisdetails = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Compmisdetails,'');
-		SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.Fundmisdetails = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Fundmisdetails,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.CONREFNO = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:CONREFNO,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.MISGRP = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRP,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.RELACC = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:RELACC,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.RELETED_REFERENCE = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:RELETED_REFERENCE,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.MISHEAD = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISHEAD,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.RATEFLG = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:RATEFLG,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.POOLCD = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:POOLCD,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.REFINANCE_RATE = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFINANCE_RATE,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.REFRATETYP = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFRATETYP,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.CALCMETH1 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:CALCMETH1,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.REFSPREAD = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFSPREAD,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.REFRATECD = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:REFRATECD,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COSTCD1 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD1,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COSTCD2 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD2,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COSTCD3 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD3,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COSTCD4 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD4,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COSTCD5 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COSTCD5,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_1 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_1,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_10 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_10,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_2 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_2,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_3 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_3,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_4 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_4,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_5 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_5,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_6 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_6,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_7 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_7,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_8 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_8,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.TXN_MIS_9 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:TXN_MIS_9,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.MISGRPCOMP = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRPCOMP,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.MISGRPTXN = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRPTXN,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_1 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_1,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_10 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_10,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_2 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_2,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_3 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_3,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_4 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_4,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_5 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_5,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_6 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_6,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_7 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_7,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_8 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_8,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.COMP_MIS_9 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:COMP_MIS_9,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_1 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_1,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_10 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_10,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_2 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_2,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_3 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_3,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_4 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_4,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_5 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_5,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_6 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_6,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_7 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_7,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_8 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_8,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.FUND_MIS_9 = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:FUND_MIS_9,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.MISGRPFUN = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:MISGRPFUN,'');
 
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].BRANCH = NULLIF(inRef.*:BRANCH,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].PERIOD_CODE = NULLIF(inRef.*:PERIOD_CODE,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].FIN_YEAR = NULLIF(inRef.*:FIN_YEAR,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].REFERENCE_NO = NULLIF(inRef.*:REFERENCE_NO,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].GL_CODE = NULLIF(inRef.*:GL_CODE,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].REFERENCE_TYPE = NULLIF(inRef.*:REFERENCE_TYPE,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].TRANSFER_IND = NULLIF(inRef.*:TRANSFER_IND,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].MIS_CLASS = NULLIF(inRef.*:MIS_CLASS,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].TXN_DATE = NULLIF(inRef.*:TXN_DATE,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].OLD_MIS_CODE = NULLIF(inRef.*:OLD_MIS_CODE,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].NEW_MIS_CODE = NULLIF(inRef.*:NEW_MIS_CODE,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].CCY = NULLIF(inRef.*:CCY,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].AMOUNT = NULLIF(inRef.*:AMOUNT,'');
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].EX_RATE = NULLIF(inRef.*:EX_RATE,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.Txnmisdetails = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Txnmisdetails,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.Compmisdetails = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Compmisdetails,'');
+			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails.Fundmisdetails = NULLIF(inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:Fundmisdetails,'');
 
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = NULLIF(inRef.*:ECODE,'');
-			SET outputBodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = NULLIF(inRef.*:EDESC,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Detbs-Jrnl-Txn-Master-IO".*:Misdetails.*:"Balance-Trnsfer-Log-Details"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].BRANCH = NULLIF(inRef.*:BRANCH,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].PERIOD_CODE = NULLIF(inRef.*:PERIOD_CODE,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].FIN_YEAR = NULLIF(inRef.*:FIN_YEAR,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].REFERENCE_NO = NULLIF(inRef.*:REFERENCE_NO,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].GL_CODE = NULLIF(inRef.*:GL_CODE,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].REFERENCE_TYPE = NULLIF(inRef.*:REFERENCE_TYPE,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].TRANSFER_IND = NULLIF(inRef.*:TRANSFER_IND,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].MIS_CLASS = NULLIF(inRef.*:MIS_CLASS,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].TXN_DATE = NULLIF(inRef.*:TXN_DATE,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].OLD_MIS_CODE = NULLIF(inRef.*:OLD_MIS_CODE,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].NEW_MIS_CODE = NULLIF(inRef.*:NEW_MIS_CODE,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].CCY = NULLIF(inRef.*:CCY,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].AMOUNT = NULLIF(inRef.*:AMOUNT,'');
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails."Balance-Trnsfer-Log-Details"[I].EX_RATE = NULLIF(inRef.*:EX_RATE,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
 
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
-			SET outputBodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-		
-		IF FIELDNAME(outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".Misdetails.*[>]) IS NULL THEN
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails = NULL;
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:FCUBS_ERROR_RESP.*:ERROR[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = NULLIF(inRef.*:ECODE,'');
+				SET outputBodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = NULLIF(inRef.*:EDESC,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
+				SET outputBodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			IF FIELDNAME(outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".Misdetails.*[>]) IS NULL THEN
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO".Misdetails = NULL;
+			END IF;
+			IF FIELDNAME(outputBodyRef."Detbs-Jrnl-Txn-Master-PK".*[>]) IS NULL THEN
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-PK" = NULL;
+			END IF;
+			IF FIELDNAME(outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".*[>]) IS NULL AND FIELDNAME(outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail".*[>]) IS NULL THEN
+				SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO" = NULL;
+			END IF;
+
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
 		END IF;
-		IF FIELDNAME(outputBodyRef."Detbs-Jrnl-Txn-Master-PK".*[>]) IS NULL THEN
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-PK" = NULL;
-		END IF;
-		IF FIELDNAME(outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Devws-Batch-Master".*[>]) IS NULL AND FIELDNAME(outputBodyRef."Detbs-Jrnl-Txn-Master-IO"."Detbs-Jrnl-Txn-Detail".*[>]) IS NULL THEN
-			SET outputBodyRef."Detbs-Jrnl-Txn-Master-IO" = NULL;
-		END IF;		
-		
-
 
 		SET Environment.outputData = OutputRoot;
 		----------------------------------------------------
 		---------------------- Response Logging -------------------------
 		MOVE domainDataRef TO Environment.outputData.SOAP;
 		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
-		PROPAGATE TO TERMINAL 'out' DELETE NONE;
+
 		SET OutputRoot.HTTPResponseHeader = NULL;
 		SET OutputRoot.SOAP = NULL;
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
@@ -500,7 +500,6 @@ CREATE COMPUTE MODULE ResponseToChannel
 	END;
 END MODULE;
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 
 CREATE COMPUTE MODULE BuildExceptionResponse
 	CREATE FUNCTION Main() RETURNS BOOLEAN
