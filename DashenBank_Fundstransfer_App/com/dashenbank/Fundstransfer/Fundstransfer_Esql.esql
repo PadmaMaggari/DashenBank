@@ -1,8 +1,10 @@
 
 
+
+
 BROKER SCHEMA com.dashenbank.Fundstransfer
 PATH com.dashenbank.genericfunctions;
-DECLARE ns NAMESPACE 'http://localhost:7800/RTSERVICE/';
+DECLARE ns NAMESPACE 'http://fcubs.ofss.com/service/FCUBSRTService';
 
 DECLARE LOG4J_CONFIG_PATH, LOG4J_ERROR_MSG, BACKEND_URL, LOGGER_NAME, LOG_TYPE EXTERNAL CHARACTER;
 ------------- Global Variable-----------
@@ -28,7 +30,6 @@ CREATE COMPUTE MODULE RequestToBackend
 		DECLARE envRef REFERENCE TO Environment.Variables;
 		CREATE LASTCHILD OF Environment AS envRef NAME 'Variables';
 
-		SET Environment.domainDataRef = InputRoot.SOAP;
 		SET ccidRef = InputRoot.Properties.CodedCharSetId;
 		SET encodeRef = InputRoot.Properties.Encoding;
 		SET envRef.Encoding = encodeRef;
@@ -39,7 +40,7 @@ CREATE COMPUTE MODULE RequestToBackend
 		SET envRef.RequestIdentifier = CAST(InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier AS CHARACTER);
 		SET envRef.ReplyIdentifier = InputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier;
 		SET Environment.reqPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-		SET envRef.id = InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MSGID;
+		SET envRef.id = InputRoot.SOAP.*:Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER.*:MSGID;
 		----------------------Request Logging-------------------------
 		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		-- DECLARE OutRef REFERENCE TO OutputRoot.XMLNSC;
@@ -48,20 +49,20 @@ CREATE COMPUTE MODULE RequestToBackend
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' ------ CHANNEL_REQ ------') INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_REQ data is: '||Environment.reqPayload) INTO rc;
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -----------------------------------------------------------------------') INTO rc;
-		----------------- Generating request to flexcube ----------------
-		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER;
-		DECLARE inputBodyref REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details";
+		----------------- Generating request to backend ----------------
+		DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_HEADER;
+		DECLARE inputBodyref REFERENCE TO InputRoot.SOAP.*:Body.*:CREATETRANSACTION_FSFS_REQ.*:FCUBS_BODY.*:"Transaction-Details";
 
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'SOAP';
 		SET OutputRoot.SOAP.Context = InputRoot.SOAP.Context;
 
 		CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'CREATETRANSACTION_FSFS_RES';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES NAMESPACE ns NAME 'FCUBS_HEADER';
-		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES NAMESPACE ns NAME 'FCUBS_BODY';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'CREATETRANSACTION_FSFS_REQ';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_REQ NAMESPACE ns NAME 'FCUBS_HEADER';
+		CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_REQ NAMESPACE ns NAME 'FCUBS_BODY';
 
-		DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES.ns:FCUBS_BODY;
-		DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES.ns:FCUBS_HEADER;
+		DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_REQ.ns:FCUBS_BODY;
+		DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_REQ.ns:FCUBS_HEADER;
 
 		SET outputHeaderRef.ns:SOURCE = inputHeaderRef.*:SOURCE;
 		SET outputHeaderRef.ns:UBSCOMP = inputHeaderRef.*:UBSCOMP;
@@ -459,10 +460,11 @@ CREATE COMPUTE MODULE ResponseToChannel
 
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 			PROPAGATE TO TERMINAL 'out' DELETE NONE;
+
 		ELSE
-			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER;
-			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details";
-			DECLARE inputWarnRef REFERENCE TO InputRoot.SOAP.Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY;
+			DECLARE inputHeaderRef REFERENCE TO InputRoot.SOAP.*:Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_HEADER;
+			DECLARE inputBodyRef REFERENCE TO InputRoot.SOAP.*:Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY.*:"Transaction-Details";
+			DECLARE inputWarnRef REFERENCE TO InputRoot.SOAP.*:Body.*:CREATETRANSACTION_FSFS_RES.*:FCUBS_BODY;
 
 			SET OutputRoot.Properties = InputRoot.Properties;
 			SET OutputRoot.HTTPResponseHeader = InputRoot.HTTPResponseHeader;
@@ -472,8 +474,8 @@ CREATE COMPUTE MODULE ResponseToChannel
 
 			CREATE LASTCHILD OF OutputRoot.SOAP NAME 'Body';
 			CREATE LASTCHILD OF OutputRoot.SOAP.Body NAMESPACE ns NAME 'CREATETRANSACTION_FSFS_RES';
-			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES NAMESPACE ns NAME 'FCUBS_HEADER';
-			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES NAMESPACE ns NAME 'FCUBS_BODY';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES NAME 'FCUBS_HEADER';
+			CREATE LASTCHILD OF OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES NAME 'FCUBS_BODY';
 
 			DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES.FCUBS_HEADER;
 			DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:CREATETRANSACTION_FSFS_RES.FCUBS_BODY;
@@ -845,13 +847,44 @@ CREATE COMPUTE MODULE ResponseToChannel
 			END WHILE;
 
 			SET I = 1;
-			MOVE inRef TO inputWarnRef.*:FCUBS_WARNING_RESP.*:ERROR[>];
+			MOVE inRef TO inputWarnRef.*:FCUBS_WARNING_RESP.*:WARNING[>];
 			WHILE LASTMOVE(inRef) DO
 				SET outputBodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
 				SET outputBodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
 				SET I = I + 1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
+			IF FIELDNAME(outputBodyRef."Transaction-Details"."Charge-Details".*) IS NULL
+				THEN
+				DELETE FIELD outputBodyRef."Transaction-Details"."Charge-Details";
+			END IF;
+
+			IF FIELDVALUE(outputBodyRef."Transaction-Details"."Cheque-Details".*) IS NULL
+				THEN
+				DELETE FIELD outputBodyRef."Transaction-Details"."Cheque-Details";
+
+			END IF;
+
+			IF FIELDVALUE(outputBodyRef."Transaction-Details"."Mis-Details".*) IS NULL
+				THEN
+				DELETE FIELD outputBodyRef."Transaction-Details"."Mis-Details";
+			END IF;
+
+			IF FIELDVALUE(outputBodyRef."Transaction-Details"."Udf-Details".*) IS NULL
+				THEN
+				DELETE FIELD outputBodyRef."Transaction-Details"."Udf-Details";
+			END IF;
+
+			IF FIELDVALUE(outputBodyRef."Transaction-Details"."Message-Details".*) IS NULL
+				THEN
+				DELETE FIELD outputBodyRef."Transaction-Details"."Message-Details";
+			END IF;
+
+			IF FIELDVALUE(outputBodyRef."Transaction-Details"."FT-Details".*) IS NULL
+				THEN
+				DELETE FIELD outputBodyRef."Transaction-Details"."FT-Details";
+			END IF;
 
 			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
 			PROPAGATE TO TERMINAL 'out' DELETE NONE;
@@ -910,6 +943,12 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		CREATE LASTCHILD OF OutputRoot.XMLNSC NAME 'ExceptionDetails';
 		DECLARE outExcpRef REFERENCE TO OutputRoot.XMLNSC.ExceptionDetails;
+
+		DECLARE errMsg CHARACTER;
+		IF CONTAINS(outExcpRef.excpText,'connection refused') OR CONTAINS(outExcpRef.excpText,'SocketTimeoutException')THEN
+			SET errMsg = 'Backend System / Flexcube is down';
+		END IF;
+
 		SET outExcpRef.Msg_Id = envRef.id;
 		SET outExcpRef.ExceptionType = inputRef.excpType;
 		SET outExcpRef.ExceptionNumber = inputRef.excpNumber;
