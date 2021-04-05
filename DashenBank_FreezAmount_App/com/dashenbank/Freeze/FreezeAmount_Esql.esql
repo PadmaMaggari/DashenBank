@@ -1,7 +1,3 @@
-
-
-
-
 BROKER SCHEMA com.dashenbank.Freeze
 PATH com.dashenbank.genericfunctions;
 
@@ -308,7 +304,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		RETURN TRUE;
 	END;
 
-	CREATE PROCEDURE BuildExceptionResponse() BEGIN
+CREATE PROCEDURE BuildExceptionResponse() BEGIN
 		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'..............Error Logging Started...........') INTO rc;
 		--DECLARE inRef REFERENCE TO InputRoot.SOAP;
 		DECLARE envRef REFERENCE TO Environment.Variables;
@@ -334,14 +330,21 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
 		CREATE LASTCHILD OF OutputRoot.XMLNSC NAME 'ExceptionDetails';
 		DECLARE outExcpRef REFERENCE TO OutputRoot.XMLNSC.ExceptionDetails;
+
+		DECLARE errMsg CHARACTER;
+		IF CONTAINS(inputRef.excpText,'connection refused') OR CONTAINS(inputRef.excpText,'SocketTimeoutException')THEN
+			SET errMsg = 'Backend System / Flexcube is down';
+		END IF;
+
 		SET outExcpRef.Msg_Id = envRef.id;
 		SET outExcpRef.ExceptionType = inputRef.excpType;
 		SET outExcpRef.ExceptionNumber = inputRef.excpNumber;
 		SET outExcpRef.ExceptionLable = inputRef.excpLable;
+		SET outExcpRef.ExceptionMessage = NULLIF(errMsg,'');
 		SET outExcpRef.ExceptionDescription = inputRef.excpText;
 		SET outExcpRef.ActualExceptionText = inputRef.actualExcpText;
 
-		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = envRef.RequestIdentifier;
-		CALL writeToLogFile(MessageFlowLabel, LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
+		SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'..............End of Error Logging ...........') INTO rc;
 	END;
 END MODULE;

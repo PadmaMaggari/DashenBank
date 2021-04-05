@@ -945,7 +945,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		DECLARE outExcpRef REFERENCE TO OutputRoot.XMLNSC.ExceptionDetails;
 
 		DECLARE errMsg CHARACTER;
-		IF CONTAINS(outExcpRef.excpText,'connection refused') OR CONTAINS(outExcpRef.excpText,'SocketTimeoutException')THEN
+		IF CONTAINS(inputRef.excpText,'connection refused') OR CONTAINS(inputRef.excpText,'SocketTimeoutException')THEN
 			SET errMsg = 'Backend System / Flexcube is down';
 		END IF;
 
@@ -953,6 +953,7 @@ CREATE COMPUTE MODULE BuildExceptionResponse
 		SET outExcpRef.ExceptionType = inputRef.excpType;
 		SET outExcpRef.ExceptionNumber = inputRef.excpNumber;
 		SET outExcpRef.ExceptionLable = inputRef.excpLable;
+		SET outExcpRef.ExceptionMessage = NULLIF(errMsg,'');
 		SET outExcpRef.ExceptionDescription = inputRef.excpText;
 		SET outExcpRef.ActualExceptionText = inputRef.actualExcpText;
 

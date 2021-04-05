@@ -1,5 +1,3 @@
-
-
 BROKER SCHEMA com.dahenbank.bulkfundtransfer
 PATH com.dashenbank.genericfunctions;
 DECLARE ns NAMESPACE 'http://fcubs.ofss.com/service/FCUBSDEService';
