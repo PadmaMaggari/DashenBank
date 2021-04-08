@@ -864,7 +864,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full"."Doctype-Remarks".SEND_NOTIFICATION = NULLIF(inputBodyRef.*:"Doctype-Remarks".*:SEND_NOTIFICATION,'');
 			SET outputBodyRef."Cust-Account-Full"."Doctype-Remarks".FREQUENCY = NULLIF(inputBodyRef.*:"Doctype-Remarks".*:FREQUENCY,'');
 			SET outputBodyRef."Cust-Account-Full"."Doctype-Remarks".DAYS = NULLIF(inputBodyRef.*:"Doctype-Remarks".*:DAYS,'');
-			-----4/6/2021
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Sttms-Od-Coll-Linkages";
 			WHILE LASTMOVE(inRef) DO
@@ -945,7 +945,6 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
 
-
 			SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn".BRN = NULLIF(inputBodyRef.*:"Custacc-Icchspcn".*:BRN,'');
 			SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn".ACC = NULLIF(inputBodyRef.*:"Custacc-Icchspcn".*:ACC,'');
 			SET I = 1;
@@ -959,541 +958,540 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn".Chgdetails[I].FREETXN = NULLIF(inRef.*:FREETXN,'');
 				SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn".Chgdetails[I].DESC = NULLIF(inRef.*:DESC,'');
 				IF FIELDNAME(inputBodyRef.*:"Custacc-Icchspcn".*:Chgdetails.*:Chgslabs.*[>]) IS NOT NULL THEN
-				DECLARE J INTEGER 1;
-				DECLARE inRefe REFERENCE TO inputBodyRef.*:"Custacc-Icchspcn".*:Chgdetails.*:Chgslabs[>];
-				WHILE LASTMOVE(inRefe) DO
-					SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn".Chgdetails.Chgslabs[J].SLABAMT = NULLIF(inRefe.*:SLABAMT,'');
-					SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn".Chgdetails.Chgslabs[J].CHGAMT = NULLIF(inRefe.*:CHGAMT,'');
-					SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn".Chgdetails.Chgslabs[J].CHGRATE = NULLIF(inRefe.*:CHGRATE,'');
-					SET J = J+1;
-					MOVE inRefe NEXTSIBLING REPEAT TYPE NAME;
-				END WHILE;
+					DECLARE J INTEGER 1;
+					DECLARE inRefe REFERENCE TO inputBodyRef.*:"Custacc-Icchspcn".*:Chgdetails.*:Chgslabs[>];
+					WHILE LASTMOVE(inRefe) DO
+						SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn".Chgdetails.Chgslabs[J].SLABAMT = NULLIF(inRefe.*:SLABAMT,'');
+						SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn".Chgdetails.Chgslabs[J].CHGAMT = NULLIF(inRefe.*:CHGAMT,'');
+						SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn".Chgdetails.Chgslabs[J].CHGRATE = NULLIF(inRefe.*:CHGRATE,'');
+						SET J = J+1;
+						MOVE inRefe NEXTSIBLING REPEAT TYPE NAME;
+					END WHILE;
+				END IF;
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn"."Misc-Icchspcn".CCY = NULLIF(inputBodyRef.*:"Custacc-Icchspcn".*:"Misc-Icchspcn".*:CCY,'');
+
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".BRN = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:BRN,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".ACC = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:ACC,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.DEPACCCLS = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:DEPACCCLS,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.ACCCCY = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:ACCCCY,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.SWPAMOUNT = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:SWPAMOUNT,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.CUSTOMER = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:CUSTOMER,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.DEPCCY = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:DEPCCY,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.SEQNO = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:SEQNO,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.SWPTOAC = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:SWPTOAC,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.SCODE = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:SCODE,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.XREF = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:XREF,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.MINREQDBAL = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:MINREQDBAL,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.SWPMULTIOF = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:SWPMULTIOF,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.RETRYTILLDT = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:RETRYTILLDT,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.SWPTOACBRN = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:SWPTOACBRN,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.STARTDT = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:STARTDT,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.DEPTENYEARS = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:DEPTENYEARS,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.MONTHS = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:MONTHS,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.DAYS = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:DAYS,'');
+
+			SET outputBodyRef."Cust-Account-Full".CustAcc.BRN = NULLIF(inputBodyRef.*:CustAcc.*:BRN,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.ACC = NULLIF(inputBodyRef.*:CustAcc.*:ACC,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MISGRP = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:MISGRP,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.POOLCD = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:POOLCD,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.REFRATE = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:REFRATE,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.REFRTTYPE = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:REFRTTYPE,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MISGRPTXN = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:MISGRPTXN,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.REFRTCD = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:REFRTCD,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.REFRTSPRD = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:REFRTSPRD,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.CALCMETH = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:CALCMETH,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS1 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS1,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS2 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS2,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS3 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS3,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS4 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS4,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS5 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS5,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS6 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS6,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS7 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS7,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS8 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS8,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS9 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS9,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS10 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS10,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MISGRPCOMP = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:MISGRPCOMP,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS1 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS1,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS2 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS2,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS3 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS3,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS4 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS4,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS5 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS5,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS6 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS6,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS7 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS7,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS8 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS8,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS9 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS9,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS10 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS10,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COSTCOD1 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COSTCOD1,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COSTCOD2 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COSTCOD2,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COSTCOD3 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COSTCOD3,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COSTCOD4 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COSTCOD4,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COSTCOD5 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COSTCOD5,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.RTFLAG = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:RTFLAG,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.LINKGRP = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:LINKGRP,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:CustAcc.*:Misdetails.*:MisAccLog[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisAccLog[I].MISCLS = NULLIF(inRef.*:MISCLS,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisAccLog[I].TXNDT = NULLIF(inRef.*:TXNDT,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisAccLog[I].OLDMISCD = NULLIF(inRef.*:OLDMISCD,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisAccLog[I].NWMISCD = NULLIF(inRef.*:NWMISCD,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:CustAcc.*:Misdetails.*:MisAccLog[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].BRN = NULLIF(inRef.*:BRN,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].PRDCD = NULLIF(inRef.*:PRDCD,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].FINYR = NULLIF(inRef.*:FINYR,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].TXNDT = NULLIF(inRef.*:TXNDT,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].GLCODE = NULLIF(inRef.*:GLCODE,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].MISCLS = NULLIF(inRef.*:MISCLS,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].OLDMISCD = NULLIF(inRef.*:OLDMISCD,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].NWMISCD = NULLIF(inRef.*:NWMISCD,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].TRNIND = NULLIF(inRef.*:TRNIND,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].CCY = NULLIF(inRef.*:CCY,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].XRATE = NULLIF(inRef.*:XRATE,'');
+				SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].AMT = NULLIF(inRef.*:AMT,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Chglog = NULLIF(inputBodyRef.*:CustAcc.*:Chglog,'');
+
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C2 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C2,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C3 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C3,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C4 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C4,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C6 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C6,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C7 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C7,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C8 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C8,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C9 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C9,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C10 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C10,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T1 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T1,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T3 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T3,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T5 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T5,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T6 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T6,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T7 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T7,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T8 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T8,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T9 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T9,'');
+			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T10 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T10,'');
+
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".BRNCD = NULLIF(inputBodyRef.*:"Custacc-Sicdiary".*:BRNCD,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".ACCNO = NULLIF(inputBodyRef.*:"Custacc-Sicdiary".*:ACCNO,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Custacc-Sicdiary".*:Diarydetails[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].INSTRNO = NULLIF(inRef.*:INSTRNO,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].UNTYPE = NULLIF(inRef.*:UNTYPE,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].UNTVAL = NULLIF(inRef.*:UNTVAL,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].INSTR = NULLIF(inRef.*:INSTR,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].INSTRTYPE = NULLIF(inRef.*:INSTRTYPE,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].EXEDAYS = NULLIF(inRef.*:EXEDAYS,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].EXEMONTHS = NULLIF(inRef.*:EXEMONTHS,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].EXEYEARS = NULLIF(inRef.*:EXEYEARS,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].MNTHENDFLG = NULLIF(inRef.*:MNTHENDFLG,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].HLDRULE = NULLIF(inRef.*:HLDRULE,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].FRSTDUEDT = NULLIF(inRef.*:FRSTDUEDT,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].NXTDUEDT = NULLIF(inRef.*:NXTDUEDT,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].NXTEXCDT = NULLIF(inRef.*:NXTEXCDT,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].OPERATOR = NULLIF(inRef.*:OPERATOR,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].CONDVAL = NULLIF(inRef.*:CONDVAL,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].ACCOFFICER = NULLIF(inRef.*:ACCOFFICER,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].SPLINSTRTYP = NULLIF(inRef.*:SPLINSTRTYP,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].SPLINSTR = NULLIF(inRef.*:SPLINSTR,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].EXPDT = NULLIF(inRef.*:EXPDT,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].RECSTATUS = NULLIF(inRef.*:RECSTATUS,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].AUTHSTAT = NULLIF(inRef.*:AUTHSTAT,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].CONDELEM = NULLIF(inRef.*:CONDELEM,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".BRN = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:BRN,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".ACCNO = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:ACCNO,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.CONSOLACC = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:CONSOLACC,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.BLLLIQD = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:BLLLIQD,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.SETLMTACC = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:SETLMTACC,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.DIRDEBIT = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:DIRDEBIT,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.DDBNKCD = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:DDBNKCD,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.DDACCNO = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:DDACCNO,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.NAME = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:NAME,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.AGREMNTID = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:AGREMNTID,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.SETLCCY = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:SETLCCY,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.CONSOLCCY = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:CONSOLCCY,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.SETLACCBRN = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:SETLACCBRN,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.CONSOLACCBRN = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:CONSOLACCBRN,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Custacc-Stccusbl".*:Billingproducts[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingproducts[I].BILLPRODCD = NULLIF(inRef.*:BILLPRODCD,'');
+				SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingproducts[I].BILLPRDDESC = NULLIF(inRef.*:BILLPRDDESC,'');
+				SET I =I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET outputBodyRef."Cust-Account-Full".Accclose.BRN = NULLIF(inputBodyRef.*:Accclose.*:BRN,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose.ACC = NULLIF(inputBodyRef.*:Accclose.*:ACC,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".CLSSN = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:CLSSN,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".CLSDT = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:CLSDT,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".CLSBAL = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:CLSBAL,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".CLSMOD = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:CLSMOD,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".LINKPRD = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:LINKPRD,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".OFFBRN = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:OFFBRN,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".OFFACC = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:OFFACC,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".OFFCCY = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:OFFCCY,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSNO = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSNO,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSPRINSTANARY = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSPRINSTANARY,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSBENFNAME = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSBENFNAME,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSPAYBRN = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSPAYBRN,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSTAUS = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSTAUS,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSEXPDT = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSEXPDT,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSISUBANK = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSISUBANK,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSTTYPE = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSTTYPE,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSULTBF1 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSULTBF1,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSULTBF2 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSULTBF2,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSULTBF3 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSULTBF3,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSULTBF4 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSULTBF4,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDETAIL1 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDETAIL1,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP1 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP1,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDETAIL2 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDETAIL2,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP2 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP2,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDETAIL3 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDETAIL3,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP3 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP3,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDETAIL4 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDETAIL4,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP4 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP4,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDETAIL5 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDETAIL5,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP5 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP5,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDETAIL6 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDETAIL6,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP6 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP6,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".NBINTERESTDUE = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:NBINTERESTDUE,'');
+			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main".REFERENCE_NO = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:"Charge-Main".*:REFERENCE_NO,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:"Charge-Main".*:"Charge-Details"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main"."Charge-Details"[I].CHG_DESC = NULLIF(inRef.*:CHG_DESC,'');
+				SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main"."Charge-Details"[I].WAIVER = NULLIF(inRef.*:WAIVER,'');
+				SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main"."Charge-Details"[I].CURRENCY = NULLIF(inRef.*:CURRENCY,'');
+				SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main"."Charge-Details"[I].AMOUNT = NULLIF(inRef.*:AMOUNT,'');
+				SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main"."Charge-Details"[I].COMPONENT = NULLIF(inRef.*:COMPONENT,'');
+				SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main"."Charge-Details"[I].ESNNO = NULLIF(inRef.*:ESNNO,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:UDFDETAILS[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full".UDFDETAILS[I].FLDNAM = NULLIF(inRef.*:FLDNAM,'');
+				SET outputBodyRef."Cust-Account-Full".UDFDETAILS[I].FLDVAL = NULLIF(inRef.*:FLDNVAL,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".ACBRN1 = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:ACBRN1,'');
+			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".ACTNO = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:ACTNO,'');
+			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".ACDESC = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:ACDESC,'');
+			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".ACCMSG = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:ACCMSG,'');
+			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".MINNOSIG = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:MINNOSIG,'');
+			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".ACCCY = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:ACCCY,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].CUST_ID = NULLIF(inRef.*:CUST_ID,'');
+				SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].RELATIONTYP = NULLIF(inRef.*:RELATIONTYP,'');
+				SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].SIGID = NULLIF(inRef.*:SIGID,'');
+				SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].SIGMSG = NULLIF(inRef.*:SIGMSG,'');
+				SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].SIGTYPE = NULLIF(inRef.*:SIGTYPE,'');
+				SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].APPROVLIMIT = NULLIF(inRef.*:APPROVLIMIT,'');
+				SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].SIGNAME = NULLIF(inRef.*:SIGNAME,'');
+				SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].SOLOSIG = NULLIF(inRef.*:SOLOSIG,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"[I].TO_AMT = NULLIF(inRef.*:TO_AMT,'');
+				IF FIELDVALUE(inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition".*[>]) IS NOT NULL THEN
+					DECLARE J INTEGER 1;
+					DECLARE inRefe REFERENCE TO inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition"[>];
+					WHILE LASTMOVE(inRefe) DO
+						SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"."Sig-Condition"[J].CONDITIONID = NULLIF(inRefe.*:CONDITIONID,'');
+						SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"."Sig-Condition"[J].REMARKS = NULLIF(inRefe.*:REMARKS,'');
+						IF FIELDVALUE(inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition".*:"Sig-Group".*[>]) IS NOT NULL THEN
+							DECLARE K INTEGER 1;
+							DECLARE inRefer REFERENCE TO inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition".*:"Sig-Group"[>];
+							WHILE LASTMOVE(inRefer) DO
+								SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"."Sig-Condition"."Sig-Group"[K].GROUPID = NULLIF(inRefer.*:GROUPID,'');
+								SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"."Sig-Condition"."Sig-Group"[K].REQ_NO_SIGN = NULLIF(inRefer.*:REQ_NO_SIGN,'');
+								SET K = K+1;
+								MOVE inRefer NEXTSIBLING REPEAT TYPE NAME;
+							END WHILE;
+						END IF;
+						SET J = J+1;
+						MOVE inRefe NEXTSIBLING REPEAT TYPE NAME;
+					END WHILE;
+				END IF;
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit".BRANCH_CODE = NULLIF(inputBodyRef.*:"Sttms-Debit".*:BRANCH_CODE,'');
+			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit".CUST_NO = NULLIF(inputBodyRef.*:"Sttms-Debit".*:CUST_NO,'');
+			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit".ACTNO = NULLIF(inputBodyRef.*:"Sttms-Debit".*:ACTNO,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Sttms-Debit".*:"Sttms-Detail"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].BRANCH_CODE = NULLIF(inRef.*:BRANCH_CODE,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].REQUEST_REFERENCE_NO = NULLIF(inRef.*:REQUEST_REFERENCE_NO,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CARDNO = NULLIF(inRef.*:CARDNO,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CUST_NO = NULLIF(inRef.*:CUST_NO,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CARD_PRODUCT = NULLIF(inRef.*:CARD_PRODUCT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].PRIMARY_CARD = NULLIF(inRef.*:PRIMARY_CARD,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].NAME_ON_CARD = NULLIF(inRef.*:NAME_ON_CARD,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].OWNER_ID_NO = NULLIF(inRef.*:OWNER_ID_NO,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CARD_ISSUED_DT = NULLIF(inRef.*:CARD_ISSUED_DT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CARD_EXPIRY_DT = NULLIF(inRef.*:CARD_EXPIRY_DT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CARD_STATUS = NULLIF(inRef.*:CARD_STATUS,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].RECORD_STAT = NULLIF(inRef.*:RECORD_STAT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].AUTH_STAT = NULLIF(inRef.*:AUTH_STAT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CARD_BIN = NULLIF(inRef.*:CARD_BIN,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CUST_AC_NO = NULLIF(inRef.*:CUST_AC_NO,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET outputBodyRef."Cust-Account-Full"."Extsys-Ws-Master".KEYID = NULLIF(inputBodyRef.*:"Extsys-Ws-Master".*:KEYID,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Extsys-Ws-Master".*:"Extsys-Ws-Details"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Extsys-Ws-Master"."Extsys-Ws-Details"[I].EXTWSRESP = NULLIF(inRef.*:EXTWSRESP,'');
+				SET outputBodyRef."Cust-Account-Full"."Extsys-Ws-Master"."Extsys-Ws-Details"[I].USERREMARKS = NULLIF(inRef.*:USERREMARKS,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo".BRANCH_CODE = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:BRANCH_CODE,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo".CUST_AC_NO = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:CUST_AC_NO,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo".CCY = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:CCY,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".CCY = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:CCY,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".BANKCODE = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:BANKCODE,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".PAYBRN = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:PAYBRN,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".BENFNAME = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:BENFNAME,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".BENFADD1 = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:BENFADD1,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".BENFADD2 = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:BENFADD2,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".OTHERDETS = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:OTHERDETS,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".NARRATIVE = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:NARRATIVE,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".CCY = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:CCY,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".PCBANKCODE = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:PCBANKCODE,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".PCOFFSET_ACC = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:PCOFFSET_ACC,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".BENFNAME = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:BENFNAME,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".BENFADD1 = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:BENFADD1,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".BENFADD2 = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:BENFADD2,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".OTHERDETS = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:OTHERDETS,'');
+			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".NARRATIVE = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:NARRATIVE,'');
+
+			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account".BRANCH_CODE = NULLIF(inputBodyRef.*:"Sttms-Cust-Account".*:BRANCH_CODE,'');
+			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account".CUST_AC_NO = NULLIF(inputBodyRef.*:"Sttms-Cust-Account".*:CUST_AC_NO,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Sttms-Cust-Account".*:"Sttbs-Sweep-Details"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].BRN = NULLIF(inRef.*:BRN,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].CUSTACC = NULLIF(inRef.*:CUSTACC,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].ORDEROFLINKAGE = NULLIF(inRef.*:ORDEROFLINKAGE,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].DEPBRN = NULLIF(inRef.*:DEPBRN,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].DEPACC = NULLIF(inRef.*:DEPACC,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].ORIGINALDEPAMT = NULLIF(inRef.*:ORIGINALDEPAMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].LINKAGEPERCENT = NULLIF(inRef.*:LINKAGEPERCENT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].LINKEDAMT = NULLIF(inRef.*:LINKEDAMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].AVAILAMT = NULLIF(inRef.*:AVAILAMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].UTILAMT = NULLIF(inRef.*:UTILAMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].MDTE = NULLIF(inRef.*:MDTE,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].BLOCKED_AMOUNT = NULLIF(inRef.*:BLOCKED_AMOUNT,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET outputBodyRef."Cust-Account-Full"."Customer-Acc".BRANCH_CODE = NULLIF(inputBodyRef.*:"Customer-Acc".*:BRANCH_CODE,'');
+			SET outputBodyRef."Cust-Account-Full"."Customer-Acc".CUST_AC_NO = NULLIF(inputBodyRef.*:"Customer-Acc".*:CUST_AC_NO,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Customer-Acc".*:"Td-Rolloverhistory"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].OLD_MAT_DATE = NULLIF(inRef.OLD_MAT_DATE,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].NEW_MAT_DATE = NULLIF(inRef.NEW_MAT_DATE,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].ROLLOVER_DATE = NULLIF(inRef.ROLLOVER_DATE,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].ACC_STATUS = NULLIF(inRef.ACC_STATUS,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].ROLLOVER_TYPE = NULLIF(inRef.ROLLOVER_TYPE,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].INTEREST = NULLIF(inRef.INTEREST,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].PRINCIPAL = NULLIF(inRef.PRINCIPAL,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].ROLLOVER_AMT = NULLIF(inRef.ROLLOVER_AMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].SEQNO = NULLIF(inRef.SEQNO,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].TENOR_YEARS = NULLIF(inRef.TENOR_YEARS,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].TENOR_MONTHS = NULLIF(inRef.TENOR_MONTHS,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].TENOR_DAYS = NULLIF(inRef.TENOR_DAYS,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET outputBodyRef."Cust-Account-Full"."Customer-Accis".BRANCH_CODE = NULLIF(inputBodyRef.*:"Customer-Accis".*:BRANCH_CODE,'');
+			SET outputBodyRef."Cust-Account-Full"."Customer-Accis".CUST_AC_NO = NULLIF(inputBodyRef.*:"Customer-Accis".*:CUST_AC_NO,'');
+			SET outputBodyRef."Cust-Account-Full"."Customer-Accis".CCY = NULLIF(inputBodyRef.*:"Customer-Accis".*:CCY,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Customer-Accis".*:"Td-Rolloverhistory-Is"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].ROLLOVER_TYPE = NULLIF(inRef.*:ROLLOVER_TYPE,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].PROFIT = NULLIF(inRef.*:PROFIT,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].PRINCIPAL = NULLIF(inRef.*:PRINCIPAL,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].ROLLOVER_AMT = NULLIF(inRef.*:ROLLOVER_AMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].SEQNO = NULLIF(inRef.*:SEQNO,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].OLD_MAT_DATE = NULLIF(inRef.*:OLD_MAT_DATE,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].NEWMATDATE = NULLIF(inRef.*:NEWMATDATE,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].ROLLOVER_DATE = NULLIF(inRef.*:ROLLOVER_DATE,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].ACC_STATUS = NULLIF(inRef.*:ACC_STATUS,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].TENOR_YEARS = NULLIF(inRef.*:TENOR_YEARS,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].TENOR_MONTHS = NULLIF(inRef.*:TENOR_MONTHS,'');
+				SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].TENOR_DAYS = NULLIF(inRef.*:TENOR_DAYS,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET outputBodyRef."Cust-Account-Full".Master.KEY_ID = NULLIF(inputBodyRef.*:Master.*:KEY_ID,'');
+			SET outputBodyRef."Cust-Account-Full".Master.FUNCTION_ID = NULLIF(inputBodyRef.*:Master.*:FUNCTION_ID,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:Master.*:"Doc-Upload"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full".Master."Doc-Upload"[I].DCREFNO = NULLIF(inRef.*:DCREFNO,'');
+				SET outputBodyRef."Cust-Account-Full".Master."Doc-Upload"[I].DOC_CATEGORY = NULLIF(inRef.*:DOC_CATEGORY,'');
+				SET outputBodyRef."Cust-Account-Full".Master."Doc-Upload"[I].DOC_TYPE = NULLIF(inRef.*:DOC_TYPE,'');
+				SET outputBodyRef."Cust-Account-Full".Master."Doc-Upload"[I].REMARKS = NULLIF(inRef.*:REMARKS,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+			SET outputBodyRef."Cust-Account-Full".Master."Ui-Columns" = NULLIF(inputBodyRef.*:Master.*:"Ui-Columns",'');
+
+			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp".BRANCH_CODE = NULLIF(inputBodyRef."Sttms-Cust-Acc-Swp".*:BRANCH_CODE,'');
+			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp".CUST_AC_NO = NULLIF(inputBodyRef."Sttms-Cust-Acc-Swp".*:CUST_AC_NO,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef."Sttms-Cust-Acc-Swp".*:"Sttms-Sweep-Details-C"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].SEQUENCE_NO1 = NULLIF(inRef.*:SEQUENCE_NO1,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].CBRANCH = NULLIF(inRef.*:CBRANCH,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].CACCOUNT = NULLIF(inRef.*:CACCOUNT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].CCCY = NULLIF(inRef.*:CCCY,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].UTILAMT = NULLIF(inRef.*:UTILAMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].BRN = NULLIF(inRef.*:BRN,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].ACC = NULLIF(inRef.*:ACC,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].SWEEP_LIMIT = NULLIF(inRef.*:SWEEP_LIMIT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].LIMIT_FREQUENCY = NULLIF(inRef.*:LIMIT_FREQUENCY,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].RETAIN_MIN_BAL = NULLIF(inRef.*:RETAIN_MIN_BAL,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].SEQUENCE_NO1 = NULLIF(inRef.*:SEQUENCE_NO1,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+			SET I = 1;
+			MOVE inRef TO inputBodyRef."Sttms-Cust-Acc-Swp".*:"Sttms-Sweep-Details-Td"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].MDTE = NULLIF(inRef.*:MDTE,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].BLOCKED_AMT = NULLIF(inRef.*:BLOCKED_AMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].UTILIZED_AMT = NULLIF(inRef.*:UTILIZED_AMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].AVL_AMT = NULLIF(inRef.*:AVL_AMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].LINKED_AMT = NULLIF(inRef.*:LINKED_AMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].LINKED_PERCENTAGE = NULLIF(inRef.*:LINKED_PERCENTAGE,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].ORIGINAL_DEP_AMT = NULLIF(inRef.*:ORIGINAL_DEP_AMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].DEP_ACC = NULLIF(inRef.*:DEP_ACC,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].DEP_BRANCH = NULLIF(inRef.*:DEP_BRANCH,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].ORDER_OF_LINKAGE = NULLIF(inRef.*:ORDER_OF_LINKAGE,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].CUST_ACC = NULLIF(inRef.*:CUST_ACC,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].BRANCH = NULLIF(inRef.*:BRANCH,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+			SET I = 1;
+			MOVE inRef TO inputBodyRef."Sttms-Cust-Acc-Swp".*:"Sttms-Sweep-Details-Ad"[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].BRANCHCODE = NULLIF(inRef.*:BRANCHCODE,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].CASA_Account = NULLIF(inRef.*:CASA_Account,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].ORDEROFLINKAGE = NULLIF(inRef.*:ORDEROFLINKAGE,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].DEPBRN = NULLIF(inRef.*:DEPBRN,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].DEPACC = NULLIF(inRef.*:DEPACC,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].ORIGINALDEPAMT = NULLIF(inRef.*:ORIGINALDEPAMT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].LINKAGEPERCENT = NULLIF(inRef.*:LINKAGEPERCENT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].LIMIT_LINKED_AMOUNT = NULLIF(inRef.*:LIMIT_LINKED_AMOUNT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].LIMIT_AVAILABLE_AMOUNT = NULLIF(inRef.*:LIMIT_AVAILABLE_AMOUNT,'');
+				SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].UTILAMT = NULLIF(inRef.*:UTILAMT,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET outputBodyRef."Cust-Account-Full"."Acc-Chnl".BRANCH_CODE = NULLIF(inputBodyRef.*:"Acc-Chnl".*:BRANCH_CODE,'');
+			SET outputBodyRef."Cust-Account-Full"."Acc-Chnl".CUST_AC_NO = NULLIF(inputBodyRef.*:"Acc-Chnl".*:CUST_AC_NO,'');
+			SET I = 1;
+			MOVE inRef TO inputBodyRef.*:"Acc-Chnl".*:Channel[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRef."Cust-Account-Full"."Acc-Chnl".Channel[I].BANKING_CHANNELS = NULLIF(inRef.BANKING_CHANNELS,'');
+				SET outputBodyRef."Cust-Account-Full"."Acc-Chnl".Channel[I].BANKINGCHANNELNAME = NULLIF(inRef.BANKINGCHANNELNAME,'');
+				SET outputBodyRef."Cust-Account-Full"."Acc-Chnl".Channel[I].REMARKS = NULLIF(inRef.REMARKS,'');
+				SET I = I+1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET I = 1;
+			MOVE inRef TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRefer.FCUBS_ERROR_RESP.ERROR[I].ECODE = NULLIF(inRef.*:ECODE,'');
+				SET outputBodyRefer.FCUBS_ERROR_RESP.ERROR[I].EDESC = NULLIF(inRef.*:EDESC,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+
+			SET I = 1;
+			MOVE inRef TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING[>];
+			WHILE LASTMOVE(inRef) DO
+				SET outputBodyRefer.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
+				SET outputBodyRefer.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
+				SET I = I + 1;
+				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
+			END WHILE;
+			-- IF (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Provision-Main") IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Interim-Details") IS NULL)
+			-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full".Acstatuslines) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full".Intdetails) IS NULL)
+			-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full".Tddetails) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Amount-Dates".Turnovers) IS NULL)
+			-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn") IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full".CustAcc.Misdetails) IS NULL)
+			-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Customer-Acc") IS NULL) THEN
+			-- SET outputBodyRef."Cust-Account-Full" = NULL;
+			-- END IF;
+
+			IF FIELDNAME(outputBodyRef."Cust-Account-Full"."Provision-Main".*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Interim-Details".*) IS NULL
+				AND FIELDVALUE(outputBodyRef."Cust-Account-Full".Acstatuslines.*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full".Intdetails.*) IS NULL
+				AND FIELDVALUE(outputBodyRef."Cust-Account-Full".Tddetails.*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Amount-Dates".Turnovers.*) IS NULL
+				AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn".*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.*) IS NULL
+				AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Customer-Acc".*) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full";
 			END IF;
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn"."Misc-Icchspcn".CCY = NULLIF(inputBodyRef.*:"Custacc-Icchspcn".*:"Misc-Icchspcn".*:CCY,'');
 
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".BRN = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:BRN,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".ACC = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:ACC,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.DEPACCCLS = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:DEPACCCLS,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.ACCCCY = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:ACCCCY,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.SWPAMOUNT = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:SWPAMOUNT,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.CUSTOMER = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:CUSTOMER,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.DEPCCY = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:DEPCCY,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.SEQNO = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:SEQNO,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.SWPTOAC = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:SWPTOAC,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.SCODE = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:SCODE,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.XREF = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:XREF,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.MINREQDBAL = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:MINREQDBAL,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.SWPMULTIOF = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:SWPMULTIOF,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.RETRYTILLDT = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:RETRYTILLDT,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.SWPTOACBRN = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:SWPTOACBRN,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.STARTDT = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:STARTDT,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.DEPTENYEARS = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:DEPTENYEARS,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.MONTHS = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:MONTHS,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails.DAYS = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*:DAYS,'');
-
-		SET outputBodyRef."Cust-Account-Full".CustAcc.BRN = NULLIF(inputBodyRef.*:CustAcc.*:BRN,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.ACC = NULLIF(inputBodyRef.*:CustAcc.*:ACC,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MISGRP = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:MISGRP,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.POOLCD = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:POOLCD,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.REFRATE = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:REFRATE,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.REFRTTYPE = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:REFRTTYPE,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MISGRPTXN = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:MISGRPTXN,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.REFRTCD = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:REFRTCD,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.REFRTSPRD = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:REFRTSPRD,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.CALCMETH = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:CALCMETH,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS1 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS1,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS2 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS2,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS3 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS3,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS4 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS4,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS5 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS5,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS6 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS6,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS7 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS7,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS8 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS8,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS9 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS9,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.TXNMIS10 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:TXNMIS10,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MISGRPCOMP = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:MISGRPCOMP,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS1 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS1,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS2 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS2,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS3 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS3,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS4 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS4,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS5 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS5,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS6 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS6,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS7 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS7,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS8 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS8,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS9 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS9,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COMPMIS10 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COMPMIS10,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COSTCOD1 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COSTCOD1,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COSTCOD2 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COSTCOD2,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COSTCOD3 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COSTCOD3,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COSTCOD4 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COSTCOD4,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COSTCOD5 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COSTCOD5,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.RTFLAG = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:RTFLAG,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.LINKGRP = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:LINKGRP,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:CustAcc.*:Misdetails.*:MisAccLog[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisAccLog[I].MISCLS = NULLIF(inRef.*:MISCLS,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisAccLog[I].TXNDT = NULLIF(inRef.*:TXNDT,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisAccLog[I].OLDMISCD = NULLIF(inRef.*:OLDMISCD,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisAccLog[I].NWMISCD = NULLIF(inRef.*:NWMISCD,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:CustAcc.*:Misdetails.*:MisAccLog[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].BRN = NULLIF(inRef.*:BRN,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].PRDCD = NULLIF(inRef.*:PRDCD,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].FINYR = NULLIF(inRef.*:FINYR,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].TXNDT = NULLIF(inRef.*:TXNDT,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].GLCODE = NULLIF(inRef.*:GLCODE,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].MISCLS = NULLIF(inRef.*:MISCLS,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].OLDMISCD = NULLIF(inRef.*:OLDMISCD,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].NWMISCD = NULLIF(inRef.*:NWMISCD,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].TRNIND = NULLIF(inRef.*:TRNIND,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].CCY = NULLIF(inRef.*:CCY,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].XRATE = NULLIF(inRef.*:XRATE,'');
-			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.MisBalLog[I].AMT = NULLIF(inRef.*:AMT,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Chglog = NULLIF(inputBodyRef.*:CustAcc.*:Chglog,'');
-
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C2 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C2,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C3 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C3,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C4 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C4,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C6 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C6,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C7 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C7,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C8 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C8,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C9 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C9,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C10 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C10,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T1 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T1,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T3 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T3,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T5 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T5,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T6 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T6,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T7 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T7,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T8 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T8,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T9 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T9,'');
-		SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.T10 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:T10,'');
-
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".BRNCD = NULLIF(inputBodyRef.*:"Custacc-Sicdiary".*:BRNCD,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".ACCNO = NULLIF(inputBodyRef.*:"Custacc-Sicdiary".*:ACCNO,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Custacc-Sicdiary".*:Diarydetails[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].INSTRNO = NULLIF(inRef.*:INSTRNO,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].UNTYPE = NULLIF(inRef.*:UNTYPE,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].UNTVAL = NULLIF(inRef.*:UNTVAL,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].INSTR = NULLIF(inRef.*:INSTR,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].INSTRTYPE = NULLIF(inRef.*:INSTRTYPE,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].EXEDAYS = NULLIF(inRef.*:EXEDAYS,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].EXEMONTHS = NULLIF(inRef.*:EXEMONTHS,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].EXEYEARS = NULLIF(inRef.*:EXEYEARS,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].MNTHENDFLG = NULLIF(inRef.*:MNTHENDFLG,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].HLDRULE = NULLIF(inRef.*:HLDRULE,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].FRSTDUEDT = NULLIF(inRef.*:FRSTDUEDT,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].NXTDUEDT = NULLIF(inRef.*:NXTDUEDT,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].NXTEXCDT = NULLIF(inRef.*:NXTEXCDT,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].OPERATOR = NULLIF(inRef.*:OPERATOR,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].CONDVAL = NULLIF(inRef.*:CONDVAL,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].ACCOFFICER = NULLIF(inRef.*:ACCOFFICER,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].SPLINSTRTYP = NULLIF(inRef.*:SPLINSTRTYP,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].SPLINSTR = NULLIF(inRef.*:SPLINSTR,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].EXPDT = NULLIF(inRef.*:EXPDT,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].RECSTATUS = NULLIF(inRef.*:RECSTATUS,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].AUTHSTAT = NULLIF(inRef.*:AUTHSTAT,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".Diarydetails[I].CONDELEM = NULLIF(inRef.*:CONDELEM,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".BRN = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:BRN,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".ACCNO = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:ACCNO,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.CONSOLACC = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:CONSOLACC,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.BLLLIQD = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:BLLLIQD,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.SETLMTACC = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:SETLMTACC,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.DIRDEBIT = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:DIRDEBIT,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.DDBNKCD = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:DDBNKCD,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.DDACCNO = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:DDACCNO,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.NAME = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:NAME,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.AGREMNTID = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:AGREMNTID,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.SETLCCY = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:SETLCCY,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.CONSOLCCY = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:CONSOLCCY,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.SETLACCBRN = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:SETLACCBRN,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.CONSOLACCBRN = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:CONSOLACCBRN,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Custacc-Stccusbl".*:Billingproducts[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingproducts[I].BILLPRODCD = NULLIF(inRef.*:BILLPRODCD,'');
-			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingproducts[I].BILLPRDDESC = NULLIF(inRef.*:BILLPRDDESC,'');
-			SET I =I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-
-		SET outputBodyRef."Cust-Account-Full".Accclose.BRN = NULLIF(inputBodyRef.*:Accclose.*:BRN,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose.ACC = NULLIF(inputBodyRef.*:Accclose.*:ACC,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".CLSSN = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:CLSSN,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".CLSDT = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:CLSDT,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".CLSBAL = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:CLSBAL,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".CLSMOD = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:CLSMOD,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".LINKPRD = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:LINKPRD,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".OFFBRN = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:OFFBRN,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".OFFACC = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:OFFACC,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".OFFCCY = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:OFFCCY,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSNO = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSNO,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSPRINSTANARY = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSPRINSTANARY,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSBENFNAME = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSBENFNAME,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSPAYBRN = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSPAYBRN,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSTAUS = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSTAUS,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSEXPDT = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSEXPDT,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSISUBANK = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSISUBANK,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSTTYPE = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSTTYPE,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSULTBF1 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSULTBF1,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSULTBF2 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSULTBF2,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSULTBF3 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSULTBF3,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSULTBF4 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSULTBF4,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDETAIL1 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDETAIL1,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP1 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP1,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDETAIL2 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDETAIL2,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP2 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP2,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDETAIL3 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDETAIL3,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP3 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP3,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDETAIL4 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDETAIL4,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP4 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP4,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDETAIL5 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDETAIL5,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP5 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP5,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDETAIL6 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDETAIL6,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP6 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP6,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".NBINTERESTDUE = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:NBINTERESTDUE,'');
-		SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main".REFERENCE_NO = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:"Charge-Main".*:REFERENCE_NO,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:"Charge-Main".*:"Charge-Details"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main"."Charge-Details"[I].CHG_DESC = NULLIF(inRef.*:CHG_DESC,'');
-			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main"."Charge-Details"[I].WAIVER = NULLIF(inRef.*:WAIVER,'');
-			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main"."Charge-Details"[I].CURRENCY = NULLIF(inRef.*:CURRENCY,'');
-			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main"."Charge-Details"[I].AMOUNT = NULLIF(inRef.*:AMOUNT,'');
-			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main"."Charge-Details"[I].COMPONENT = NULLIF(inRef.*:COMPONENT,'');
-			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main"."Charge-Details"[I].ESNNO = NULLIF(inRef.*:ESNNO,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:UDFDETAILS[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full".UDFDETAILS[I].FLDNAM = NULLIF(inRef.*:FLDNAM,'');
-			SET outputBodyRef."Cust-Account-Full".UDFDETAILS[I].FLDVAL = NULLIF(inRef.*:FLDNVAL,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-
-		SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".ACBRN1 = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:ACBRN1,'');
-		SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".ACTNO = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:ACTNO,'');
-		SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".ACDESC = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:ACDESC,'');
-		SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".ACCMSG = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:ACCMSG,'');
-		SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".MINNOSIG = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:MINNOSIG,'');
-		SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".ACCCY = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:ACCCY,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].CUST_ID = NULLIF(inRef.*:CUST_ID,'');
-			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].RELATIONTYP = NULLIF(inRef.*:RELATIONTYP,'');
-			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].SIGID = NULLIF(inRef.*:SIGID,'');
-			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].SIGMSG = NULLIF(inRef.*:SIGMSG,'');
-			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].SIGTYPE = NULLIF(inRef.*:SIGTYPE,'');
-			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].APPROVLIMIT = NULLIF(inRef.*:APPROVLIMIT,'');
-			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].SIGNAME = NULLIF(inRef.*:SIGNAME,'');
-			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails[I].SOLOSIG = NULLIF(inRef.*:SOLOSIG,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"[I].TO_AMT = NULLIF(inRef.*:TO_AMT,'');
-			IF FIELDVALUE(inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition".*[>]) IS NOT NULL THEN
-				DECLARE J INTEGER 1;
-				DECLARE inRefe REFERENCE TO inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition"[>];
-				WHILE LASTMOVE(inRefe) DO
-					SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"."Sig-Condition"[J].CONDITIONID = NULLIF(inRefe.*:CONDITIONID,'');
-					SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"."Sig-Condition"[J].REMARKS = NULLIF(inRefe.*:REMARKS,'');
-					IF FIELDVALUE(inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition".*:"Sig-Group".*[>]) IS NOT NULL THEN
-						DECLARE K INTEGER 1;
-						DECLARE inRefer REFERENCE TO inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition".*:"Sig-Group"[>];
-						WHILE LASTMOVE(inRefer) DO
-							SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"."Sig-Condition"."Sig-Group"[K].GROUPID = NULLIF(inRefer.*:GROUPID,'');
-							SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"."Sig-Condition"."Sig-Group"[K].REQ_NO_SIGN = NULLIF(inRefer.*:REQ_NO_SIGN,'');
-							SET K = K+1;
-							MOVE inRefer NEXTSIBLING REPEAT TYPE NAME;
-						END WHILE;
-					END IF;
-					SET J = J+1;
-					MOVE inRefe NEXTSIBLING REPEAT TYPE NAME;
-				END WHILE;
+			IF (FIELDVALUE(outputBodyRef."Cust-Account-IO".BRN) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-IO".ACC) IS NULL) THEN
+				SET outputBodyRef."Cust-Account-IO" = NULL;
 			END IF;
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
 
-		SET outputBodyRef."Cust-Account-Full"."Sttms-Debit".BRANCH_CODE = NULLIF(inputBodyRef.*:"Sttms-Debit".*:BRANCH_CODE,'');
-		SET outputBodyRef."Cust-Account-Full"."Sttms-Debit".CUST_NO = NULLIF(inputBodyRef.*:"Sttms-Debit".*:CUST_NO,'');
-		SET outputBodyRef."Cust-Account-Full"."Sttms-Debit".ACTNO = NULLIF(inputBodyRef.*:"Sttms-Debit".*:ACTNO,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Sttms-Debit".*:"Sttms-Detail"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].BRANCH_CODE = NULLIF(inRef.*:BRANCH_CODE,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].REQUEST_REFERENCE_NO = NULLIF(inRef.*:REQUEST_REFERENCE_NO,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CARDNO = NULLIF(inRef.*:CARDNO,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CUST_NO = NULLIF(inRef.*:CUST_NO,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CARD_PRODUCT = NULLIF(inRef.*:CARD_PRODUCT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].PRIMARY_CARD = NULLIF(inRef.*:PRIMARY_CARD,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].NAME_ON_CARD = NULLIF(inRef.*:NAME_ON_CARD,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].OWNER_ID_NO = NULLIF(inRef.*:OWNER_ID_NO,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CARD_ISSUED_DT = NULLIF(inRef.*:CARD_ISSUED_DT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CARD_EXPIRY_DT = NULLIF(inRef.*:CARD_EXPIRY_DT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CARD_STATUS = NULLIF(inRef.*:CARD_STATUS,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].RECORD_STAT = NULLIF(inRef.*:RECORD_STAT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].AUTH_STAT = NULLIF(inRef.*:AUTH_STAT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CARD_BIN = NULLIF(inRef.*:CARD_BIN,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit"."Sttms-Detail"[I].CUST_AC_NO = NULLIF(inRef.*:CUST_AC_NO,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-
-		SET outputBodyRef."Cust-Account-Full"."Extsys-Ws-Master".KEYID = NULLIF(inputBodyRef.*:"Extsys-Ws-Master".*:KEYID,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Extsys-Ws-Master".*:"Extsys-Ws-Details"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Extsys-Ws-Master"."Extsys-Ws-Details"[I].EXTWSRESP = NULLIF(inRef.*:EXTWSRESP,'');
-			SET outputBodyRef."Cust-Account-Full"."Extsys-Ws-Master"."Extsys-Ws-Details"[I].USERREMARKS = NULLIF(inRef.*:USERREMARKS,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo".BRANCH_CODE = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:BRANCH_CODE,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo".CUST_AC_NO = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:CUST_AC_NO,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo".CCY = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:CCY,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".CCY = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:CCY,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".BANKCODE = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:BANKCODE,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".PAYBRN = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:PAYBRN,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".BENFNAME = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:BENFNAME,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".BENFADD1 = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:BENFADD1,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".BENFADD2 = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:BENFADD2,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".OTHERDETS = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:OTHERDETS,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int".NARRATIVE = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*:NARRATIVE,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".CCY = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:CCY,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".PCBANKCODE = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:PCBANKCODE,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".PCOFFSET_ACC = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:PCOFFSET_ACC,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".BENFNAME = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:BENFNAME,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".BENFADD1 = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:BENFADD1,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".BENFADD2 = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:BENFADD2,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".OTHERDETS = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:OTHERDETS,'');
-		SET outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int".NARRATIVE = NULLIF(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*:NARRATIVE,'');
-
-		SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account".BRANCH_CODE = NULLIF(inputBodyRef.*:"Sttms-Cust-Account".*:BRANCH_CODE,'');
-		SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account".CUST_AC_NO = NULLIF(inputBodyRef.*:"Sttms-Cust-Account".*:CUST_AC_NO,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Sttms-Cust-Account".*:"Sttbs-Sweep-Details"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].BRN = NULLIF(inRef.*:BRN,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].CUSTACC = NULLIF(inRef.*:CUSTACC,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].ORDEROFLINKAGE = NULLIF(inRef.*:ORDEROFLINKAGE,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].DEPBRN = NULLIF(inRef.*:DEPBRN,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].DEPACC = NULLIF(inRef.*:DEPACC,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].ORIGINALDEPAMT = NULLIF(inRef.*:ORIGINALDEPAMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].LINKAGEPERCENT = NULLIF(inRef.*:LINKAGEPERCENT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].LINKEDAMT = NULLIF(inRef.*:LINKEDAMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].AVAILAMT = NULLIF(inRef.*:AVAILAMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].UTILAMT = NULLIF(inRef.*:UTILAMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].MDTE = NULLIF(inRef.*:MDTE,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account"."Sttbs-Sweep-Details"[I].BLOCKED_AMOUNT = NULLIF(inRef.*:BLOCKED_AMOUNT,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-
-		SET outputBodyRef."Cust-Account-Full"."Customer-Acc".BRANCH_CODE = NULLIF(inputBodyRef.*:"Customer-Acc".*:BRANCH_CODE,'');
-		SET outputBodyRef."Cust-Account-Full"."Customer-Acc".CUST_AC_NO = NULLIF(inputBodyRef.*:"Customer-Acc".*:CUST_AC_NO,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Customer-Acc".*:"Td-Rolloverhistory"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].OLD_MAT_DATE = NULLIF(inRef.OLD_MAT_DATE,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].NEW_MAT_DATE = NULLIF(inRef.NEW_MAT_DATE,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].ROLLOVER_DATE = NULLIF(inRef.ROLLOVER_DATE,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].ACC_STATUS = NULLIF(inRef.ACC_STATUS,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].ROLLOVER_TYPE = NULLIF(inRef.ROLLOVER_TYPE,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].INTEREST = NULLIF(inRef.INTEREST,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].PRINCIPAL = NULLIF(inRef.PRINCIPAL,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].ROLLOVER_AMT = NULLIF(inRef.ROLLOVER_AMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].SEQNO = NULLIF(inRef.SEQNO,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].TENOR_YEARS = NULLIF(inRef.TENOR_YEARS,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].TENOR_MONTHS = NULLIF(inRef.TENOR_MONTHS,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Acc"."Td-Rolloverhistory"[I].TENOR_DAYS = NULLIF(inRef.TENOR_DAYS,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-
-		SET outputBodyRef."Cust-Account-Full"."Customer-Accis".BRANCH_CODE = NULLIF(inputBodyRef.*:"Customer-Accis".*:BRANCH_CODE,'');
-		SET outputBodyRef."Cust-Account-Full"."Customer-Accis".CUST_AC_NO = NULLIF(inputBodyRef.*:"Customer-Accis".*:CUST_AC_NO,'');
-		SET outputBodyRef."Cust-Account-Full"."Customer-Accis".CCY = NULLIF(inputBodyRef.*:"Customer-Accis".*:CCY,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Customer-Accis".*:"Td-Rolloverhistory-Is"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].ROLLOVER_TYPE = NULLIF(inRef.*:ROLLOVER_TYPE,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].PROFIT = NULLIF(inRef.*:PROFIT,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].PRINCIPAL = NULLIF(inRef.*:PRINCIPAL,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].ROLLOVER_AMT = NULLIF(inRef.*:ROLLOVER_AMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].SEQNO = NULLIF(inRef.*:SEQNO,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].OLD_MAT_DATE = NULLIF(inRef.*:OLD_MAT_DATE,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].NEWMATDATE = NULLIF(inRef.*:NEWMATDATE,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].ROLLOVER_DATE = NULLIF(inRef.*:ROLLOVER_DATE,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].ACC_STATUS = NULLIF(inRef.*:ACC_STATUS,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].TENOR_YEARS = NULLIF(inRef.*:TENOR_YEARS,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].TENOR_MONTHS = NULLIF(inRef.*:TENOR_MONTHS,'');
-			SET outputBodyRef."Cust-Account-Full"."Customer-Accis"."Td-Rolloverhistory-Is"[I].TENOR_DAYS = NULLIF(inRef.*:TENOR_DAYS,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-
-		SET outputBodyRef."Cust-Account-Full".Master.KEY_ID = NULLIF(inputBodyRef.*:Master.*:KEY_ID,'');
-		SET outputBodyRef."Cust-Account-Full".Master.FUNCTION_ID = NULLIF(inputBodyRef.*:Master.*:FUNCTION_ID,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:Master.*:"Doc-Upload"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full".Master."Doc-Upload"[I].DCREFNO = NULLIF(inRef.*:DCREFNO,'');
-			SET outputBodyRef."Cust-Account-Full".Master."Doc-Upload"[I].DOC_CATEGORY = NULLIF(inRef.*:DOC_CATEGORY,'');
-			SET outputBodyRef."Cust-Account-Full".Master."Doc-Upload"[I].DOC_TYPE = NULLIF(inRef.*:DOC_TYPE,'');
-			SET outputBodyRef."Cust-Account-Full".Master."Doc-Upload"[I].REMARKS = NULLIF(inRef.*:REMARKS,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-		SET outputBodyRef."Cust-Account-Full".Master."Ui-Columns" = NULLIF(inputBodyRef.*:Master.*:"Ui-Columns",'');
-
-		SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp".BRANCH_CODE = NULLIF(inputBodyRef."Sttms-Cust-Acc-Swp".*:BRANCH_CODE,'');
-		SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp".CUST_AC_NO = NULLIF(inputBodyRef."Sttms-Cust-Acc-Swp".*:CUST_AC_NO,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef."Sttms-Cust-Acc-Swp".*:"Sttms-Sweep-Details-C"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].SEQUENCE_NO1 = NULLIF(inRef.*:SEQUENCE_NO1,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].CBRANCH = NULLIF(inRef.*:CBRANCH,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].CACCOUNT = NULLIF(inRef.*:CACCOUNT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].CCCY = NULLIF(inRef.*:CCCY,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].UTILAMT = NULLIF(inRef.*:UTILAMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].BRN = NULLIF(inRef.*:BRN,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].ACC = NULLIF(inRef.*:ACC,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].SWEEP_LIMIT = NULLIF(inRef.*:SWEEP_LIMIT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].LIMIT_FREQUENCY = NULLIF(inRef.*:LIMIT_FREQUENCY,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].RETAIN_MIN_BAL = NULLIF(inRef.*:RETAIN_MIN_BAL,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-C"[I].SEQUENCE_NO1 = NULLIF(inRef.*:SEQUENCE_NO1,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-		SET I = 1;
-		MOVE inRef TO inputBodyRef."Sttms-Cust-Acc-Swp".*:"Sttms-Sweep-Details-Td"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].MDTE = NULLIF(inRef.*:MDTE,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].BLOCKED_AMT = NULLIF(inRef.*:BLOCKED_AMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].UTILIZED_AMT = NULLIF(inRef.*:UTILIZED_AMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].AVL_AMT = NULLIF(inRef.*:AVL_AMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].LINKED_AMT = NULLIF(inRef.*:LINKED_AMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].LINKED_PERCENTAGE = NULLIF(inRef.*:LINKED_PERCENTAGE,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].ORIGINAL_DEP_AMT = NULLIF(inRef.*:ORIGINAL_DEP_AMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].DEP_ACC = NULLIF(inRef.*:DEP_ACC,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].DEP_BRANCH = NULLIF(inRef.*:DEP_BRANCH,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].ORDER_OF_LINKAGE = NULLIF(inRef.*:ORDER_OF_LINKAGE,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].CUST_ACC = NULLIF(inRef.*:CUST_ACC,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Td"[I].BRANCH = NULLIF(inRef.*:BRANCH,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-		SET I = 1;
-		MOVE inRef TO inputBodyRef."Sttms-Cust-Acc-Swp".*:"Sttms-Sweep-Details-Ad"[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].BRANCHCODE = NULLIF(inRef.*:BRANCHCODE,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].CASA_Account = NULLIF(inRef.*:CASA_Account,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].ORDEROFLINKAGE = NULLIF(inRef.*:ORDEROFLINKAGE,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].DEPBRN = NULLIF(inRef.*:DEPBRN,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].DEPACC = NULLIF(inRef.*:DEPACC,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].ORIGINALDEPAMT = NULLIF(inRef.*:ORIGINALDEPAMT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].LINKAGEPERCENT = NULLIF(inRef.*:LINKAGEPERCENT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].LIMIT_LINKED_AMOUNT = NULLIF(inRef.*:LIMIT_LINKED_AMOUNT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].LIMIT_AVAILABLE_AMOUNT = NULLIF(inRef.*:LIMIT_AVAILABLE_AMOUNT,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp"."Sttms-Sweep-Details-Ad"[I].UTILAMT = NULLIF(inRef.*:UTILAMT,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-
-		SET outputBodyRef."Cust-Account-Full"."Acc-Chnl".BRANCH_CODE = NULLIF(inputBodyRef.*:"Acc-Chnl".*:BRANCH_CODE,'');
-		SET outputBodyRef."Cust-Account-Full"."Acc-Chnl".CUST_AC_NO = NULLIF(inputBodyRef.*:"Acc-Chnl".*:CUST_AC_NO,'');
-		SET I = 1;
-		MOVE inRef TO inputBodyRef.*:"Acc-Chnl".*:Channel[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRef."Cust-Account-Full"."Acc-Chnl".Channel[I].BANKING_CHANNELS = NULLIF(inRef.BANKING_CHANNELS,'');
-			SET outputBodyRef."Cust-Account-Full"."Acc-Chnl".Channel[I].BANKINGCHANNELNAME = NULLIF(inRef.BANKINGCHANNELNAME,'');
-			SET outputBodyRef."Cust-Account-Full"."Acc-Chnl".Channel[I].REMARKS = NULLIF(inRef.REMARKS,'');
-			SET I = I+1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-
-		SET I = 1;
-		MOVE inRef TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRefer.FCUBS_ERROR_RESP.ERROR[I].ECODE = NULLIF(inRef.*:ECODE,'');
-			SET outputBodyRefer.FCUBS_ERROR_RESP.ERROR[I].EDESC = NULLIF(inRef.*:EDESC,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-		
-		SET I = 1;
-		MOVE inRef TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING[>];
-		WHILE LASTMOVE(inRef) DO
-			SET outputBodyRefer.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
-			SET outputBodyRefer.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
-			SET I = I + 1;
-			MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
-		END WHILE;
-
-		-- IF (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Provision-Main") IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Interim-Details") IS NULL)
-		-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full".Acstatuslines) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full".Intdetails) IS NULL)
-		-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full".Tddetails) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Amount-Dates".Turnovers) IS NULL)
-		-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn") IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full".CustAcc.Misdetails) IS NULL)
-		-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Customer-Acc") IS NULL) THEN
-		-- SET outputBodyRef."Cust-Account-Full" = NULL;
-		-- END IF;
-
-		IF FIELDNAME(outputBodyRef."Cust-Account-Full"."Provision-Main".*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Interim-Details".*) IS NULL
-			AND FIELDVALUE(outputBodyRef."Cust-Account-Full".Acstatuslines.*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full".Intdetails.*) IS NULL
-			AND FIELDVALUE(outputBodyRef."Cust-Account-Full".Tddetails.*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Amount-Dates".Turnovers.*) IS NULL
-			AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn".*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.*) IS NULL
-			AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Customer-Acc".*) IS NULL THEN
-			DELETE FIELD outputBodyRef."Cust-Account-Full";
+			SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
+			PROPAGATE TO TERMINAL 'out' DELETE NONE;
 		END IF;
 
-		IF (FIELDVALUE(outputBodyRef."Cust-Account-IO".BRN) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-IO".ACC) IS NULL) THEN
-			SET outputBodyRef."Cust-Account-IO" = NULL;
-		END IF;
+		SET Environment.outputData = OutputRoot;
+		---------------------- Response Logging -------------------------
+		MOVE domainDataRef TO Environment.outputData.SOAP;
+		SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		SET OutputRoot.HTTPResponseHeader = NULL;
+		SET OutputRoot.SOAP = NULL;
+		-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		-- MOVE OutRef TO OutputRoot.XMLNSC;
+		-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RESP',MessageFlowLabel,OutRef);
 
-		SET OutputLocalEnvironment.Destination.SOAP.Reply.ReplyIdentifier = envRef.ReplyIdentifier;
-		PROPAGATE TO TERMINAL 'out' DELETE NONE;
-	END IF;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
+		CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||Environment.resPayload) INTO rc;
 
-	SET Environment.outputData = OutputRoot;
-	---------------------- Response Logging -------------------------
-	MOVE domainDataRef TO Environment.outputData.SOAP;
-	SET Environment.resPayload = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
-	SET OutputRoot.HTTPResponseHeader = NULL;
-	SET OutputRoot.SOAP = NULL;
-	-- CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
-	-- MOVE OutRef TO OutputRoot.XMLNSC;
-	-- CALL PayloadLogging(envRef.id,Environment.reqPayload,'CHANNEL_RESP',MessageFlowLabel,OutRef);
-
-	CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,' -------- CHANNEL_RESP -------') INTO rc;
-	CALL writeToLogFile(MessageFlowLabel,LOGGER_NAME,LOG_TYPE,'CHANNEL_RESP data is: '||Environment.resPayload) INTO rc;
-
-END;
+	END;
 END MODULE;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
