@@ -1371,8 +1371,8 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			END WHILE;
 			SET outputBodyRef."Cust-Account-Full".Master."Ui-Columns" = NULLIF(inputBodyRef.*:Master.*:"Ui-Columns",'');
 
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp".BRANCH_CODE = NULLIF(inputBodyRef."Sttms-Cust-Acc-Swp".*:BRANCH_CODE,'');
-			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp".CUST_AC_NO = NULLIF(inputBodyRef."Sttms-Cust-Acc-Swp".*:CUST_AC_NO,'');
+			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp".BRANCH_CODE = NULLIF(inputBodyRef.*:"Sttms-Cust-Acc-Swp".*:BRANCH_CODE,'');
+			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp".CUST_AC_NO = NULLIF(inputBodyRef.*:"Sttms-Cust-Acc-Swp".*:CUST_AC_NO,'');
 			SET I = 1;
 			MOVE inRef TO inputBodyRef."Sttms-Cust-Acc-Swp".*:"Sttms-Sweep-Details-C"[>];
 			WHILE LASTMOVE(inRef) DO
