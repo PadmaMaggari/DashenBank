@@ -773,7 +773,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full".Noticepref.VALIDITYPERIOD = NULLIF(inputBodyRef.*:Noticepref.*:VALIDITYPERIOD,'');
 			SET outputBodyRef."Cust-Account-Full".Noticepref.ADESC = NULLIF(inputBodyRef.*:Noticepref.*:ADESC,'');
 
-			SET I =1;
+			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Acc-Nominees"[>];
 			WHILE LASTMOVE(inRef) DO
 				SET outputBodyRef."Cust-Account-Full"."Acc-Nominees"[I].NADDR1 = NULLIF(inRef.*:NADDR1,'');
@@ -795,7 +795,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
-			SET I =1;
+			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:Tdpayindetails[>];
 			WHILE LASTMOVE(inRef) DO
 				SET outputBodyRef."Cust-Account-Full".Tdpayindetails[I].MMPAYOPT = NULLIF(inRef.*:MMPAYOPT,'');
@@ -806,7 +806,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
-			SET I =1;
+			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:Tdpayoutdetails[>];
 			WHILE LASTMOVE(inRef) DO
 				SET outputBodyRef."Cust-Account-Full".Tdpayoutdetails[I].PAYOUTTYPE = NULLIF(inRef.*:PAYOUTTYPE,'');
@@ -832,7 +832,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET outputBodyRef."Cust-Account-Full"."Od-Limit"[I].LINKAGE_SEQUENCE_NUMBER = NULLIF(inRef.*:LINKAGE_SEQUENCE_NUMBER,'');
 				SET outputBodyRef."Cust-Account-Full"."Od-Limit"[I].LIABNO = NULLIF(inRef.*:LIABNO,'');
 				SET outputBodyRef."Cust-Account-Full"."Od-Limit"[I].LIABNO = NULLIF(inRef.*:LIABNO,'');
-				SET I =I+1;
+				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
 			SET I = 1;
@@ -845,7 +845,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET outputBodyRef."Cust-Account-Full"."Doctype-Checklist"[I].EXPECTED_DATE_SUBMISSION = NULLIF(inRef.*:EXPECTED_DATE_SUBMISSION,'');
 				SET outputBodyRef."Cust-Account-Full"."Doctype-Checklist"[I].ACTUAL_SUBMISSION_DATE = NULLIF(inRef.*:ACTUAL_SUBMISSION_DATE,'');
 				SET outputBodyRef."Cust-Account-Full"."Doctype-Checklist"[I].DOCREFNO = NULLIF(inRef.*:DOCREFNO,'');
-				SET I =I+1;
+				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
 
@@ -1442,7 +1442,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			WHILE LASTMOVE(inRef) DO
 				SET outputBodyRefer.FCUBS_ERROR_RESP.ERROR[I].ECODE = NULLIF(inRef.*:ECODE,'');
 				SET outputBodyRefer.FCUBS_ERROR_RESP.ERROR[I].EDESC = NULLIF(inRef.*:EDESC,'');
-				SET I = I + 1;
+				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
 
@@ -1451,7 +1451,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			WHILE LASTMOVE(inRef) DO
 				SET outputBodyRefer.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
 				SET outputBodyRefer.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
-				SET I = I + 1;
+				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
 			-- IF (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Provision-Main") IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Interim-Details") IS NULL)
