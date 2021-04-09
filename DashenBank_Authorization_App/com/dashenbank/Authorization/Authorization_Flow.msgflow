@@ -22,13 +22,13 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_ECXAuthorization_App/icons/full/obj16/Authorization_Flow.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_ECXAuthorization_App/icons/full/obj30/Authorization_Flow.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="513,31" computeExpression="esql://routine/com.dashenbank.Authorization#BuildExceptionResponse.Main" computeMode="all">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="655,187" computeExpression="esql://routine/com.dashenbank.Authorization#BuildExceptionResponse.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="BuildBusinessError"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="197,122" wsdlOperationMode="gateway" useHTTPTransport="true" urlSelector="/ESB_ECXAuthorization" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="Authorization_Request"/>
       </nodes>
-      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="472,196" rotation="TOP_TO_BOTTOM" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
+      <nodes xmi:type="ComIbmCallableFlowInvoke.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="614,9" targetApplication="DashenBank_AuditDBLogging_App" targetEndpointName="auditlogging">
         <translation xmi:type="utility:ConstantString" string="PayloadLogging"/>
       </nodes>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="555,116" computeExpression="esql://routine/com.dashenbank.Authorization#ResponseToChannel.Main" computeMode="all">
@@ -43,7 +43,7 @@
       <nodes xmi:type="ComIbmSOAPRequest.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="456,117" wsdlOperationMode="gateway" useHTTPTransport="true" webServiceURL="http://localhost:7800/CBS_BACKEND" sslProtocol="TLS" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
         <translation xmi:type="utility:ConstantString" string="BackEndSystemCall"/>
       </nodes>
-      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_5" location="364,33">
+      <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_5" location="550,234">
         <translation xmi:type="utility:ConstantString" string="ExceptionHandlerSubFlow"/>
       </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_6" sourceNode="FCMComposite_1_4" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
@@ -57,6 +57,7 @@
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_9" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.timeout" targetTerminalName="InTerminal.Input"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_10" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.catch" targetTerminalName="InTerminal.Input"/>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_11" targetNode="FCMComposite_1_1" sourceNode="FCMComposite_1_5" sourceTerminalName="OutTerminal.Output" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_12" targetNode="FCMComposite_1_5" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.failure" targetTerminalName="InTerminal.Input"/>
     </composition>
     <propertyOrganizer>
       <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.LOG4J_CONFIG_PATH">
