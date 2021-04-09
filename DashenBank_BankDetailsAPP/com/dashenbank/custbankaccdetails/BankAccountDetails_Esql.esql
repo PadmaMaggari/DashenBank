@@ -164,7 +164,6 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 			DECLARE outputHeaderRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_HEADER;
 			DECLARE outputBodyRef REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY;
-			DECLARE outputBodyRefer REFERENCE TO OutputRoot.SOAP.Body.ns:QUERYCUSTACC_IOFS_RES.FCUBS_BODY;
 
 			SET outputHeaderRef.SOURCE = NULLIF(inputHeaderRef.*:SOURCE,'');
 			SET outputHeaderRef.UBSCOMP = NULLIF(inputHeaderRef.*:UBSCOMP,'');
@@ -197,6 +196,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-IO".BRN = NULLIF(inputBodyRefer.*:"Cust-Account-IO".*:BRN,'');
 			SET outputBodyRef."Cust-Account-IO".ACC = NULLIF(inputBodyRefer.*:"Cust-Account-IO".*:ACC,'');
 			SET outputBodyRef."Cust-Account-IO".CRS_STST_REQD = NULLIF(inputBodyRefer.*:"Cust-Account-IO".*:CRS_STST_REQD,'');
+			
 			SET outputBodyRef."Cust-Account-Full".BRN = NULLIF(inputBodyRef.*:BRN,'');
 			SET outputBodyRef."Cust-Account-Full".ACC = NULLIF(inputBodyRef.*:ACC,'');
 			SET outputBodyRef."Cust-Account-Full".CUSTNO = NULLIF(inputBodyRef.*:CUSTNO,'');
@@ -1440,8 +1440,8 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET I = 1;
 			MOVE inRef TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_ERROR_RESP.*:ERROR[>];
 			WHILE LASTMOVE(inRef) DO
-				SET outputBodyRefer.FCUBS_ERROR_RESP.ERROR[I].ECODE = NULLIF(inRef.*:ECODE,'');
-				SET outputBodyRefer.FCUBS_ERROR_RESP.ERROR[I].EDESC = NULLIF(inRef.*:EDESC,'');
+				SET outputBodyRef.FCUBS_ERROR_RESP.ERROR[I].ECODE = NULLIF(inRef.*:ECODE,'');
+				SET outputBodyRef.FCUBS_ERROR_RESP.ERROR[I].EDESC = NULLIF(inRef.*:EDESC,'');
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
@@ -1449,8 +1449,8 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET I = 1;
 			MOVE inRef TO InputRoot.SOAP.Body.*:QUERYCUSTACC_IOFS_RES.*:FCUBS_BODY.*:FCUBS_WARNING_RESP.*:WARNING[>];
 			WHILE LASTMOVE(inRef) DO
-				SET outputBodyRefer.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
-				SET outputBodyRefer.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
+				SET outputBodyRef.FCUBS_WARNING_RESP.WARNING[I].WCODE = NULLIF(inRef.*:WCODE,'');
+				SET outputBodyRef.FCUBS_WARNING_RESP.WARNING[I].WDESC = NULLIF(inRef.*:WDESC,'');
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
@@ -1461,16 +1461,97 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Customer-Acc") IS NULL) THEN
 			-- SET outputBodyRef."Cust-Account-Full" = NULL;
 			-- END IF;
-
-			IF FIELDNAME(outputBodyRef."Cust-Account-Full"."Provision-Main".*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Interim-Details".*) IS NULL
-				AND FIELDVALUE(outputBodyRef."Cust-Account-Full".Acstatuslines.*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full".Intdetails.*) IS NULL
-				AND FIELDVALUE(outputBodyRef."Cust-Account-Full".Tddetails.*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Amount-Dates".Turnovers.*) IS NULL
-				AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn".*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.*) IS NULL
-				AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails.*) IS NULL AND FIELDVALUE(outputBodyRef."Cust-Account-Full"."Customer-Acc".*) IS NULL THEN
-				DELETE FIELD outputBodyRef."Cust-Account-Full";
+			IF FIELDNAME(inputBodyRef.*:"Provision-Main".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full";     
 			END IF;
-
-			IF (FIELDVALUE(outputBodyRef."Cust-Account-IO".BRN) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-IO".ACC) IS NULL) THEN
+			IF FIELDNAME(inputBodyRef.*:Accmaintinstr.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Accmaintinstr;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Tddetails.*:Dcdmaster.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Tddetails.Dcdmaster;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childintdetails.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo.Childintdetails;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childinttddetails.*:Bcpayoutspo.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo.Childinttddetails.Bcpayoutspo;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childinttddetails.*:Pcpayoutspo.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo.Childinttddetails.Pcpayoutspo;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childinttddetails.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo.Childinttddetails;
+			END IF;			
+            IF FIELDNAME(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo;
+			END IF;		
+			IF FIELDNAME(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Bcpayout.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Bcpayout;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Pcpayout.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Pcpayout;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Tddetails.*:Tddetailsprn.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:"Tod-Renew".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Tod-Renew";
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:"Doctype-Remarks".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Doctype-Remarks";
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:"Cust-Acc-Card".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Cust-Acc-Card";
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Linkedentities.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Linkedentities;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:"Custacc-Icccspcn".*:Chgcons.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn".Chgcons;
+			END IF;
+             IF FIELDNAME(inputBodyRef.*:"Custacc-Icchspcn".*:"Misc-Icchspcn".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn"."Misc-Icchspcn";
+			END IF;     
+             IF FIELDNAME(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails;
+			END IF;     
+			IF FIELDNAME(inputBodyRef.*:CustAcc.*:Classname.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".CustAcc.Classname;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:"Charge-Main".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main";
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure";
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Accclose.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Accclose;
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:"Sttms-Debit".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Sttms-Debit";
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:"Extsys-Ws-Master".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Extsys-Ws-Master";
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:"Custacc-Iccintpo".*:"Bcpayout-Int".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Bcpayout-Int";
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:"Custacc-Iccintpo".*:"Pcpayout-Int".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Custacc-Iccintpo"."Pcpayout-Int";
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:"Sttms-Cust-Account".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account";
+			END IF;	
+			IF FIELDNAME(inputBodyRef.*:"Customer-Accis".*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full"."Customer-Accis";
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Master.*[>]) IS NULL THEN
+				DELETE FIELD outputBodyRef."Cust-Account-Full".Master;
+			END IF;	
+			IF FIELDNAME(inputBodyRefer.*:"Cust-Account-IO".*[>]) IS NULL THEN -- Cust-Account-IO Populated for Failure Response
 				SET outputBodyRef."Cust-Account-IO" = NULL;
 			END IF;
 
