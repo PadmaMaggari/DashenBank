@@ -1,0 +1,1047 @@
+
+CREATE COMPUTE MODULE Simulator_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- CALL CopyMessageHeaders();
+		CALL CopyEntireMessage();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		DECLARE AccountBalanceEnquiry,AccountSummary,Authorization,BankAccountDetails,Blocking,BulkFundTransfer,FundTransfer,LiquidateTransaction,Reversal,UnBlocking CHARACTER;
+		SET Blocking = '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+		<S:Body>
+		<CREATEAMTBLK_IOPK_RES xmlns="http://fcubs.ofss.com/service/FCUBSCustomerService">
+		<FCUBS_HEADER>
+		<SOURCE>CTR</SOURCE>
+		<UBSCOMP>FCUBS</UBSCOMP>
+		<MSGID>6121075750633909</MSGID>
+		<CORRELID>null</CORRELID>
+		<USERID>CTSUSER</USERID>
+		<ENTITY>null</ENTITY>
+		<BRANCH>444</BRANCH>
+		<SERVICE>FCUBSCustomerService</SERVICE>
+		<OPERATION>CreateAmtBlk</OPERATION>
+		<DESTINATION>CTR</DESTINATION>
+		<FUNCTIONID>CADAMBLK</FUNCTIONID>
+		<ACTION>NEW</ACTION>
+		<MSGSTAT>SUCCESS</MSGSTAT>
+		</FCUBS_HEADER>
+		<FCUBS_BODY>
+		<FCUBS_WARNING_RESP>
+		<WARNING>
+		<WCODE>CA-AB010</WCODE>
+		<WDESC>System has defaulted the Effective Date to Today</WDESC>
+		</WARNING>
+		<WARNING>
+		<WCODE>ST-SAVE-002</WCODE>
+		<WDESC>Record Successfully Saved and Authorized</WDESC>
+		</WARNING>
+		</FCUBS_WARNING_RESP>
+		</FCUBS_BODY>
+		</CREATEAMTBLK_IOPK_RES>
+		</S:Body>
+		</S:Envelope>';
+		SET AccountBalanceEnquiry = '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <QUERYACCBAL_IOFS_RES xmlns="http://fcubs.ofss.com/service/FCUBSAccService">
+         <FCUBS_HEADER>
+            <SOURCE>FLEXCUBE</SOURCE>
+            <UBSCOMP>FCUBS</UBSCOMP>
+            <MSGID>9121075067135160</MSGID>
+            <CORRELID>4115155</CORRELID>
+            <USERID>IBEXTUSR</USERID>
+            <BRANCH>001</BRANCH>
+            <SERVICE>FCUBSAccService</SERVICE>
+            <OPERATION>QueryAccBal</OPERATION>
+            <SOURCE_OPERATION>SOURCE_OPERATION</SOURCE_OPERATION>
+            <DESTINATION>IBEXT1</DESTINATION>
+            <MULTITRIPID>6210750750633730</MULTITRIPID>
+            <FUNCTIONID>STACCBAL</FUNCTIONID>
+            <ACTION>EXECUTEQUERY</ACTION>
+            <MSGSTAT>SUCCESS</MSGSTAT>
+         </FCUBS_HEADER>
+         <FCUBS_BODY>
+            <ACC-Balance>
+               <ACC_BAL>
+                  <BRANCH_CODE>002</BRANCH_CODE>
+                  <CUST_AC_NO>0002770250011</CUST_AC_NO>
+                  <CCY>ETB</CCY>
+                  <TRNDT>2021-02-12</TRNDT>
+                  <OPNBAL>0</OPNBAL>
+                  <CURBAL>0</CURBAL>
+                  <AVLBAL>0</AVLBAL>
+                  <UNCOLAMT>0</UNCOLAMT>
+                  <AVLCR>0</AVLCR>
+                  <MTDTOVCR>1103054.47</MTDTOVCR>
+                  <MTDTOVDR>1103734.21</MTDTOVDR>
+                  <ACY_BKD_AMT>0</ACY_BKD_AMT>
+                  <ACCR_DR>0</ACCR_DR>
+                  <ACCR_CR>0</ACCR_CR>
+                  <ACY_TANK_CR>0</ACY_TANK_CR>
+                  <ACY_TANK_DR>0</ACY_TANK_DR>
+                  <ACY_TANK_UNCOL>0</ACY_TANK_UNCOL>
+                  <ACY_UNAUTH_DR>0</ACY_UNAUTH_DR>
+                  <ACY_UNAUTH_TANK_DR>0</ACY_UNAUTH_TANK_DR>
+                  <ACY_UNAUTH_CR>0</ACY_UNAUTH_CR>
+                  <ACY_UNAUTH_TANK_CR>0</ACY_UNAUTH_TANK_CR>
+                  <ACY_UNAUTH_UNCOL>0</ACY_UNAUTH_UNCOL>
+                  <ACY_UNAUTH_TANK_UNCOL>0</ACY_UNAUTH_TANK_UNCOL>
+               </ACC_BAL>
+            </ACC-Balance>
+         </FCUBS_BODY>
+      </QUERYACCBAL_IOFS_RES>
+   </S:Body>
+</S:Envelope>';
+        SET AccountSummary = '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <QUERYACCSUMM_IOFS_RES xmlns="http://fcubs.ofss.com/service/FCUBSAccService">
+         <FCUBS_HEADER>
+            <SOURCE>IBEXT1</SOURCE>
+            <UBSCOMP>FCUBS</UBSCOMP>
+            <MSGID>14744258</MSGID>
+            <CORRELID>14744258</CORRELID>
+            <USERID>IBEXTUSR</USERID>
+            <ENTITY>null</ENTITY>
+            <BRANCH>002</BRANCH>
+            <SERVICE>FCUBSAccService</SERVICE>
+            <OPERATION>QueryAccSumm</OPERATION>
+            <DESTINATION>IBEXT1</DESTINATION>
+            <FUNCTIONID>STDACCDT</FUNCTIONID>
+            <ACTION>EXECUTEQUERY</ACTION>
+            <MSGSTAT>SUCCESS</MSGSTAT>
+         </FCUBS_HEADER>
+         <FCUBS_BODY>
+            <Stvw-Account-Sumary-Full>
+               <CUST_NO>002770250</CUST_NO>
+               <Stvw-Account-Sumary--A>
+                  <CUSTACNO>0002770250011</CUSTACNO>
+                  <BRANCH_CODE>002</BRANCH_CODE>
+                  <CCY>ETB</CCY>
+                  <CURRBAL>0</CURRBAL>
+                  <ACCOUNT_TYPE>U</ACCOUNT_TYPE>
+                  <CUSTOMER_NAME>TSEGAY AREGAWI HAILU-275473</CUSTOMER_NAME>
+                  <AC_DESC>TSEGAY AREGAWI HAILU</AC_DESC>
+                  <ACCOUNT_CLASS>CURRNT</ACCOUNT_CLASS>
+                  <ACCLASSDESC>CURRENT ACCOUNT  CLASS</ACCLASSDESC>
+               </Stvw-Account-Sumary--A>
+               <Stvw-Account-Sumary--A>
+                  <CUSTACNO>5002770250001</CUSTACNO>
+                  <BRANCH_CODE>002</BRANCH_CODE>
+                  <CCY>ETB</CCY>
+                  <CURRBAL>593.3</CURRBAL>
+                  <ACCOUNT_TYPE>S</ACCOUNT_TYPE>
+                  <CUSTOMER_NAME>TSEGAY AREGAWI HAILU-275473</CUSTOMER_NAME>
+                  <AC_DESC>TSEGAY AREGAWI HAILU S/A</AC_DESC>
+                  <ACCOUNT_CLASS>SAVING</ACCOUNT_CLASS>
+                  <ACCLASSDESC>SAVINGS ACCOUNT CLASS</ACCLASSDESC>
+               </Stvw-Account-Sumary--A>
+            </Stvw-Account-Sumary-Full>
+            <FCUBS_WARNING_RESP>
+               <WARNING>
+                  <WCODE>ST-SAVE-023</WCODE>
+                  <WDESC>Record Successfully Retrieved</WDESC>
+               </WARNING>
+            </FCUBS_WARNING_RESP>
+         </FCUBS_BODY>
+      </QUERYACCSUMM_IOFS_RES>
+   </S:Body>
+</S:Envelope>';
+ SET BankAccountDetails = '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <QUERYCUSTACC_IOFS_RES xmlns="http://fcubs.ofss.com/service/FCUBSAccService">
+         <FCUBS_HEADER>
+            <SOURCE>IBEXT1</SOURCE>
+            <UBSCOMP>FCUBS</UBSCOMP>
+            <MSGID>104342229</MSGID>
+            <CORRELID>104342229</CORRELID>
+            <USERID>IBEXTUSR</USERID>
+            <ENTITY>null</ENTITY>
+            <BRANCH>002</BRANCH>
+            <SERVICE>FCUBSAccService</SERVICE>
+            <OPERATION>QueryCustAcc</OPERATION>
+            <DESTINATION>IBEXT1</DESTINATION>
+            <FUNCTIONID>STDCUSAC</FUNCTIONID>
+            <ACTION>EXECUTEQUERY</ACTION>
+            <MSGSTAT>SUCCESS</MSGSTAT>
+         </FCUBS_HEADER>
+         <FCUBS_BODY>
+            <Cust-Account-Full>
+               <BRN>002</BRN>
+               <ACC>0002770250011</ACC>
+               <CUSTNO>002770250</CUSTNO>
+               <ACCLS>CURRNT</ACCLS>
+               <CCY>ETB</CCY>
+               <CUSTNAME>TSEGAY AREGAWI HAILU-275473</CUSTNAME>
+               <ACCLSTYP>U</ACCLSTYP>
+               <ADESC>TSEGAY AREGAWI HAILU</ADESC>
+               <ACSTATNODR>N</ACSTATNODR>
+               <ACSTATNOCR>N</ACSTATNOCR>
+               <ACSTATSTPAY>N</ACSTATSTPAY>
+               <DORM>Y</DORM>
+               <ACCTYPE>S</ACCTYPE>
+               <ACCOPENDT>2007-09-04</ACCOPENDT>
+               <ALTACC>0002770250011</ALTACC>
+               <FROZEN>N</FROZEN>
+               <ADDRESS_2>MEKEL. W.SEMEN  K.03</ADDRESS_2>
+               <ADDRESS_3>TEL-0914 700423 OR 034 408878</ADDRESS_3>
+               <POSTALLOWED>Y</POSTALLOWED>
+               <TRKREC>N</TRKREC>
+               <REFREQ>N</REFREQ>
+               <ACCSTAT>NORM</ACCSTAT>
+               <STATSINCE>2011-10-21</STATSINCE>
+               <INHERITREP>Y</INHERITREP>
+               <AUTOSTATCHANGE>N</AUTOSTATCHANGE>
+               <DORMPRM>M</DORMPRM>
+               <LOC>AAB</LOC>
+               <MEDIA>MAIL</MEDIA>
+               <CHQBOOK>Y</CHQBOOK>
+               <PASSBOOK>Y</PASSBOOK>
+               <CASACC>N</CASACC>
+               <TYOFCHQ>C</TYOFCHQ>
+               <ATMDLIM>0</ATMDLIM>
+               <ATMDCNTLIM>0</ATMDCNTLIM>
+               <POSPAYAC>N</POSPAYAC>
+               <AUTOREORDERCHKREQ>N</AUTOREORDERCHKREQ>
+               <LODGEBKFAC>N</LODGEBKFAC>
+               <ALLWBKPERENTRY>N</ALLWBKPERENTRY>
+               <AUTOPROVREQ>N</AUTOPROVREQ>
+               <PROVCCYTYPE>L</PROVCCYTYPE>
+               <DEFRECON>N</DEFRECON>
+               <CONSREQD>N</CONSREQD>
+               <FUNDING>N</FUNDING>
+               <MOD9RQD>N</MOD9RQD>
+               <NETREQ>N</NETREQ>
+               <ACSTMTDAY>31</ACSTMTDAY>
+               <ACSTMTCYCLE>M</ACSTMTCYCLE>
+               <ATM>Y</ATM>
+               <ACSTMTTYPEP>D</ACSTMTTYPEP>
+               <GENSTMTMV>N</GENSTMTMV>
+               <DISPIBANINADV>N</DISPIBANINADV>
+               <ACSTMTTYPS>N</ACSTMTTYPS>
+               <GENSTMTMV2>N</GENSTMTMV2>
+               <ACSTMTTYPE3>N</ACSTMTTYPE3>
+               <GENSTMTMV3>N</GENSTMTMV3>
+               <FLGEXCLRVRTRANS>N</FLGEXCLRVRTRANS>
+               <PREVSTMTDT>2019-03-12</PREVSTMTDT>
+               <PREVSTMTBAL>111.87</PREVSTMTBAL>
+               <PREVSTMTNO>1</PREVSTMTNO>
+               <SWPTYPE>1</SWPTYPE>
+               <REGCCAVL>N</REGCCAVL>
+               <REGDAPP>N</REGDAPP>
+               <REGDPER>N</REGDPER>
+               <PRDLST>D</PRDLST>
+               <TXNLST>D</TXNLST>
+               <SPCONDLST>N</SPCONDLST>
+               <SPCONDTXN>N</SPCONDTXN>
+               <ODREQ>Y</ODREQ>
+               <DAYLIGHTLIMIT>0</DAYLIGHTLIMIT>
+               <ESCROWTRN>N</ESCROWTRN>
+               <ACCOUNTAUTOCLOSED>N</ACCOUNTAUTOCLOSED>
+               <CRS_STST_REQD>N</CRS_STST_REQD>
+               <MT110_RECON_REQD>N</MT110_RECON_REQD>
+               <PROJACC>N</PROJACC>
+               <PRIVATE_CUSTOMER>N</PRIVATE_CUSTOMER>
+               <DFLT_WAIVER>N</DFLT_WAIVER>
+               <AUTO_DEBIT_CARD_REQUEST>N</AUTO_DEBIT_CARD_REQUEST>
+               <AUTO_CHEQUE_BOOK_REQ>N</AUTO_CHEQUE_BOOK_REQ>
+               <NSFBLKSTAT>N</NSFBLKSTAT>
+               <DROVD>N</DROVD>
+               <CROVD>N</CROVD>
+               <SPL_AC_GEN>N</SPL_AC_GEN>
+               <MAKER>RAHELGET</MAKER>
+               <MAKERSTAMP>2019-03-12 16:55:06</MAKERSTAMP>
+               <CHECKER>ABDU</CHECKER>
+               <CHECKERSTAMP>2019-03-12 17:19:34</CHECKERSTAMP>
+               <MODNO>3</MODNO>
+               <TXNSTAT>C</TXNSTAT>
+               <AUTHSTAT>A</AUTHSTAT>
+               <Provision-Main>
+                  <PRVACCUI>0002770250011</PRVACCUI>
+               </Provision-Main>
+               <Interim-Details>
+                  <INTRMSTMTCNT>0</INTRMSTMTCNT>
+               </Interim-Details>
+               <Acstatuslines>
+                  <ACSTATUS>NORM</ACSTATUS>
+                  <DRHOLINE>HO_LINE</DRHOLINE>
+                  <CRHOLINE>HO_LINE</CRHOLINE>
+                  <CRCBLINE>CB_LINE</CRCBLINE>
+                  <DRCBLINE>CB_LINE</DRCBLINE>
+                  <DRGL>200010002</DRGL>
+                  <CRGL>200010002</CRGL>
+                  <DESC>Normal Status</DESC>
+               </Acstatuslines>
+               <Intdetails>
+                  <CALCACC>0002770250011</CALCACC>
+                  <BOOKACC>0002770250011</BOOKACC>
+                  <HASIS>N</HASIS>
+                  <INTSTARTDT>2007-09-04</INTSTARTDT>
+                  <BOOKACCBRN>002</BOOKACCBRN>
+                  <DRCRADV>N</DRCRADV>
+                  <CHGBOOKACCBRN>002</CHGBOOKACCBRN>
+                  <CHGBOOKACC>0002770250011</CHGBOOKACC>
+                  <CHGSTARTDT>2007-09-04</CHGSTARTDT>
+                  <BRN>002</BRN>
+                  <ACC>0002770250011</ACC>
+               </Intdetails>
+               <Tddetails>
+                  <AUTOROLL>N</AUTOROLL>
+                  <CLONMAT>N</CLONMAT>
+                  <MOVINTUNCLM>N</MOVINTUNCLM>
+                  <ROLLTYPE>P</ROLLTYPE>
+                  <MOVPRIUNCLM>N</MOVPRIUNCLM>
+                  <INTSTDT>2007-09-04</INTSTDT>
+               </Tddetails>
+               <Amount-Dates>
+                  <LCY>ETB</LCY>
+                  <ACY>ETB</ACY>
+                  <DR_INT_DUE>0</DR_INT_DUE>
+                  <PROVAMT>0</PROVAMT>
+                  <CHG_DUE>0</CHG_DUE>
+                  <WITHDRAWABLE_UNCOLLED_FUND>0</WITHDRAWABLE_UNCOLLED_FUND>
+                  <ACY_OPENING_BAL>0</ACY_OPENING_BAL>
+                  <LCY_OPENING_BAL>0</LCY_OPENING_BAL>
+                  <ACY_TODAY_TOVER_DR>0</ACY_TODAY_TOVER_DR>
+                  <LCY_TODAY_TOVER_DR>0</LCY_TODAY_TOVER_DR>
+                  <ACY_TODAY_TOVER_CR>0</ACY_TODAY_TOVER_CR>
+                  <LCY_TODAY_TOVER_CR>0</LCY_TODAY_TOVER_CR>
+                  <ACY_TANK_CR>0</ACY_TANK_CR>
+                  <ACY_TANK_DR>0</ACY_TANK_DR>
+                  <LCY_TANK_CR>0</LCY_TANK_CR>
+                  <LCY_TANK_DR>0</LCY_TANK_DR>
+                  <ACY_TANK_UNCOLLECTED>0</ACY_TANK_UNCOLLECTED>
+                  <ACY_CURR_BALANCE>0</ACY_CURR_BALANCE>
+                  <LCY_CURR_BALANCE>0</LCY_CURR_BALANCE>
+                  <ACY_BLOCKED_AMOUNT>0</ACY_BLOCKED_AMOUNT>
+                  <ACY_AVL_BAL>0</ACY_AVL_BAL>
+                  <ACY_UNAUTH_DR>0</ACY_UNAUTH_DR>
+                  <ACY_UNAUTH_TANK_DR>0</ACY_UNAUTH_TANK_DR>
+                  <ACY_UNAUTH_CR>0</ACY_UNAUTH_CR>
+                  <ACY_UNAUTH_TANK_CR>0</ACY_UNAUTH_TANK_CR>
+                  <ACY_UNAUTH_UNCOLLECTED>0</ACY_UNAUTH_UNCOLLECTED>
+                  <ACY_UNAUTH_TANK_UNCOLLECTED>0</ACY_UNAUTH_TANK_UNCOLLECTED>
+                  <ACY_ACCRUED_DR_IC>0</ACY_ACCRUED_DR_IC>
+                  <ACY_ACCRUED_CR_IC>0</ACY_ACCRUED_CR_IC>
+                  <DATE_LAST_CR_ACTIVITY>2014-05-12</DATE_LAST_CR_ACTIVITY>
+                  <DATE_LAST_DR_ACTIVITY>2017-11-30</DATE_LAST_DR_ACTIVITY>
+                  <DATE_LAST_DR>2019-01-31</DATE_LAST_DR>
+                  <DATE_LAST_CR>2014-05-12</DATE_LAST_CR>
+                  <ACY_UNCOLLECTED>0</ACY_UNCOLLECTED>
+                  <AMTAVL>0</AMTAVL>
+                  <DIS_UNUTILIZED_AMT>0</DIS_UNUTILIZED_AMT>
+                  <DIS_TOT_AVL_AMOUNT>0</DIS_TOT_AVL_AMOUNT>
+                  <ACY_UNAUTH>ETB</ACY_UNAUTH>
+                  <UTILIZED_AMT>0</UTILIZED_AMT>
+                  <LIMIT_AMOUNT>0</LIMIT_AMOUNT>
+                  <ILM_SWEEP_BAL>0</ILM_SWEEP_BAL>
+                  <SWEEP_ELIG_BAL>0</SWEEP_ELIG_BAL>
+                  <PRINC_OUTSTAND>0</PRINC_OUTSTAND>
+                  <INT_OUTSTAND>0</INT_OUTSTAND>
+                  <CHG_OUTSTAND>0</CHG_OUTSTAND>
+                  <AMTDUE>0</AMTDUE>
+                  <Turnovers>
+                     <ACY_MTD_TOVER_DR>1103734.21</ACY_MTD_TOVER_DR>
+                     <LCY_MTD_TOVER_DR>1103734.21</LCY_MTD_TOVER_DR>
+                     <ACY_MTD_TOVER_CR>1103054.47</ACY_MTD_TOVER_CR>
+                     <LCY_MTD_TOVER_CR>1102406.6</LCY_MTD_TOVER_CR>
+                     <ACY_TOV>ETB</ACY_TOV>
+                     <LCY_TOV>ETB</LCY_TOV>
+                  </Turnovers>
+               </Amount-Dates>
+               <Noticepref/>
+               <Cust-Acc-Check/>
+               <Custacc-Icccspcn>
+                  <BRNCD>002</BRNCD>
+                  <ACCNO>0002770250011</ACCNO>
+               </Custacc-Icccspcn>
+               <Custacc-Icchspcn>
+                  <BRN>002</BRN>
+                  <ACC>0002770250011</ACC>
+               </Custacc-Icchspcn>
+               <Custacc-Iccinstr>
+                  <BRN>002</BRN>
+                  <ACC>0002770250011</ACC>
+               </Custacc-Iccinstr>
+               <CustAcc>
+                  <BRN>002</BRN>
+                  <ACC>0002770250011</ACC>
+                  <Misdetails>
+                     <POOLCD>DFLTPOOL</POOLCD>
+                     <REFRTTYPE>X</REFRTTYPE>
+                     <CALCMETH>9</CALCMETH>
+                     <TXNMIS1>002</TXNMIS1>
+                     <RTFLAG>P</RTFLAG>
+                  </Misdetails>
+               </CustAcc>
+               <Custacc-Sicdiary/>
+               <Custacc-Stccusbl>
+                  <BRN>002</BRN>
+                  <ACCNO>0002770250011</ACCNO>
+               </Custacc-Stccusbl>
+               <UDFDETAILS>
+                  <FLDNAM>AGRICULTURE_SUBSECTOR_OD</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>CONSTRUCTION_SUBSECTOR_OD</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>DOMESTIC_SUBSECTOR_OD</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>EXPORT_SUBSECTOR_OD</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>IMPORT_SUBSECTOR_OD</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>MANUFACTURING_SUBSECTOR_OD</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>MINING_SUBSECTOR_OD</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>PERSONAL_SUBSECTOR_OD</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>REAL_ESTATE_SUBSECTOR_OD</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>STAFF_SUBSECTOR_OD</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>TRANSPORT_SUBSECTOR_OD</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>REASON_OF_ACCOUNT_CLOSE</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>REASON/REMARK FOR STATUS CHANGE</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>SMSLANG_PREF</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>DOCUMENT PRESENTED/CONSIDERED</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>CRITERIA USED</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>AMOUNT</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>PENSION_CATAGORY</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>ECX_CATEGORY</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>REFERRAL_CATEGORY</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>REFERRAL_ID</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>AGENCY_REGION</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>PENSIONER_ID</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>FINANCING_AREAS</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>AGRICULTURE</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>MANUFACTURING</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>DOMESTIC_TRADE</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>DOMESTIC_SERVICES</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>TRANSPORT</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>HOTEL_AND _TURISM</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>EXPORT</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>IMPORT</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>BUILDING_AND_CONSTRUCTION</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>MINING</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>CONSUMER_LOAN</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>TENURE</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>LOAN_SEGMENTATION</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>PROCESSING_CENTER</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>MERCHANT</FLDNAM>
+               </UDFDETAILS>
+               <UDFDETAILS>
+                  <FLDNAM>EXPORTER</FLDNAM>
+               </UDFDETAILS>
+               <Acc-Svcacsig>
+                  <ACBRN1>002</ACBRN1>
+                  <ACTNO>0002770250011</ACTNO>
+                  <ACDESC>TSEGAY AREGAWI HAILU</ACDESC>
+                  <ACCMSG>MEKEL. W.SEMEN  K.03 MEKEL. W.SEMEN  K.03 MEKEL. W.SEMEN  K.03</ACCMSG>
+                  <MINNOSIG>0</MINNOSIG>
+                  <ACCCY>ETB</ACCCY>
+                  <Accsigdetails>
+                     <CUST_ID>002770250</CUST_ID>
+                     <RELATIONTYP>Authorised signatory</RELATIONTYP>
+                     <SIGID>001</SIGID>
+                     <SIGMSG>MEKEL. W.SEMEN  K.03 MEKEL. W.SEMEN  K.03 MEKEL. W.SEMEN  K.03</SIGMSG>
+                     <SIGTYPE>SIGANTORY</SIGTYPE>
+                     <APPROVLIMIT>9999999999999999999</APPROVLIMIT>
+                     <SIGNAME>TSEGAY AREGAWI</SIGNAME>
+                     <SOLOSIG>0</SOLOSIG>
+                  </Accsigdetails>
+               </Acc-Svcacsig>
+               <Custacc-Iccintpo>
+                  <BRANCH_CODE>002</BRANCH_CODE>
+                  <CUST_AC_NO>0002770250011</CUST_AC_NO>
+                  <CCY>ETB</CCY>
+               </Custacc-Iccintpo>
+               <Customer-Acc>
+                  <BRANCH_CODE>002</BRANCH_CODE>
+                  <CUST_AC_NO>0002770250011</CUST_AC_NO>
+               </Customer-Acc>
+               <Sttms-Cust-Acc-Swp>
+                  <BRANCH_CODE>002</BRANCH_CODE>
+                  <CUST_AC_NO>0002770250011</CUST_AC_NO>
+               </Sttms-Cust-Acc-Swp>
+               <Acc-Chnl>
+                  <BRANCH_CODE>002</BRANCH_CODE>
+                  <CUST_AC_NO>0002770250011</CUST_AC_NO>
+               </Acc-Chnl>
+            </Cust-Account-Full>
+            <FCUBS_WARNING_RESP>
+               <WARNING>
+                  <WCODE>ST-SAVE-023</WCODE>
+                  <WDESC>Record Successfully Retrieved</WDESC>
+               </WARNING>
+            </FCUBS_WARNING_RESP>
+         </FCUBS_BODY>
+      </QUERYCUSTACC_IOFS_RES>
+   </S:Body>
+</S:Envelope>';
+SET BulkFundTransfer = '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <CREATEMJRNLBOOK_IOPK_RES xmlns="http://fcubs.ofss.com/service/FCUBSDEService">
+         <FCUBS_HEADER>
+            <SOURCE>IBEXT1</SOURCE>
+            <UBSCOMP>FCUBS</UBSCOMP>
+            <MSGID>ECXEXTREF00100233743</MSGID>
+            <CORRELID>ECXEXTREF00100233743</CORRELID>
+            <USERID>ECXUSER</USERID>
+            <ENTITY>null</ENTITY>
+            <BRANCH>001</BRANCH>
+            <MODULEID>DE</MODULEID>
+            <SERVICE>FCUBSDEService</SERVICE>
+            <OPERATION>CreateMjrnlbook</OPERATION>
+            <SOURCE_OPERATION>CreateMjrnlbook</SOURCE_OPERATION>
+            <DESTINATION>IBEXT1</DESTINATION>
+            <FUNCTIONID>DEDJNLON</FUNCTIONID>
+            <ACTION>NEW</ACTION>
+            <MSGSTAT>SUCCESS</MSGSTAT>
+         </FCUBS_HEADER>
+         <FCUBS_BODY>
+            <FCUBS_WARNING_RESP>
+               <WARNING>
+                  <WCODE>DE-MLT24</WCODE>
+                  <WDESC>Value Date Is Before Previous Working Day</WDESC>
+               </WARNING>
+               <WARNING>
+                  <WCODE>ST-SAVE-052</WCODE>
+                  <WDESC>Successfully Saved and Authorized</WDESC>
+               </WARNING>
+            </FCUBS_WARNING_RESP>
+         </FCUBS_BODY>
+      </CREATEMJRNLBOOK_IOPK_RES>
+   </S:Body>
+</S:Envelope>';
+
+SET FundTransfer = '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <CREATETRANSACTION_FSFS_RES xmlns="http://fcubs.ofss.com/service/FCUBSRTService">
+         <FCUBS_HEADER>
+            <SOURCE>IBEXT1</SOURCE>
+            <UBSCOMP>FCUBS</UBSCOMP>
+            <MSGID>1esb7163754253123</MSGID>
+            <CORRELID>1esb7163754253123</CORRELID>
+            <USERID>IBEXTUSR</USERID>
+            <ENTITY>null</ENTITY>
+            <BRANCH>001</BRANCH>
+            <MODULEID>RT</MODULEID>
+            <SERVICE>FCUBSRTService</SERVICE>
+            <OPERATION>CreateTransaction</OPERATION>
+            <SOURCE_OPERATION>CreateTransaction</SOURCE_OPERATION>
+            <DESTINATION>IBEXT1</DESTINATION>
+            <FUNCTIONID>DEGRTTLR</FUNCTIONID>
+            <ACTION>NEW</ACTION>
+            <MSGSTAT>SUCCESS</MSGSTAT>
+         </FCUBS_HEADER>
+         <FCUBS_BODY>
+            <Transaction-Details>
+               <XREF>116374253123</XREF>
+               <FCCREF>001IBTR2104301Yp</FCCREF>
+               <PRD>IBTR</PRD>
+               <BRN>001</BRN>
+               <TXNBRN>001</TXNBRN>
+               <TXNACC>5001527310013</TXNACC>
+               <TXNCCY>ETB</TXNCCY>
+               <TXNAMT>3200</TXNAMT>
+               <TXNTRN>888</TXNTRN>
+               <OFFSETBRN>001</OFFSETBRN>
+               <OFFSETACC>5001001400005</OFFSETACC>
+               <OFFSETCCY>ETB</OFFSETCCY>
+               <OFFSETAMT>3200</OFFSETAMT>
+               <OFFSETTRN>888</OFFSETTRN>
+               <XRATE>1</XRATE>
+               <LCYAMT>3200</LCYAMT>
+               <TXNDATE>2020-09-23</TXNDATE>
+               <VALDATE>2020-09-23</VALDATE>
+               <RELCUST>001527310</RELCUST>
+               <TCYCHGAMT>0</TCYCHGAMT>
+               <TCYTOTCHGAMT>0</TCYTOTCHGAMT>
+               <NARRATIVE>FUNDS TRANSFER DEFAULT TARGET NARRATIVE</NARRATIVE>
+               <TRACKREVERSE>Y</TRACKREVERSE>
+               <LCYXRATE>1</LCYXRATE>
+               <MAKERID>IBEXTUSR</MAKERID>
+               <MAKERSTAMP>2021-02-12 10:24:52 AM</MAKERSTAMP>
+               <CHECKERID>IBEXTUSR</CHECKERID>
+               <CHECKERSTAMP>2021-02-12 10:24:52 AM</CHECKERSTAMP>
+               <RECSTAT>A</RECSTAT>
+               <AUTHSTAT>A</AUTHSTAT>
+               <LCYCHGAMT>0</LCYCHGAMT>
+               <DRACC>TXN</DRACC>
+               <TXNDRCR>D</TXNDRCR>
+               <BOOKDATE>2020-09-23</BOOKDATE>
+               <FT>N</FT>
+               <LCYTOTCHGAMT>0</LCYTOTCHGAMT>
+               <DENMCCY1>ETB</DENMCCY1>
+               <DENMAMT1>3200</DENMAMT1>
+               <DENMAMT2>3200</DENMAMT2>
+               <ACCTITLE1>BRUTAWIT NEGASH FOR AMANUEAL-685566</ACCTITLE1>
+               <ACCTITLE2>BRUTAWIT NEGASH -652871</ACCTITLE2>
+               <ACTAMT>3200</ACTAMT>
+               <CHRACC>5001527310013</CHRACC>
+               <CUSTNAME>BRUTAWIT NEGASH FOR AMANUEAL</CUSTNAME>
+               <Charge-Details>
+                  <CHGCOMP>TXN_FEE</CHGCOMP>
+                  <CHGAMT>0</CHGAMT>
+                  <CHGCCY>ETB</CHGCCY>
+                  <MISHEAD>MISINC</MISHEAD>
+                  <TXNCODE>710</TXNCODE>
+                  <NETTINGIND>N</NETTINGIND>
+                  <CHGGL>430180001</CHGGL>
+                  <TYPE>P</TYPE>
+                  <LCYCHG>0</LCYCHG>
+                  <XRATE>1</XRATE>
+               </Charge-Details>
+               <Mis-Details>
+                  <BRANCH>001</BRANCH>
+                  <CUSTNO>001527310</CUSTNO>
+                  <CCY>ETB</CCY>
+                  <RTFLAG>P</RTFLAG>
+                  <FUNDMIS1LBL1>FUNDID</FUNDMIS1LBL1>
+                  <COMPMIS3LBL3>CUST_SEG</COMPMIS3LBL3>
+                  <TXNMIS1LBL1>COST_CTR</TXNMIS1LBL1>
+                  <TXNMIS2LBL2>ACCT-OFF</TXNMIS2LBL2>
+               </Mis-Details>
+            </Transaction-Details>
+            <FCUBS_WARNING_RESP>
+               <WARNING>
+                  <WCODE>GW-SAV-03</WCODE>
+                  <WDESC>Transaction completed Succesfully</WDESC>
+               </WARNING>
+            </FCUBS_WARNING_RESP>
+         </FCUBS_BODY>
+      </CREATETRANSACTION_FSFS_RES>
+   </S:Body>
+</S:Envelope>';
+
+SET LiquidateTransaction = '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <LIQUIDATETRANSACTION_FSFS_RES xmlns="http://fcubs.ofss.com/service/FCUBSDDService">
+         <FCUBS_HEADER>
+            <SOURCE>FLEXCUBE</SOURCE>
+            <UBSCOMP>FCUBS</UBSCOMP>
+            <MSGID>9121077067135440</MSGID>
+            <USERID>CTSUSER</USERID>
+            <BRANCH>155</BRANCH>
+            <MODULEID>DD</MODULEID>
+            <SERVICE>FCUBSDDService</SERVICE>
+            <OPERATION>LiquidateTransaction</OPERATION>
+            <SOURCE_OPERATION>SOURCE_OPERATION</SOURCE_OPERATION>
+            <DESTINATION>CTR</DESTINATION>
+            <MULTITRIPID>6210770750634714</MULTITRIPID>
+            <FUNCTIONID>DDGONLIQ</FUNCTIONID>
+            <ACTION>LIQUIDATE</ACTION>
+            <MSGSTAT>SUCCESS</MSGSTAT>
+         </FCUBS_HEADER>
+         <FCUBS_BODY>
+            <Transaction-Details>
+               <XREF>201024105444402</XREF>
+               <PRODUCTCODE>BCLA</PRODUCTCODE>
+               <FCCREF>155BCSA210120002</FCCREF>
+               <VERNO>2</VERNO>
+               <ESN>2</ESN>
+               <INSTRTYPE>BCA</INSTRTYPE>
+               <ISSBRN>155</ISSBRN>
+               <INSTRSTAT>LIQD</INSTRSTAT>
+               <PAYBANK>1AMB</PAYBANK>
+               <EXPDT>2022-01-12</EXPDT>
+               <RELCUST>155001856</RELCUST>
+               <ACBRN>155</ACBRN>
+               <ACNO>0155001856856</ACNO>
+               <BENFNM>ETHIO TELECOM LEGEHAR OFFICE</BENFNM>
+               <INSTRNO>1368879</INSTRNO>
+               <INSTRDATE>2021-01-12</INSTRDATE>
+               <INSTRCCY>ETB</INSTRCCY>
+               <INSTRAMT>23799.26</INSTRAMT>
+               <EXCHRATE>1</EXCHRATE>
+               <ACCCY>ETB</ACCCY>
+               <OFSCCY>ETB</OFSCCY>
+               <OFSAMT>23799.26</OFSAMT>
+               <NARRATIVE>INWARD CPO</NARRATIVE>
+               <MAKERID>CTSUSER</MAKERID>
+               <MAKERSTAMP>2021-01-14</MAKERSTAMP>
+               <CHECKERID>CTSUSER</CHECKERID>
+               <CHECKERSTAMP>2021-01-14</CHECKERSTAMP>
+               <CONTSTAT>O</CONTSTAT>
+               <AUTHSTAT>A</AUTHSTAT>
+               <MODNO>2</MODNO>
+               <ONCEAUTH>Y</ONCEAUTH>
+               <TCYTOTCHGAMT>0</TCYTOTCHGAMT>
+               <ACCTITLE>SELAMAWI BEYENE TEFERI( BMORE APARTEMENT HOTEL)</ACCTITLE>
+               <ACTAMT>23799.26</ACTAMT>
+               <TXNDATE>2021-01-14</TXNDATE>
+               <ACYAMOUNT>23799.26</ACYAMOUNT>
+               <OFSACC>246010008</OFSACC>
+               <MULCHGCY>ETB</MULCHGCY>
+               <OFSBRANCH>155</OFSBRANCH>
+               <DELIVERY_MODE>N</DELIVERY_MODE>
+               <Cheque-Details>
+                  <PAYBRN>155</PAYBRN>
+                  <STAT>LIQD</STAT>
+                  <BENFNAME>ETHIO TELECOM LEGEHAR OFFICE</BENFNAME>
+               </Cheque-Details>
+               <Mis-Details>
+                  <BRANCH>155</BRANCH>
+                  <RTFLAG>P</RTFLAG>
+                  <FUNDMIS1LBL1>FUNDID</FUNDMIS1LBL1>
+                  <COMPMIS3LBL3>CUST_SEG</COMPMIS3LBL3>
+                  <TXNMIS1LBL1>COST_CTR</TXNMIS1LBL1>
+                  <TXNMIS2LBL2>ACCT-OFF</TXNMIS2LBL2>
+               </Mis-Details>
+               <Udf-Details>
+                  <FIELD_NAME>BENIFICIARY_NAME</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>CUSTOMER_ID</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>ID_TYPE</FIELD_NAME>
+                  <VAL_TYPE>V</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>ID_ISSUED_BY</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>FIRST_NAME</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>MIDDLE_NAME</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>LAST_NAME</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>GENDER</FIELD_NAME>
+                  <VAL_TYPE>V</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>TELEPHONE</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>CITY</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>SUB_CITY</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>WEREDA</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>HOUSE_NO</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>POSTAL_CODE</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>BUSSINESS_TEL_NO</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>BUSINESS_FAX_NO</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>RESIDENCE_TEL_NO</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>EMAIL_ADDRESS</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>PASSPORT_NO</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>PASSPORT_ISSUEDBY</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>RESIDENCE_COUNTRY</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>ORIGINAL_COUNTYR</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>OCCUPATION</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>COUNTRY</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+               <Udf-Details>
+                  <FIELD_NAME>REGION</FIELD_NAME>
+                  <VAL_TYPE>N</VAL_TYPE>
+               </Udf-Details>
+            </Transaction-Details>
+            <FCUBS_WARNING_RESP>
+               <WARNING>
+                  <WCODE>GW-SAV-01</WCODE>
+                  <WDESC>Transaction Saved Successfully</WDESC>
+               </WARNING>
+            </FCUBS_WARNING_RESP>
+         </FCUBS_BODY>
+      </LIQUIDATETRANSACTION_FSFS_RES>
+   </S:Body>
+</S:Envelope>';
+
+SET Reversal = '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <REVERSETRANSACTION_IOPK_RES xmlns="http://fcubs.ofss.com/service/FCUBSRTService">
+         <FCUBS_HEADER>
+            <SOURCE>IBEXT1</SOURCE>
+            <UBSCOMP>FCUBS</UBSCOMP>
+            <MSGID>1258232</MSGID>
+            <CORRELID>1258232</CORRELID>
+            <USERID>IBEXTUSR</USERID>
+            <ENTITY>StringValue</ENTITY>
+            <BRANCH>083</BRANCH>
+            <MODULEID>RT</MODULEID>
+            <SERVICE>FCUBSRTService</SERVICE>
+            <OPERATION>ReverseTransaction</OPERATION>
+            <SOURCE_OPERATION>ReverseTransaction</SOURCE_OPERATION>
+            <DESTINATION>IBEXT1</DESTINATION>
+            <FUNCTIONID>DEGRTTLR</FUNCTIONID>
+            <ACTION>REVERSE</ACTION>
+            <MSGSTAT>SUCCESS</MSGSTAT>
+         </FCUBS_HEADER>
+         <FCUBS_BODY>
+            <FCUBS_WARNING_RESP>
+               <WARNING>
+                  <WCODE>GW-REV-01</WCODE>
+                  <WDESC>Transaction Reversed Successfully</WDESC>
+               </WARNING>
+            </FCUBS_WARNING_RESP>
+         </FCUBS_BODY>
+      </REVERSETRANSACTION_IOPK_RES>
+   </S:Body>
+</S:Envelope>';
+
+SET UnBlocking = '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <CLOSEAMTBLK_FSFS_RES xmlns="http://fcubs.ofss.com/service/FCUBSCustomerService">
+         <FCUBS_HEADER>
+            <SOURCE>CTR</SOURCE>
+            <UBSCOMP>FCUBS</UBSCOMP>
+            <MSGID>6121075750633915</MSGID>
+            <CORRELID>null</CORRELID>
+            <USERID>CTSUSER</USERID>
+            <ENTITY>null</ENTITY>
+            <BRANCH>383</BRANCH>
+            <SERVICE>FCUBSCustomerService</SERVICE>
+            <OPERATION>CloseAmtBlk</OPERATION>
+            <DESTINATION>CTR</DESTINATION>
+            <FUNCTIONID>CADAMBLK</FUNCTIONID>
+            <ACTION>CLOSE</ACTION>
+            <MSGSTAT>SUCCESS</MSGSTAT>
+         </FCUBS_HEADER>
+         <FCUBS_BODY>
+            <Amount-Blocks-Full>
+               <ACC>5001899377829</ACC>
+               <AMTBLKNO>2010240444325728</AMTBLKNO>
+               <AMT>160000</AMT>
+               <ABLKTYPE>F</ABLKTYPE>
+               <EFFDATE>2021-01-14</EFFDATE>
+               <BRANCH>001</BRANCH>
+               <VERIFY_AVL_BAL>N</VERIFY_AVL_BAL>
+               <SOURCE_CODE>CTR</SOURCE_CODE>
+               <MAKER>CTSUSER</MAKER>
+               <MAKERSTAMP>2021-01-14 13:50:43</MAKERSTAMP>
+               <CHECKER>CTSUSER</CHECKER>
+               <CHECKERSTAMP>2021-01-14 13:50:43</CHECKERSTAMP>
+               <MODNO>2</MODNO>
+               <TXNSTAT>C</TXNSTAT>
+               <AUTHSTAT>A</AUTHSTAT>
+            </Amount-Blocks-Full>
+            <FCUBS_WARNING_RESP>
+               <WARNING>
+                  <WCODE>ST-SAVE-010</WCODE>
+                  <WDESC>Record Successfully Closed and Authorized</WDESC>
+               </WARNING>
+            </FCUBS_WARNING_RESP>
+         </FCUBS_BODY>
+      </CLOSEAMTBLK_FSFS_RES>
+   </S:Body>
+</S:Envelope>';
+
+SET Authorization = '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <AUTHORIZEMJRNLBOOK_FSFS_RES xmlns="http://fcubs.ofss.com/service/FCUBSDEService">
+         <FCUBS_HEADER>
+            <SOURCE>ECXSYS</SOURCE>
+            <UBSCOMP>FCUBS</UBSCOMP>
+            <MSGID>EPIA01202104074084407</MSGID>
+            <CORRELID>EPIA01202104074084407</CORRELID>
+            <USERID>ECXAUTH</USERID>
+            <ENTITY>null</ENTITY>
+            <BRANCH>000</BRANCH>
+            <MODULEID>DE</MODULEID>
+            <SERVICE>FCUBSDEService</SERVICE>
+            <OPERATION>AuthorizeMjrnlbook</OPERATION>
+            <SOURCE_OPERATION>AuthorizeMjrnlbook</SOURCE_OPERATION>
+            <DESTINATION>ECXSYS</DESTINATION>
+            <FUNCTIONID>DEDJNLON</FUNCTIONID>
+            <ACTION>AUTH</ACTION>
+            <MSGSTAT>SUCCESS</MSGSTAT>
+         </FCUBS_HEADER>
+         <FCUBS_BODY>
+            <Detbs-Jrnl-Txn-Master-Full>
+               <REFERENCE_NO>000e025210620001</REFERENCE_NO>
+               <BRANCH_CODE>000</BRANCH_CODE>
+               <CCY>ETB</CCY>
+               <MAKER>ECXUSER</MAKER>
+               <MAKDTTIME>2021-03-03 13:39:58</MAKDTTIME>
+               <CHECHKERID>ECXAUTH</CHECHKERID>
+               <CHKDTTIME>2021-04-03 08:11:21</CHKDTTIME>
+               <AUTHSTAT>A</AUTHSTAT>
+               <TXNSTAT>A</TXNSTAT>
+               <Misdetails>
+                  <CONREFNO>000e025210620001</CONREFNO>
+                  <POOLCD>DFLTPOOL</POOLCD>
+                  <CALCMETH1>1</CALCMETH1>
+                  <TRANMIS1>COST_CTR</TRANMIS1>
+                  <TRANMIS2>ACCT-OFF</TRANMIS2>
+                  <COMMIS3>CUST_SEG</COMMIS3>
+                  <FUNMIS1>FUNDID</FUNMIS1>
+               </Misdetails>
+            </Detbs-Jrnl-Txn-Master-Full>
+            <FCUBS_WARNING_RESP>
+               <WARNING>
+                  <WCODE>ST-SAVE-070</WCODE>
+                  <WDESC>Successfully Authorized</WDESC>
+               </WARNING>
+            </FCUBS_WARNING_RESP>
+         </FCUBS_BODY>
+      </AUTHORIZEMJRNLBOOK_FSFS_RES>
+   </S:Body>
+</S:Envelope>';
+        CASE
+		WHEN InputRoot.SOAP.Context.operation = 'QUERYACCBAL_IOFS_REQ' THEN
+			SET Environment.data = CAST(AccountBalanceEnquiry AS BLOB CCSID InputRoot.Properties.CodedCharSetId);
+			--CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Environment.data ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
+		WHEN InputRoot.SOAP.Context.operation = 'QUERYACCSUMM_IOFS_REQ' THEN
+			SET Environment.data = CAST(AccountSummary AS BLOB CCSID InputRoot.Properties.CodedCharSetId);
+			--CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Environment.data ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
+		WHEN InputRoot.SOAP.Context.operation = 'AUTHORIZEMJRNLBOOK_FSFS_REQ' THEN
+			SET Environment.data = CAST(Authorization AS BLOB CCSID InputRoot.Properties.CodedCharSetId);
+			--CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Environment.data ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
+		WHEN InputRoot.SOAP.Context.operation = 'QUERYCUSTACC_IOFS_REQ' THEN
+			SET Environment.data = CAST(BankAccountDetails AS BLOB CCSID InputRoot.Properties.CodedCharSetId);
+			--CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Environment.data ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
+		WHEN InputRoot.SOAP.Context.operation = 'CREATEAMTBLK_IOPK_REQ' THEN
+			SET Environment.data = CAST(Blocking AS BLOB CCSID InputRoot.Properties.CodedCharSetId);
+			--CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Environment.data ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
+		WHEN InputRoot.SOAP.Context.operation = 'CREATEMJRNLBOOK_IOPK_REQ' THEN
+			SET Environment.data = CAST(BulkFundTransfer AS BLOB CCSID InputRoot.Properties.CodedCharSetId);
+			--CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Environment.data ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
+		WHEN InputRoot.SOAP.Context.operation = 'CREATETRANSACTION_FSFS_REQ' THEN
+			SET Environment.data = CAST(FundTransfer AS BLOB CCSID InputRoot.Properties.CodedCharSetId);
+			--CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Environment.data ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
+		WHEN InputRoot.SOAP.Context.operation = 'LIQUIDATETRANSACTION_FSFS_REQ' THEN
+			SET Environment.data = CAST(LiquidateTransaction AS BLOB CCSID InputRoot.Properties.CodedCharSetId);
+			--CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Environment.data ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
+		WHEN InputRoot.SOAP.Context.operation = 'REVERSETRANSACTION_IOPK_REQ' THEN
+			SET Environment.data = CAST(Reversal AS BLOB CCSID InputRoot.Properties.CodedCharSetId);
+			--CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Environment.data ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
+		WHEN InputRoot.SOAP.Context.operation = 'CLOSEAMTBLK_FSFS_REQ' THEN
+			SET Environment.data = CAST(UnBlocking AS BLOB CCSID InputRoot.Properties.CodedCharSetId);
+			--CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Environment.data ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
+		END CASE;
+		
+		CREATE LASTCHILD OF OutputRoot DOMAIN('XMLNSC') PARSE(Environment.data ENCODING InputRoot.Properties.Encoding CCSID InputRoot.Properties.CodedCharSetId);
+		
+    
+	END;
+END MODULE;
