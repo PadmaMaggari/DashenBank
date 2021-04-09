@@ -1214,13 +1214,13 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			MOVE inRef TO inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab"[>];
 			WHILE LASTMOVE(inRef) DO
 				SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"[I].TO_AMT = NULLIF(inRef.*:TO_AMT,'');
-				IF FIELDVALUE(inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition".*[>]) IS NOT NULL THEN
+				IF FIELDNAME(inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition".*[>]) IS NOT NULL THEN
 					DECLARE J INTEGER 1;
 					DECLARE inRefe REFERENCE TO inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition"[>];
 					WHILE LASTMOVE(inRefe) DO
 						SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"."Sig-Condition"[J].CONDITIONID = NULLIF(inRefe.*:CONDITIONID,'');
 						SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig"."Amt-Slab"."Sig-Condition"[J].REMARKS = NULLIF(inRefe.*:REMARKS,'');
-						IF FIELDVALUE(inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition".*:"Sig-Group".*[>]) IS NOT NULL THEN
+						IF FIELDNAME(inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition".*:"Sig-Group".*[>]) IS NOT NULL THEN
 							DECLARE K INTEGER 1;
 							DECLARE inRefer REFERENCE TO inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab".*:"Sig-Condition".*:"Sig-Group"[>];
 							WHILE LASTMOVE(inRefer) DO
