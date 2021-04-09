@@ -1,0 +1,297 @@
+
+
+Importing file: C:\Users\Administrator\git\DashenBank\DashenBank_Authorization_App\Authorization.wsdl
+
+
+The following is a list of WS-I warning messages found when importing:
+XSD: There is no xmlns declaration for namespace 'http://fcubs.ofss.com/service/FCUBSDEService', Line: 4, Column: 1
+
+
+The WSDL import will proceed with bindings FCUBSDEServiceSEIBinding.
+Creating wsdl schema document for file:///C:/Users/Administrator/git/DashenBank/DashenBank_Authorization_App/Authorization.wsdl.
+Parsing wsdl binding {http://FCUBSDEService.types.ws.gw.fcubs.ofss.com}FCUBSDEServiceSEIBinding.
+Parsing wsdl binding input DeleteSingleJrnlIO.
+Parsing wsdl binding output DeleteSingleJrnlIO.
+Parsing wsdl binding input ReopenDEDraftIssuerMaintFS.
+Parsing wsdl binding output ReopenDEDraftIssuerMaintFS.
+Parsing wsdl binding input AuthorizeMjrnlbookIO.
+Parsing wsdl binding output AuthorizeMjrnlbookIO.
+Parsing wsdl binding input ModifyMjrnlTemplateIO.
+Parsing wsdl binding output ModifyMjrnlTemplateIO.
+Parsing wsdl binding input ReopenDEBranchRestIO.
+Parsing wsdl binding output ReopenDEBranchRestIO.
+Parsing wsdl binding input QuerySingleJrnlIO.
+Parsing wsdl binding output QuerySingleJrnlIO.
+Parsing wsdl binding input MultiNewIO.
+Parsing wsdl binding output MultiNewIO.
+Parsing wsdl binding input ModifyMjrnlbookFS.
+Parsing wsdl binding output ModifyMjrnlbookFS.
+Parsing wsdl binding input AuthorizeDEBatchBrowserIO.
+Parsing wsdl binding output AuthorizeDEBatchBrowserIO.
+Parsing wsdl binding input QueryMjrnlbookIO.
+Parsing wsdl binding output QueryMjrnlbookIO.
+Parsing wsdl binding input SingleNewIO.
+Parsing wsdl binding output SingleNewIO.
+Parsing wsdl binding input DeleteDEMultiOffsetIO.
+Parsing wsdl binding output DeleteDEMultiOffsetIO.
+Parsing wsdl binding input SingleDeleteIO.
+Parsing wsdl binding output SingleDeleteIO.
+Parsing wsdl binding input CreateMjrnlTemplateIO.
+Parsing wsdl binding output CreateMjrnlTemplateIO.
+Parsing wsdl binding input ModifyDEBranchRestFS.
+Parsing wsdl binding output ModifyDEBranchRestFS.
+Parsing wsdl binding input MultiDeleteFS.
+Parsing wsdl binding output MultiDeleteFS.
+Parsing wsdl binding input ModifyDEDraftIssuerMaintFS.
+Parsing wsdl binding output ModifyDEDraftIssuerMaintFS.
+Parsing wsdl binding input BatchAuthorizeFS.
+Parsing wsdl binding output BatchAuthorizeFS.
+Parsing wsdl binding input AuthorizeMjrnlTemplateFS.
+Parsing wsdl binding output AuthorizeMjrnlTemplateFS.
+Parsing wsdl binding input SingleAuthorizeIO.
+Parsing wsdl binding output SingleAuthorizeIO.
+Parsing wsdl binding input BatchTotDeleteIO.
+Parsing wsdl binding output BatchTotDeleteIO.
+Parsing wsdl binding input CloseMjrnlTemplateFS.
+Parsing wsdl binding output CloseMjrnlTemplateFS.
+Parsing wsdl binding input QueryDEBatchBrowserIO.
+Parsing wsdl binding output QueryDEBatchBrowserIO.
+Parsing wsdl binding input AuthorizeTellerFS.
+Parsing wsdl binding output AuthorizeTellerFS.
+Parsing wsdl binding input AuthorizeMjrnlTemplateIO.
+Parsing wsdl binding output AuthorizeMjrnlTemplateIO.
+Parsing wsdl binding input AuthorizeTellerIO.
+Parsing wsdl binding output AuthorizeTellerIO.
+Parsing wsdl binding input CreateTellerIO.
+Parsing wsdl binding output CreateTellerIO.
+Parsing wsdl binding input CreateMjrnlbookIO.
+Parsing wsdl binding output CreateMjrnlbookIO.
+Parsing wsdl binding input DeleteDEDraftIssuerMaintIO.
+Parsing wsdl binding output DeleteDEDraftIssuerMaintIO.
+Parsing wsdl binding input CreateDEBranchRestIO.
+Parsing wsdl binding output CreateDEBranchRestIO.
+Parsing wsdl binding input ReopenDEDraftIssuerMaintIO.
+Parsing wsdl binding output ReopenDEDraftIssuerMaintIO.
+Parsing wsdl binding input AuthorizeDEDraftIssuerMaintIO.
+Parsing wsdl binding output AuthorizeDEDraftIssuerMaintIO.
+Parsing wsdl binding input AuthorizeSingleJrnlFS.
+Parsing wsdl binding output AuthorizeSingleJrnlFS.
+Parsing wsdl binding input MultiNewFS.
+Parsing wsdl binding output MultiNewFS.
+Parsing wsdl binding input CreateSingleJrnlIO.
+Parsing wsdl binding output CreateSingleJrnlIO.
+Parsing wsdl binding input QueryDEMultiOffsetIO.
+Parsing wsdl binding output QueryDEMultiOffsetIO.
+Parsing wsdl binding input CreateMjrnlTemplateFS.
+Parsing wsdl binding output CreateMjrnlTemplateFS.
+Parsing wsdl binding input ModifyDEBranchRestIO.
+Parsing wsdl binding output ModifyDEBranchRestIO.
+Parsing wsdl binding input DeleteDEMultiOffsetFS.
+Parsing wsdl binding output DeleteDEMultiOffsetFS.
+Parsing wsdl binding input ModifyDEDraftIssuerMaintIO.
+Parsing wsdl binding output ModifyDEDraftIssuerMaintIO.
+Parsing wsdl binding input CloseDEDraftIssuerMaintIO.
+Parsing wsdl binding output CloseDEDraftIssuerMaintIO.
+Parsing wsdl binding input CreateTellerFS.
+Parsing wsdl binding output CreateTellerFS.
+Parsing wsdl binding input DeleteDEDraftIssuerMaintFS.
+Parsing wsdl binding output DeleteDEDraftIssuerMaintFS.
+Parsing wsdl binding input CloseDEBranchRestIO.
+Parsing wsdl binding output CloseDEBranchRestIO.
+Parsing wsdl binding input CreateMjrnlbookFS.
+Parsing wsdl binding output CreateMjrnlbookFS.
+Parsing wsdl binding input DeleteDEBatchBrowserIO.
+Parsing wsdl binding output DeleteDEBatchBrowserIO.
+Parsing wsdl binding input ReverseTellerFS.
+Parsing wsdl binding output ReverseTellerFS.
+Parsing wsdl binding input AuthorizeDEDraftIssuerMaintFS.
+Parsing wsdl binding output AuthorizeDEDraftIssuerMaintFS.
+Parsing wsdl binding input AuthorizeDEMultiOffsetFS.
+Parsing wsdl binding output AuthorizeDEMultiOffsetFS.
+Parsing wsdl binding input CloseMjrnlTemplateIO.
+Parsing wsdl binding output CloseMjrnlTemplateIO.
+Parsing wsdl binding input SingleDeleteFS.
+Parsing wsdl binding output SingleDeleteFS.
+Parsing wsdl binding input ReverseCommonReversalFS.
+Parsing wsdl binding output ReverseCommonReversalFS.
+Parsing wsdl binding input CreateDEDraftIssuerMaintFS.
+Parsing wsdl binding output CreateDEDraftIssuerMaintFS.
+Parsing wsdl binding input CreateDEMultiOffsetIO.
+Parsing wsdl binding output CreateDEMultiOffsetIO.
+Parsing wsdl binding input DeleteMjrnlbookIO.
+Parsing wsdl binding output DeleteMjrnlbookIO.
+Parsing wsdl binding input SingleNewFS.
+Parsing wsdl binding output SingleNewFS.
+Parsing wsdl binding input AuthorizeDEBatchBrowserFS.
+Parsing wsdl binding output AuthorizeDEBatchBrowserFS.
+Parsing wsdl binding input AuthorizeDEBranchRestFS.
+Parsing wsdl binding output AuthorizeDEBranchRestFS.
+Parsing wsdl binding input CreateSingleJrnlFS.
+Parsing wsdl binding output CreateSingleJrnlFS.
+Parsing wsdl binding input MultiAuthorizeFS.
+Parsing wsdl binding output MultiAuthorizeFS.
+Parsing wsdl binding input DeleteSingleJrnlFS.
+Parsing wsdl binding output DeleteSingleJrnlFS.
+Parsing wsdl binding input ReopenDEBranchRestFS.
+Parsing wsdl binding output ReopenDEBranchRestFS.
+Parsing wsdl binding input AuthorizeMjrnlbookFS.
+Parsing wsdl binding output AuthorizeMjrnlbookFS.
+Parsing wsdl binding input DeleteDEBranchRestIO.
+Parsing wsdl binding output DeleteDEBranchRestIO.
+Parsing wsdl binding input DeleteTellerFS.
+Parsing wsdl binding output DeleteTellerFS.
+Parsing wsdl binding input ModifyMjrnlTemplateFS.
+Parsing wsdl binding output ModifyMjrnlTemplateFS.
+Parsing wsdl binding input QueryDEBranchRestIO.
+Parsing wsdl binding output QueryDEBranchRestIO.
+Parsing wsdl binding input QueryTellerIO.
+Parsing wsdl binding output QueryTellerIO.
+Parsing wsdl binding input DeleteMjrnlTemplateIO.
+Parsing wsdl binding output DeleteMjrnlTemplateIO.
+Parsing wsdl binding input AuthorizeDEMultiOffsetIO.
+Parsing wsdl binding output AuthorizeDEMultiOffsetIO.
+Parsing wsdl binding input CreateDEDraftIssuerMaintIO.
+Parsing wsdl binding output CreateDEDraftIssuerMaintIO.
+Parsing wsdl binding input DeleteTellerIO.
+Parsing wsdl binding output DeleteTellerIO.
+Parsing wsdl binding input DeleteDEBatchBrowserFS.
+Parsing wsdl binding output DeleteDEBatchBrowserFS.
+Parsing wsdl binding input ReverseCommonReversalIO.
+Parsing wsdl binding output ReverseCommonReversalIO.
+Parsing wsdl binding input CloseDEDraftIssuerMaintFS.
+Parsing wsdl binding output CloseDEDraftIssuerMaintFS.
+Parsing wsdl binding input AuthorizeSingleJrnlIO.
+Parsing wsdl binding output AuthorizeSingleJrnlIO.
+Parsing wsdl binding input CloseDEBranchRestFS.
+Parsing wsdl binding output CloseDEBranchRestFS.
+Parsing wsdl binding input ModifyMjrnlbookIO.
+Parsing wsdl binding output ModifyMjrnlbookIO.
+Parsing wsdl binding input ReverseTellerIO.
+Parsing wsdl binding output ReverseTellerIO.
+Parsing wsdl binding input MultiDeleteIO.
+Parsing wsdl binding output MultiDeleteIO.
+Parsing wsdl binding input SingleAuthorizeFS.
+Parsing wsdl binding output SingleAuthorizeFS.
+Parsing wsdl binding input CreateDEBranchRestFS.
+Parsing wsdl binding output CreateDEBranchRestFS.
+Parsing wsdl binding input QueryMjrnlTemplateIO.
+Parsing wsdl binding output QueryMjrnlTemplateIO.
+Parsing wsdl binding input DeleteMjrnlTemplateFS.
+Parsing wsdl binding output DeleteMjrnlTemplateFS.
+Parsing wsdl binding input CreateDEMultiOffsetFS.
+Parsing wsdl binding output CreateDEMultiOffsetFS.
+Parsing wsdl binding input DeleteMjrnlbookFS.
+Parsing wsdl binding output DeleteMjrnlbookFS.
+Parsing wsdl binding input BatchTotDeleteFS.
+Parsing wsdl binding output BatchTotDeleteFS.
+Parsing wsdl binding input DeleteDEBranchRestFS.
+Parsing wsdl binding output DeleteDEBranchRestFS.
+Parsing wsdl binding input MultiAuthorizeIO.
+Parsing wsdl binding output MultiAuthorizeIO.
+Parsing wsdl binding input AuthorizeDEBranchRestIO.
+Parsing wsdl binding output AuthorizeDEBranchRestIO.
+Parsing wsdl binding input BatchAuthorizeIO.
+Parsing wsdl binding output BatchAuthorizeIO.
+Processing doc style for operation DeleteSingleJrnlIO.
+Processing doc style for operation ReopenDEDraftIssuerMaintFS.
+Processing doc style for operation AuthorizeMjrnlbookIO.
+Processing doc style for operation ModifyMjrnlTemplateIO.
+Processing doc style for operation ReopenDEBranchRestIO.
+Processing doc style for operation QuerySingleJrnlIO.
+Processing doc style for operation MultiNewIO.
+Processing doc style for operation ModifyMjrnlbookFS.
+Processing doc style for operation AuthorizeDEBatchBrowserIO.
+Processing doc style for operation QueryMjrnlbookIO.
+Processing doc style for operation SingleNewIO.
+Processing doc style for operation DeleteDEMultiOffsetIO.
+Processing doc style for operation SingleDeleteIO.
+Processing doc style for operation CreateMjrnlTemplateIO.
+Processing doc style for operation ModifyDEBranchRestFS.
+Processing doc style for operation MultiDeleteFS.
+Processing doc style for operation ModifyDEDraftIssuerMaintFS.
+Processing doc style for operation BatchAuthorizeFS.
+Processing doc style for operation AuthorizeMjrnlTemplateFS.
+Processing doc style for operation SingleAuthorizeIO.
+Processing doc style for operation BatchTotDeleteIO.
+Processing doc style for operation CloseMjrnlTemplateFS.
+Processing doc style for operation QueryDEBatchBrowserIO.
+Processing doc style for operation AuthorizeTellerFS.
+Processing doc style for operation AuthorizeMjrnlTemplateIO.
+Processing doc style for operation AuthorizeTellerIO.
+Processing doc style for operation CreateTellerIO.
+Processing doc style for operation CreateMjrnlbookIO.
+Processing doc style for operation DeleteDEDraftIssuerMaintIO.
+Processing doc style for operation CreateDEBranchRestIO.
+Processing doc style for operation ReopenDEDraftIssuerMaintIO.
+Processing doc style for operation AuthorizeDEDraftIssuerMaintIO.
+Processing doc style for operation AuthorizeSingleJrnlFS.
+Processing doc style for operation MultiNewFS.
+Processing doc style for operation CreateSingleJrnlIO.
+Processing doc style for operation QueryDEMultiOffsetIO.
+Processing doc style for operation CreateMjrnlTemplateFS.
+Processing doc style for operation ModifyDEBranchRestIO.
+Processing doc style for operation DeleteDEMultiOffsetFS.
+Processing doc style for operation ModifyDEDraftIssuerMaintIO.
+Processing doc style for operation CloseDEDraftIssuerMaintIO.
+Processing doc style for operation CreateTellerFS.
+Processing doc style for operation DeleteDEDraftIssuerMaintFS.
+Processing doc style for operation CloseDEBranchRestIO.
+Processing doc style for operation CreateMjrnlbookFS.
+Processing doc style for operation DeleteDEBatchBrowserIO.
+Processing doc style for operation ReverseTellerFS.
+Processing doc style for operation AuthorizeDEDraftIssuerMaintFS.
+Processing doc style for operation AuthorizeDEMultiOffsetFS.
+Processing doc style for operation CloseMjrnlTemplateIO.
+Processing doc style for operation SingleDeleteFS.
+Processing doc style for operation ReverseCommonReversalFS.
+Processing doc style for operation CreateDEDraftIssuerMaintFS.
+Processing doc style for operation CreateDEMultiOffsetIO.
+Processing doc style for operation DeleteMjrnlbookIO.
+Processing doc style for operation SingleNewFS.
+Processing doc style for operation AuthorizeDEBatchBrowserFS.
+Processing doc style for operation AuthorizeDEBranchRestFS.
+Processing doc style for operation CreateSingleJrnlFS.
+Processing doc style for operation MultiAuthorizeFS.
+Processing doc style for operation DeleteSingleJrnlFS.
+Processing doc style for operation ReopenDEBranchRestFS.
+Processing doc style for operation AuthorizeMjrnlbookFS.
+Processing doc style for operation DeleteDEBranchRestIO.
+Processing doc style for operation DeleteTellerFS.
+Processing doc style for operation ModifyMjrnlTemplateFS.
+Processing doc style for operation QueryDEBranchRestIO.
+Processing doc style for operation QueryTellerIO.
+Processing doc style for operation DeleteMjrnlTemplateIO.
+Processing doc style for operation AuthorizeDEMultiOffsetIO.
+Processing doc style for operation CreateDEDraftIssuerMaintIO.
+Processing doc style for operation DeleteTellerIO.
+Processing doc style for operation DeleteDEBatchBrowserFS.
+Processing doc style for operation ReverseCommonReversalIO.
+Processing doc style for operation CloseDEDraftIssuerMaintFS.
+Processing doc style for operation AuthorizeSingleJrnlIO.
+Processing doc style for operation CloseDEBranchRestFS.
+Processing doc style for operation ModifyMjrnlbookIO.
+Processing doc style for operation ReverseTellerIO.
+Processing doc style for operation MultiDeleteIO.
+Processing doc style for operation SingleAuthorizeFS.
+Processing doc style for operation CreateDEBranchRestFS.
+Processing doc style for operation QueryMjrnlTemplateIO.
+Processing doc style for operation DeleteMjrnlTemplateFS.
+Processing doc style for operation CreateDEMultiOffsetFS.
+Processing doc style for operation DeleteMjrnlbookFS.
+Processing doc style for operation BatchTotDeleteFS.
+Processing doc style for operation DeleteDEBranchRestFS.
+Processing doc style for operation MultiAuthorizeIO.
+Processing doc style for operation AuthorizeDEBranchRestIO.
+Processing doc style for operation BatchAuthorizeIO.
+Populating WSDL schema Authorization.xsd.
+Creating file Authorization.xsd in the workspace.
+Creating file /DashenBank_ECXAuthorization_App/DashenBank_ECXAuthorization_App/RemoteFiles/xsd_1.xsd in the workspace.
+Copying source WSDL Authorization.wsdl to Authorization.wsdl.
+
+Elapsed time processing this message definition file: 2.479 seconds
+Number of warnings for this message definition file: 0
+
+
+Number of files processed: 1
+
+
