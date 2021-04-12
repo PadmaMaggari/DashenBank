@@ -1,3 +1,5 @@
+
+
 BROKER SCHEMA com.dashenbank.custbankaccdetails
 PATH com.dashenbank.genericfunctions;
 -- DECLARE soapenv NAMESPACE 'http://schemas.xmlsoap.org/soap/envelope/;
@@ -79,6 +81,7 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		SET outputHeaderRef.ns:SNAPSHOTID = inputHeaderRef.*:SNAPSHOTID;
 		SET outputHeaderRef.ns:PASSWORD = inputHeaderRef.*:PASSWORD;
 		SET outputHeaderRef.ns:MSGSTAT = inputHeaderRef.*:MSGSTAT;
+
 		DECLARE I INTEGER 1;
 		DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
 		WHILE LASTMOVE(inRef) DO
@@ -91,6 +94,7 @@ CREATE COMPUTE MODULE BankAccountDetails_RequestToBackend
 		SET outputBodyRef.ns:"Cust-Account-IO".ns:BRN = inputBodyRef.*:BRN;
 		SET outputBodyRef.ns:"Cust-Account-IO".ns:ACC = inputBodyRef.*:ACC;
 		SET outputBodyRef.ns:"Cust-Account-IO".ns:CRS_STST_REQD = inputBodyRef.*:CRS_STST_REQD;
+
 		SET Environment.outputData = OutputRoot.SOAP;
 		----------------------Response Logging-------------------------
 		MOVE domainDataRef TO OutputRoot.SOAP;
@@ -184,6 +188,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputHeaderRef.MSGSTAT = NULLIF(inputHeaderRef.*:MSGSTAT,'');
 			SET outputHeaderRef.SNAPSHOTID = NULLIF(inputHeaderRef.*:SNAPSHOTID,'');
 			SET outputHeaderRef.PASSWORD = NULLIF(inputHeaderRef.*:PASSWORD,'');
+
 			DECLARE I INTEGER 1;
 			DECLARE inRef REFERENCE TO inputHeaderRef.*:ADDL.*:PARAM[>];
 			WHILE LASTMOVE(inRef) DO
@@ -196,7 +201,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-IO".BRN = NULLIF(inputBodyRefer.*:"Cust-Account-IO".*:BRN,'');
 			SET outputBodyRef."Cust-Account-IO".ACC = NULLIF(inputBodyRefer.*:"Cust-Account-IO".*:ACC,'');
 			SET outputBodyRef."Cust-Account-IO".CRS_STST_REQD = NULLIF(inputBodyRefer.*:"Cust-Account-IO".*:CRS_STST_REQD,'');
-			
+
 			SET outputBodyRef."Cust-Account-Full".BRN = NULLIF(inputBodyRef.*:BRN,'');
 			SET outputBodyRef."Cust-Account-Full".ACC = NULLIF(inputBodyRef.*:ACC,'');
 			SET outputBodyRef."Cust-Account-Full".CUSTNO = NULLIF(inputBodyRef.*:CUSTNO,'');
@@ -356,6 +361,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full".TXNSTAT = NULLIF(inputBodyRef.*:TXNSTAT,'');
 			SET outputBodyRef."Cust-Account-Full".AUTHSTAT = NULLIF(inputBodyRef.*:AUTHSTAT,'');
 			SET outputBodyRef."Cust-Account-Full"."Provision-Main".PRVACCUI = NULLIF(inputBodyRef.*:"Provision-Main".*:PRVACCUI,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:Provdetails[>];
 			WHILE LASTMOVE(inRef) DO
@@ -365,6 +371,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Report-Gentime1"[>];
 			WHILE LASTMOVE(inRef) DO
@@ -372,6 +379,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
 			SET outputBodyRef."Cust-Account-Full".Accmaintinstr.BRN = NULLIF(inputBodyRef.*:Accmaintinstr.*:BRN,'');
 			SET outputBodyRef."Cust-Account-Full".Accmaintinstr.ACC = NULLIF(inputBodyRef.*:Accmaintinstr.*:ACC,'');
 			SET outputBodyRef."Cust-Account-Full".Accmaintinstr.DTOFLSTMAINT = NULLIF(inputBodyRef.*:Accmaintinstr.*:DTOFLSTMAINT,'');
@@ -383,6 +391,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full".Accmaintinstr.MAINTINSTR2 = NULLIF(inputBodyRef.*:Accmaintinstr.*:MAINTINSTR2,'');
 			SET outputBodyRef."Cust-Account-Full".Accmaintinstr.MAINTINSTR3 = NULLIF(inputBodyRef.*:Accmaintinstr.*:MAINTINSTR3,'');
 			SET outputBodyRef."Cust-Account-Full".Accmaintinstr.MAINTINSTR4 = NULLIF(inputBodyRef.*:Accmaintinstr.*:MAINTINSTR4,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Report-Gentime2"[>];
 			WHILE LASTMOVE(inRef) DO
@@ -390,6 +399,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
 			SET outputBodyRef."Cust-Account-Full"."Interim-Details".BALRPTTYP = NULLIF(inputBodyRef.*:"Interim-Details".*:BALRPTTYP,'');
 			SET outputBodyRef."Cust-Account-Full"."Interim-Details".INTRMDRCRAMT = NULLIF(inputBodyRef.*:"Interim-Details".*:INTRMDRCRAMT,'');
 			SET outputBodyRef."Cust-Account-Full"."Interim-Details".INTRMCRAMT = NULLIF(inputBodyRef.*:"Interim-Details".*:INTRMCRAMT,'');
@@ -493,6 +503,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full".Intdetails.ACC = NULLIF(inputBodyRef.*:Intdetails.*:ACC,'');
 			SET outputBodyRef."Cust-Account-Full".Intdetails.CONSOL_CHG_ACC = NULLIF(inputBodyRef.*:Intdetails.*:CONSOL_CHG_ACC,'');
 			SET outputBodyRef."Cust-Account-Full".Intdetails.CONSOLCHGBRN = NULLIF(inputBodyRef.*:Intdetails.*:CONSOLCHGBRN,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:Intdetails.*:Intprodmap[>];
 			WHILE LASTMOVE(inRef) DO
@@ -502,6 +513,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET outputBodyRef."Cust-Account-Full".Intdetails.Intprodmap[I].INTPROD = NULLIF(inRef.*:INTPROD,'');
 				SET outputBodyRef."Cust-Account-Full".Intdetails.Intprodmap[I].ILPRD = NULLIF(inRef.*:ILPRD,'');
 				SET outputBodyRef."Cust-Account-Full".Intdetails.Intprodmap[I].DISPTYP = NULLIF(inRef.*:DISPTYP,'');
+
 				IF FIELDVALUE(inputBodyRef.*:Intdetails.*:Intprodmap.*:Inteffdtmap.*[>]) IS NOT NULL THEN
 					DECLARE J INTEGER 1;
 					DECLARE inRefe REFERENCE TO inputBodyRef.*:Intdetails.*:Intprodmap.*:Inteffdtmap[>];
@@ -527,6 +539,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
 			SET outputBodyRef."Cust-Account-Full".Tddetails.TDCCY = NULLIF(inputBodyRef.*:Tddetails.*:TDCCY,'');
 			SET outputBodyRef."Cust-Account-Full".Tddetails.TDAMT = NULLIF(inputBodyRef.*:Tddetails.*:TDAMT,'');
 			SET outputBodyRef."Cust-Account-Full".Tddetails.AUTOROLL = NULLIF(inputBodyRef.*:Tddetails.*:AUTOROLL,'');
@@ -580,6 +593,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo.Childintdetails.BOOKACCBRN = NULLIF(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childintdetails.*:BOOKACCBRN,'');
 			SET outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo.Childintdetails.DRCRADV = NULLIF(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childintdetails.*:DRCRADV,'');
 			SET outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo.Childintdetails.INTRATE_CUMAMT_REQD = NULLIF(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childintdetails.*:INTRATE_CUMAMT_REQD,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childintdetails.*:Childintprodmap[>];
 			WHILE LASTMOVE(inRef) DO
@@ -644,6 +658,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo.Childinttddetails.ROLLTENORYEARS = NULLIF(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childinttddetails.*:ROLLTENORYEARS,'');
 			SET outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo.Childinttddetails.DEPTENORPREF = NULLIF(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childinttddetails.*:DEPTENORPREF,'');
 			SET outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo.Childinttddetails.CASCADE_MONTH = NULLIF(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childinttddetails.*:CASCADE_MONTH,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childinttddetails.*:Childtdpayoutdetails[>];
 			WHILE LASTMOVE(inRef) DO
@@ -795,6 +810,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:Tdpayindetails[>];
 			WHILE LASTMOVE(inRef) DO
@@ -822,6 +838,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full"."Tod-Renew".RNW_UNIT = NULLIF(inputBodyRef.*:"Tod-Renew".*:RNW_UNIT,'');
 			SET outputBodyRef."Cust-Account-Full"."Tod-Renew".RNW_FLG = NULLIF(inputBodyRef.*:"Tod-Renew".*:RNW_FLG,'');
 			SET outputBodyRef."Cust-Account-Full"."Tod-Renew".RNW_FREQ = NULLIF(inputBodyRef.*:"Tod-Renew".*:RNW_FREQ,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Od-Limit"[>];
 			WHILE LASTMOVE(inRef) Do
@@ -835,6 +852,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Doctype-Checklist"[>];
 			WHILE LASTMOVE(inRef) Do
@@ -917,6 +935,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 			SET outputBodyRef."Cust-Account-Full".Linkedentities.BRN = NULLIF(inputBodyRef.*:Linkedentities.*:BRN,'');
 			SET outputBodyRef."Cust-Account-Full".Linkedentities.CUSTACNO = NULLIF(inputBodyRef.*:Linkedentities.*:CUSTACNO,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:Linkedentities.*:Linkedentities[>];
 			WHILE LASTMOVE(inRef) DO
@@ -947,6 +966,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 			SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn".BRN = NULLIF(inputBodyRef.*:"Custacc-Icchspcn".*:BRN,'');
 			SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn".ACC = NULLIF(inputBodyRef.*:"Custacc-Icchspcn".*:ACC,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Custacc-Icchspcn".*:Chgdetails[>];
 			WHILE LASTMOVE(inRef) Do
@@ -971,6 +991,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
 			SET outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn"."Misc-Icchspcn".CCY = NULLIF(inputBodyRef.*:"Custacc-Icchspcn".*:"Misc-Icchspcn".*:CCY,'');
 
 			SET outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".BRN = NULLIF(inputBodyRef.*:"Custacc-Iccinstr".*:BRN,'');
@@ -1031,6 +1052,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.COSTCOD5 = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:COSTCOD5,'');
 			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.RTFLAG = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:RTFLAG,'');
 			SET outputBodyRef."Cust-Account-Full".CustAcc.Misdetails.LINKGRP = NULLIF(inputBodyRef.*:CustAcc.*:Misdetails.*:LINKGRP,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:CustAcc.*:Misdetails.*:MisAccLog[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1041,6 +1063,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:CustAcc.*:Misdetails.*:MisAccLog[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1059,6 +1082,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
 			SET outputBodyRef."Cust-Account-Full".CustAcc.Chglog = NULLIF(inputBodyRef.*:CustAcc.*:Chglog,'');
 
 			SET outputBodyRef."Cust-Account-Full".CustAcc.Classname.C2 = NULLIF(inputBodyRef.*:CustAcc.*:Classname.*:C2,'');
@@ -1080,6 +1104,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".BRNCD = NULLIF(inputBodyRef.*:"Custacc-Sicdiary".*:BRNCD,'');
 			SET outputBodyRef."Cust-Account-Full"."Custacc-Sicdiary".ACCNO = NULLIF(inputBodyRef.*:"Custacc-Sicdiary".*:ACCNO,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Custacc-Sicdiary".*:Diarydetails[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1123,6 +1148,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.CONSOLCCY = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:CONSOLCCY,'');
 			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.SETLACCBRN = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:SETLACCBRN,'');
 			SET outputBodyRef."Cust-Account-Full"."Custacc-Stccusbl".Billingprefmaster.CONSOLACCBRN = NULLIF(inputBodyRef.*:"Custacc-Stccusbl".*:Billingprefmaster.*:CONSOLACCBRN,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Custacc-Stccusbl".*:Billingproducts[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1168,6 +1194,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".INSOTHDTLTYP6 = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:INSOTHDTLTYP6,'');
 			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure".NBINTERESTDUE = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:NBINTERESTDUE,'');
 			SET outputBodyRef."Cust-Account-Full".Accclose."Cust-Account-Closure"."Charge-Main".REFERENCE_NO = NULLIF(inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:"Charge-Main".*:REFERENCE_NO,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:Accclose.*:"Cust-Account-Closure".*:"Charge-Main".*:"Charge-Details"[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1196,6 +1223,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".ACCMSG = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:ACCMSG,'');
 			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".MINNOSIG = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:MINNOSIG,'');
 			SET outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".ACCCY = NULLIF(inputBodyRef.*:"Acc-Svcacsig".*:ACCCY,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Acc-Svcacsig".*:Accsigdetails[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1210,6 +1238,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Acc-Svcacsig".*:"Amt-Slab"[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1241,6 +1270,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit".BRANCH_CODE = NULLIF(inputBodyRef.*:"Sttms-Debit".*:BRANCH_CODE,'');
 			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit".CUST_NO = NULLIF(inputBodyRef.*:"Sttms-Debit".*:CUST_NO,'');
 			SET outputBodyRef."Cust-Account-Full"."Sttms-Debit".ACTNO = NULLIF(inputBodyRef.*:"Sttms-Debit".*:ACTNO,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Sttms-Debit".*:"Sttms-Detail"[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1295,6 +1325,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account".BRANCH_CODE = NULLIF(inputBodyRef.*:"Sttms-Cust-Account".*:BRANCH_CODE,'');
 			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account".CUST_AC_NO = NULLIF(inputBodyRef.*:"Sttms-Cust-Account".*:CUST_AC_NO,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Sttms-Cust-Account".*:"Sttbs-Sweep-Details"[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1316,6 +1347,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 			SET outputBodyRef."Cust-Account-Full"."Customer-Acc".BRANCH_CODE = NULLIF(inputBodyRef.*:"Customer-Acc".*:BRANCH_CODE,'');
 			SET outputBodyRef."Cust-Account-Full"."Customer-Acc".CUST_AC_NO = NULLIF(inputBodyRef.*:"Customer-Acc".*:CUST_AC_NO,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Customer-Acc".*:"Td-Rolloverhistory"[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1338,6 +1370,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			SET outputBodyRef."Cust-Account-Full"."Customer-Accis".BRANCH_CODE = NULLIF(inputBodyRef.*:"Customer-Accis".*:BRANCH_CODE,'');
 			SET outputBodyRef."Cust-Account-Full"."Customer-Accis".CUST_AC_NO = NULLIF(inputBodyRef.*:"Customer-Accis".*:CUST_AC_NO,'');
 			SET outputBodyRef."Cust-Account-Full"."Customer-Accis".CCY = NULLIF(inputBodyRef.*:"Customer-Accis".*:CCY,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Customer-Accis".*:"Td-Rolloverhistory-Is"[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1359,6 +1392,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 			SET outputBodyRef."Cust-Account-Full".Master.KEY_ID = NULLIF(inputBodyRef.*:Master.*:KEY_ID,'');
 			SET outputBodyRef."Cust-Account-Full".Master.FUNCTION_ID = NULLIF(inputBodyRef.*:Master.*:FUNCTION_ID,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:Master.*:"Doc-Upload"[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1373,6 +1407,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp".BRANCH_CODE = NULLIF(inputBodyRef.*:"Sttms-Cust-Acc-Swp".*:BRANCH_CODE,'');
 			SET outputBodyRef."Cust-Account-Full"."Sttms-Cust-Acc-Swp".CUST_AC_NO = NULLIF(inputBodyRef.*:"Sttms-Cust-Acc-Swp".*:CUST_AC_NO,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef."Sttms-Cust-Acc-Swp".*:"Sttms-Sweep-Details-C"[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1390,6 +1425,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef."Sttms-Cust-Acc-Swp".*:"Sttms-Sweep-Details-Td"[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1408,6 +1444,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef."Sttms-Cust-Acc-Swp".*:"Sttms-Sweep-Details-Ad"[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1427,6 +1464,7 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 
 			SET outputBodyRef."Cust-Account-Full"."Acc-Chnl".BRANCH_CODE = NULLIF(inputBodyRef.*:"Acc-Chnl".*:BRANCH_CODE,'');
 			SET outputBodyRef."Cust-Account-Full"."Acc-Chnl".CUST_AC_NO = NULLIF(inputBodyRef.*:"Acc-Chnl".*:CUST_AC_NO,'');
+
 			SET I = 1;
 			MOVE inRef TO inputBodyRef.*:"Acc-Chnl".*:Channel[>];
 			WHILE LASTMOVE(inRef) DO
@@ -1454,15 +1492,9 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 				SET I = I+1;
 				MOVE inRef NEXTSIBLING REPEAT TYPE NAME;
 			END WHILE;
-			-- IF (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Provision-Main") IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Interim-Details") IS NULL)
-			-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full".Acstatuslines) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full".Intdetails) IS NULL)
-			-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full".Tddetails) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Amount-Dates".Turnovers) IS NULL)
-			-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn") IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full".CustAcc.Misdetails) IS NULL)
-			-- AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Acc-Svcacsig".Accsigdetails) IS NULL) AND (FIELDVALUE(outputBodyRef."Cust-Account-Full"."Customer-Acc") IS NULL) THEN
-			-- SET outputBodyRef."Cust-Account-Full" = NULL;
-			-- END IF;
+
 			IF FIELDNAME(inputBodyRef.*:"Provision-Main".*[>]) IS NULL THEN
-				DELETE FIELD outputBodyRef."Cust-Account-Full";     
+				DELETE FIELD outputBodyRef."Cust-Account-Full";
 			END IF;
 			IF FIELDNAME(inputBodyRef.*:Accmaintinstr.*[>]) IS NULL THEN
 				DELETE FIELD outputBodyRef."Cust-Account-Full".Accmaintinstr;
@@ -1481,10 +1513,10 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			END IF;
 			IF FIELDNAME(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*:Childinttddetails.*[>]) IS NULL THEN
 				DELETE FIELD outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo.Childinttddetails;
-			END IF;			
-            IF FIELDNAME(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*[>]) IS NULL THEN
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Tddetailsfpo.*[>]) IS NULL THEN
 				DELETE FIELD outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Tddetailsfpo;
-			END IF;		
+			END IF;
 			IF FIELDNAME(inputBodyRef.*:Tddetails.*:Tddetailsprn.*:Bcpayout.*[>]) IS NULL THEN
 				DELETE FIELD outputBodyRef."Cust-Account-Full".Tddetails.Tddetailsprn.Bcpayout;
 			END IF;
@@ -1509,12 +1541,12 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			IF FIELDNAME(inputBodyRef.*:"Custacc-Icccspcn".*:Chgcons.*[>]) IS NULL THEN
 				DELETE FIELD outputBodyRef."Cust-Account-Full"."Custacc-Icccspcn".Chgcons;
 			END IF;
-             IF FIELDNAME(inputBodyRef.*:"Custacc-Icchspcn".*:"Misc-Icchspcn".*[>]) IS NULL THEN
+			IF FIELDNAME(inputBodyRef.*:"Custacc-Icchspcn".*:"Misc-Icchspcn".*[>]) IS NULL THEN
 				DELETE FIELD outputBodyRef."Cust-Account-Full"."Custacc-Icchspcn"."Misc-Icchspcn";
-			END IF;     
-             IF FIELDNAME(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*[>]) IS NULL THEN
+			END IF;
+			IF FIELDNAME(inputBodyRef.*:"Custacc-Iccinstr".*:Autodepdetails.*[>]) IS NULL THEN
 				DELETE FIELD outputBodyRef."Cust-Account-Full"."Custacc-Iccinstr".Autodepdetails;
-			END IF;     
+			END IF;
 			IF FIELDNAME(inputBodyRef.*:CustAcc.*:Classname.*[>]) IS NULL THEN
 				DELETE FIELD outputBodyRef."Cust-Account-Full".CustAcc.Classname;
 			END IF;
@@ -1544,13 +1576,13 @@ CREATE COMPUTE MODULE BankAccountDetails_ResponseToChannel
 			END IF;
 			IF FIELDNAME(inputBodyRef.*:"Sttms-Cust-Account".*[>]) IS NULL THEN
 				DELETE FIELD outputBodyRef."Cust-Account-Full"."Sttms-Cust-Account";
-			END IF;	
+			END IF;
 			IF FIELDNAME(inputBodyRef.*:"Customer-Accis".*[>]) IS NULL THEN
 				DELETE FIELD outputBodyRef."Cust-Account-Full"."Customer-Accis";
 			END IF;
 			IF FIELDNAME(inputBodyRef.*:Master.*[>]) IS NULL THEN
 				DELETE FIELD outputBodyRef."Cust-Account-Full".Master;
-			END IF;	
+			END IF;
 			IF FIELDNAME(inputBodyRefer.*:"Cust-Account-IO".*[>]) IS NULL THEN -- Cust-Account-IO Populated for Failure Response
 				SET outputBodyRef."Cust-Account-IO" = NULL;
 			END IF;

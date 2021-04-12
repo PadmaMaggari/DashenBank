@@ -6,7 +6,7 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/Backend_Simulator/icons/full/obj16/Backend_FCSimulator.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/Backend_Simulator/icons/full/obj30/Backend_FCSimulator.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="228,94" computeExpression="esql://routine/#Simulator_Compute.Main">
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="228,94" computeExpression="esql://routine/#Simulator_Compute.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="Compute"/>
       </nodes>
       <nodes xmi:type="ComIbmSOAPInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="68,108" wsdlOperationMode="gateway" useHTTPTransport="true" urlSelector="/*" parserXmlnscBuildTreeUsingXMLSchema="false" validateMaster="none">
