@@ -1,0 +1,158 @@
+
+
+BROKER SCHEMA com.dashenbank.tcpiprouter
+
+PATH com.dashenbank.genericfunctions;
+CREATE COMPUTE MODULE OutgoingRouterFlow_RouteBasedOnProtocol
+	DECLARE MTI EXTERNAL CHARACTER '';
+	-- DECLARE IsLogRequired EXTERNAL CHARACTER '';
+	-- DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER '';
+	-- DECLARE LOG4J_INIT_ERROR_MSG EXTERNAL CHARACTER '';
+	-- DECLARE rc BOOLEAN;
+	DECLARE RAW_AUDIT_Q EXTERNAL CHARACTER '';
+	DECLARE EXCEPTION_Q EXTERNAL CHARACTER '';
+	-- DECLARE ERR_AUDIT_Q EXTERNAL CHARACTER '';
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL CopyEntireMessage();
+		RETURN FALSE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
+		DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
+		DECLARE domainDataRef REFERENCE TO InputRoot.DFDL;
+		DECLARE domainName CHARACTER FIELDNAME(InputBody);
+		DECLARE logRef REFERENCE TO InputRoot.DFDL;
+		DECLARE jsonRef REFERENCE TO OutputRoot;
+		SET Environment.MQRFH2 = InputRoot.MQRFH2;
+		CREATE LASTCHILD OF OutputRoot AS jsonRef DOMAIN('JSON');
+		CREATE LASTCHILD OF OutputRoot.JSON AS jsonRef NAME ('Data');
+		--CALL JSONLogMessage(logRef,jsonRef);
+
+		SET jsonRef = logRef;
+		SET Environment.Variables.resMsg = getPayLoad('JSON',jsonRef,encodeRef,ccidRef);
+		SET OutputRoot.JSON = NULL;
+		--SET Environment.Variables.resMsg = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		DECLARE tcpipDetails REFERENCE TO InputLocalEnvironment.TCPIP.Input.ConnectionDetails;
+		SET Environment.Variables.Id = COALESCE(tcpipDetails.Id,InputRoot.MQRFH2.usr.Id,Environment.MQRFH2.usr.Id,'');
+		DECLARE req CHARACTER;
+		-- CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
+		-- IF ( rc = FALSE ) THEN
+		-- DECLARE msg CHARACTER ;
+		-- SET Environment.Variables.Log4j.ErrorMsg = LOG4J_INIT_ERROR_MSG;
+		-- END IF;
+		-- CALL writeToLogFile(MessageFlowLabel,'TCPRouterLog','DEBUG','=====================================  OUTGOING ROUTER =================================') INTO rc ;
+		-- CALL writeToLogFile(MessageFlowLabel,'TCPRouterLog','DEBUG','ISO Request: '||Environment.Variables.resMsg) INTO rc ;
+		-- CALL writeToLogFile(MessageFlowLabel,'TCPRouterLog','DEBUG','TCPIP ID: '||InputRoot.MQRFH2.usr.Id)INTO rc;
+		-- CALL writeToLogFile(MessageFlowLabel,'TCPRouterLog','DEBUG','=====================================  OUTGOING ROUTER END =================================') INTO rc ;
+		SET Environment.Variables.reqMsg = getPayLoad(FIELDNAME(InputBody),domainDataRef,encodeRef,ccidRef);
+		/* =================================== ZSS NOTIFICATION =================================*/
+		DECLARE mtiDetails CHARACTER '';
+		DECLARE MTI_Version CHARACTER InputRoot.DFDL.ISO8583_1987.MTI_Version;
+		DECLARE MTI_MessageClass CHARACTER InputRoot.DFDL.ISO8583_1987.MTI_MessageClass;
+		DECLARE MTI_MessageFunction CHARACTER InputRoot.DFDL.ISO8583_1987.MTI_MessageFunction;
+		DECLARE MTI_MessageOrigin CHARACTER InputRoot.DFDL.ISO8583_1987.MTI_MessageOrigin;
+		DECLARE data BLOB ASBITSTREAM(InputRoot.DFDL ENCODING encodeRef CCSID ccidRef SET '{ISO8583_Lib}' TYPE '{}:ISO8583_1987');
+		-- DECLARE tcpHeader BLOB ;
+		--JAVA procedure call to get 2 byte header
+		-- SET tcpHeader = Get2ByteHeader(data);
+		-- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','Data with header') INTO rc;
+		-- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG',CAST(tcpHeader AS CHARACTER)) INTO rc;
+		-- DECLARE hexBits CHARACTER SUBSTRING(CAST(tcpHeader AS CHARACTER) FROM 3 FOR 4);
+		-- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','Hex Data of Header:'||hexBits) INTO rc;
+		-- DECLARE dataWithHeader CHARACTER SUBSTRING(CAST(data AS CHARACTER) FROM 1 FOR 2) || hexBits || SUBSTRING(CAST(data AS CHARACTER) FROM 3);
+		-- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','Data with Header'||dataWithHeader) INTO rc;
+		-- =================== CALLING DB RAW AUDIT LOGGING ==============
+		DECLARE outRefer REFERENCE TO OutputRoot;
+		-- CALL DBLogging(Environment.Variables.Id,Environment.Variables.reqMsg,'Router Response',ApplicationLabel,BrokerName,Environment.MQRFH2.usr.timeLocalTransaction,Environment.MQRFH2.usr.dateLocalTransaction,Environment.MQRFH2.usr.retrievalReferenceNumber,outRefer);
+		-- SET OutputLocalEnvironment.Destination.MQ.DestinationData[1].queueName = RAW_AUDIT_Q;
+		-- PROPAGATE TO TERMINAL 'out1';
+		SET OutputLocalEnvironment.Destination.TCPIP.Output.Id = InputRoot.MQRFH2.usr.Id;
+		-- SET OutputRoot.Properties.MessageType = '{}:ISO8583WithHeader';
+		-- CREATE LASTCHILD OF OutputRoot DOMAIN('DFDL')
+		-- PARSE(CAST(dataWithHeader AS BLOB) ENCODING encodeRef CCSID ccidRef SET '{ISO8583_Lib}' TYPE '{}:ISO8583WithHeader');
+		SET OutputRoot.DFDL = InputRoot.DFDL; -- DASHEN
+		DECLARE outDomainRef REFERENCE TO OutputRoot.DFDL;
+		-- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','OutputRoot:') INTO rc;
+		-- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG',getPayLoad(FIELDNAME(OutputRoot.DFDL.ISO8583_1987),outDomainRef,encodeRef,ccidRef)) INTO rc;
+
+		PROPAGATE TO TERMINAL 'out';
+	END;
+END MODULE;
+
+
+CREATE COMPUTE MODULE OutgoingRouterFlow_CaptureExceptionDetails
+	-- DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER '';
+	-- DECLARE rc BOOLEAN;
+	-- DECLARE ERR_AUDIT_Q EXTERNAL CHARACTER '';
+	DECLARE EXCEPTION_Q EXTERNAL CHARACTER '';
+	-- DECLARE LOG4J_INIT_ERROR_MSG EXTERNAL CHARACTER '';
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL CaptureExceptionDetails();
+		RETURN FALSE;
+	END;
+
+	CREATE PROCEDURE CaptureExceptionDetails() BEGIN
+		-- CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
+		-- IF ( rc = FALSE ) THEN
+		-- DECLARE msg CHARACTER ;
+		-- SET Environment.Variables.Log4j.ErrorMsg = LOG4J_INIT_ERROR_MSG;
+		-- END IF;
+		DECLARE excpRef REFERENCE TO InputRoot.XMLNSC.ExceptionDetails;
+		DECLARE outRefer REFERENCE TO OutputRoot;
+		SET Environment.Variables.Id = InputRoot.MQRFH2.usr.Id ;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'XMLNSC';
+		CREATE LASTCHILD OF OutputRoot.XMLNSC NAME 'OutGoingRouter';
+		DECLARE outRef REFERENCE TO OutputRoot.XMLNSC.*;
+		CALL BuildExceptionDetails(excpRef,outRef,'OutGoingRouter');
+		SET Environment.Variables.OutgoingRouterErrorCodes = OutputRoot.XMLNSC;
+		SET OutputLocalEnvironment.Destination.MQ.DestinationData[1].queueName = EXCEPTION_Q;
+		PROPAGATE TO TERMINAL 'out';
+		-- -- DB Logging===================
+		-- DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
+		-- DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
+		-- DECLARE domainDataRef REFERENCE TO InputRoot.XMLNSC;
+		-- DECLARE domainName CHARACTER FIELDNAME(InputBody);
+		-- DECLARE exe_Desc CHARACTER '';
+		-- SET exe_Desc = getPayLoad(domainName,domainDataRef,encodeRef,ccidRef);
+		-- CALL writeToLogFile(MessageFlowLabel,'ErrorLogger','ERROR','=====================================  OUTGOING ROUTER  EXCEPTIOPN =================================') INTO rc ;
+		-- CALL writeToLogFile(MessageFlowLabel,'ErrorLogger','ERROR','Exception Details: '||exe_Desc) INTO rc ;
+		-- CALL writeToLogFile(MessageFlowLabel,'ErrorLogger','ERROR','TCPIP ID: '||InputRoot.MQRFH2.usr.Id)INTO rc;
+		-- CALL Error_DBLogging(Environment.Variables.Id,Environment.Variables.reqMsg,'Router Response Error',ApplicationLabel,BrokerName,exe_Desc,Environment.Variables.systemsTraceAuditNumber,Environment.Variables.dateLocalTransaction,Environment.Variables.retrievalReferenceNumber,CAST(excpRef.excpNumber AS CHARACTER),Environment.OutgoingRouterErrorCodes.OutGoingRouter.ErrorCode,outRefer);
+		-- SET OutputLocalEnvironment.Destination.MQ.DestinationData[1].queueName = ERR_AUDIT_Q ;
+		-- PROPAGATE TO TERMINAL 'out1';
+	END;
+END MODULE;
+--CREATE COMPUTE MODULE OutgoingRouterFlow_LogSentData
+---- DECLARE LOG_CONFIG_PATH EXTERNAL CHARACTER '';
+---- DECLARE LOG4J_INIT_ERROR_MSG EXTERNAL CHARACTER '';
+-- CREATE FUNCTION Main() RETURNS BOOLEAN
+-- BEGIN
+---- DECLARE rc BOOLEAN FALSE;
+---- CALL initLog4j(LOG_CONFIG_PATH) INTO rc;
+---- IF ( rc = FALSE ) THEN
+---- DECLARE msg CHARACTER ;
+---- SET Environment.Variables.Log4j.ErrorMsg = LOG4J_INIT_ERROR_MSG;
+---- END IF;
+--
+-- DECLARE ccidRef INTEGER InputRoot.Properties.CodedCharSetId;
+-- DECLARE encodeRef INTEGER InputRoot.Properties.Encoding;
+-- DECLARE inDomainDataRef REFERENCE TO InputRoot.DFDL;
+-- -- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','..............Start Logging after sending msg...........') INTO rc;
+-- SET OutputRoot.Properties = InputRoot.Properties;
+---- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG',getPayLoad(FIELDNAME(InputRoot.DFDL),inDomainDataRef,encodeRef,ccidRef)) INTO rc;
+---- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','local environemnt::') INTO rc;
+---- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','Hostname:'||InputLocalEnvironment.WrittenDestination.TCPIP.Output.ConnectionDetails.Hostname) INTO rc;
+---- -- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','Port:'||CAST(InputLocalEnvironment.WrittenDestination.TCPIP.Output.ConnectionDetails.Port AS CHARACTER)) INTO rc;
+---- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','Client Address:'||InputLocalEnvironment.WrittenDestination.TCPIP.Output.ConnectionDetails.ClientDetails.Address) INTO rc;
+---- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','Client Hostname:'||InputLocalEnvironment.WrittenDestination.TCPIP.Output.ConnectionDetails.ClientDetails.Hostname) INTO rc;
+---- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','id:'||InputLocalEnvironment.WrittenDestination.TCPIP.Output.ConnectionDetails.Id) INTO rc;
+---- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','seq number:'||CAST(InputLocalEnvironment.WrittenDestination.TCPIP.Output.ConnectionDetails.SequenceNumber AS CHARACTER)) INTO rc;
+---- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','open time:'||CAST(InputLocalEnvironment.WrittenDestination.TCPIP.Output.ConnectionDetails.OpenTimestamp AS CHARACTER)) INTO rc;
+---- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','close time:'||CAST(InputLocalEnvironment.WrittenDestination.TCPIP.Output.ConnectionDetails.CloseTimestamp AS CHARACTER)) INTO rc;
+---- CALL writeToLogFile(MessageFlowLabel, 'TCPRouterLog', 'DEBUG','..............end Logging after sending msg...........') INTO rc;
+-- RETURN FALSE;
+-- END;
+--END MODULE;
