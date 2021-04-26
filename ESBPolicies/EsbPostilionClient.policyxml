@@ -2,7 +2,7 @@
 <policies>
   <policy policyType="TCPIPClient" policyName="EsbPostilionClient" policyTemplate="TCPIPClient">
     <Hostname>localhost</Hostname>
-    <Port>8806</Port>
+    <Port>8817</Port>
     <SSLProtocol></SSLProtocol>
     <SSLCiphers></SSLCiphers>
     <MinimumConnections>0</MinimumConnections>
