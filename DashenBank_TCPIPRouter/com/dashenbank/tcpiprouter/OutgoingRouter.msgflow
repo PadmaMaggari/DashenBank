@@ -31,7 +31,7 @@
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="254,75" computeExpression="esql://routine/com.dashenbank.tcpiprouter#OutgoingRouterFlow_RouteBasedOnProtocol.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="RouteBasedOnProtocol"/>
       </nodes>
-      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_9" location="491,134" destinationMode="list">
+      <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_9" location="491,134" destinationQueueManagerName="DASHEN" destinationMode="list">
         <translation xmi:type="utility:ConstantString" string="EXCEP_Q"/>
       </nodes>
       <nodes xmi:type="ComIbmTCPIPServerOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="464,46" connectionDetails="{ESBPolicies}:EsbPostilionServer" modifyOutputStream="release" modifyInputStream="release">
