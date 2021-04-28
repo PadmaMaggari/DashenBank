@@ -6,6 +6,7 @@
 		<project>DashenBank_ExceptionHandlerLib</project>
 		<project>DashenBank_GenericFunctionsLib</project>
 		<project>ISO8583_Lib</project>
+		<project>DashenBank_TCPIPFlexcubeCall</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
