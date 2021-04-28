@@ -10,13 +10,13 @@
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="477,57" computeExpression="esql://routine/#base24_esql.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="Compute"/>
       </nodes>
-      <nodes xmi:type="ComIbmTCPIPClientReceive.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="328,80" connectionDetails="{ESBPolicies}:EsbPostilionClient" timeoutWaitingForData="80" modifyInputStream="reserve" modifyOutputStream="release" messageDomainProperty="DFDL" messageSetProperty="{ISO8583_Lib}" messageTypeProperty="{}:ISO8583WithHeader" recordDetection="parsedRecordSequence">
+      <nodes xmi:type="ComIbmTCPIPClientReceive.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="328,80" connectionDetails="localhost:8521" timeoutWaitingForData="80" modifyInputStream="release" modifyOutputStream="release" messageDomainProperty="DFDL" messageSetProperty="{ISO8583_Lib}" messageTypeProperty="{}:ISO8583_1987" recordDetection="parsedRecordSequence">
         <translation xmi:type="utility:ConstantString" string="TCPIP Client Receive"/>
       </nodes>
       <nodes xmi:type="ComIbmMQInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="116,70" queueName="BASE24_REQ_INQ" destinationQueueManagerName="DASHEN" messageDomainProperty="DFDL" messageSetProperty="{ISO8583_Lib}" messageTypeProperty="{}:ISO8583_1987" transactionMode="no">
         <translation xmi:type="utility:ConstantString" string="MQ Input"/>
       </nodes>
-      <nodes xmi:type="ComIbmTCPIPClientOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="199,83" connectionDetails="{ESBPolicies}:EsbPostilionClient" timeoutSendingData="80" closeOutputStream="true" modifyInputStream="reserveThenRelease">
+      <nodes xmi:type="ComIbmTCPIPClientOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="199,83" connectionDetails="localhost:8521" timeoutSendingData="80" closeOutputStream="true" modifyInputStream="reserveThenRelease">
         <translation xmi:type="utility:ConstantString" string="TCPIP Client Output"/>
       </nodes>
       <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_5" location="585,23" queueName="BASE24_RES_OUTQ" destinationQueueManagerName="DASHEN">

@@ -34,7 +34,7 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_TCPIPRouter/icons/full/obj16/IncomingRouter.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_TCPIPRouter/icons/full/obj30/IncomingRouter.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmTCPIPServerInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="71,74" connectionDetails="{ESBPolicies}:EsbPostilionServer" timeoutWaitingForData="100" messageDomainProperty="DFDL" messageSetProperty="{ISO8583_Lib}" messageTypeProperty="{}:ISO8583_1987" validateTiming="immediate" recordDetection="fixedLength" recordLength="2">
+      <nodes xmi:type="ComIbmTCPIPServerInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="71,74" connectionDetails="8521" timeoutWaitingForData="100" modifyInputStream="reserve" messageDomainProperty="DFDL" messageSetProperty="{ISO8583_Lib}" messageTypeProperty="{}:ISO8583_1987" validateTiming="immediate" recordDetection="parsedRecordSequence" recordLength="2">
         <translation xmi:type="utility:ConstantString" string="BackendISOReq"/>
       </nodes>
       <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="653,72" destinationQueueManagerName="DASHEN" destinationMode="list">

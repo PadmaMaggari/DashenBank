@@ -117,7 +117,7 @@ CREATE COMPUTE MODULE IncomingRouterFlow_RouteToInterfaceBasedonProcessingCode
 			SET OutputRoot.MQRFH2.usr.resQueueName = DBValues.values.TCP_RES_QNAME;
 		END IF;
 		SET OutputRoot.MQRFH2.usr.esbPcode = Environment.MQRFH2.usr.esbPcode;
-		SET OutputRoot.DFDL = InputRoot.DFDL;
+		SET OutputRoot.DFDL.ISO8583_1987 = InputRoot.DFDL.ISO8583_1987;
 		-- CALL writeToLogFile(MessageFlowLabel,'TCPRouterLog','DEBUG','=====================================Business QUEUENAME=================================') INTO rc ;
 		-- CALL writeToLogFile(MessageFlowLabel,'TCPRouterLog','DEBUG',QueueName) INTO rc ;
 		SET OutputLocalEnvironment.Destination.MQ.DestinationData[1].queueName = QueueName;
@@ -126,7 +126,9 @@ CREATE COMPUTE MODULE IncomingRouterFlow_RouteToInterfaceBasedonProcessingCode
 
 	CREATE PROCEDURE STORE_CACHE (IN procCodeData CHARACTER)
 	BEGIN
-		SET getDBDetailsCache.Values[] = SELECT A.* FROM Database.DB_ESB_TRAN_DETAILS AS A;
+		SET getDBDetailsCache.Values[] = PASSTHRU('SELECT * FROM DB_ESB_TRAN_DETAILS' TO Database.DBDSN);
+	--	SET Environment.DBdetails = getDBDetailsCache;
+	--	SET getDBDetailsCache.Values[] = SELECT A.* FROM Database.DB_ESB_TRAN_DETAILS AS A;
 		IF EXISTS(getDBDetailsCache.Values[]) THEN
 			-- CALL writeToLogFile(MessageFlowLabel,'TCPRouterLog','DEBUG','Retrieved values from Database')INTO rc;
 		ELSE
