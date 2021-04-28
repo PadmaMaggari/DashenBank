@@ -6,17 +6,17 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_FlexcubeTCPIPSimulator/icons/full/obj16/TCPIP_Simulator.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_FlexcubeTCPIPSimulator/icons/full/obj30/TCPIP_Simulator.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="312,53" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.tcpipsimulator#TCPIPSimulator_Compute.Main" computeMode="all">
-        <translation xmi:type="utility:ConstantString" string="Compute"/>
+      <nodes xmi:type="ComIbmTCPIPServerOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="486,76" connectionDetails="{ESB_DBPolicies}:FlexcubeServer" closeOutputStream="true" modifyInputStream="release">
+        <translation xmi:type="utility:ConstantString" string="TCPIP Server Output(T24toESB)"/>
       </nodes>
-      <nodes xmi:type="ComIbmTCPIPServerInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="197,44" connectionDetails="{ESB_DBPolicies}:FlexcubeServer" closeConnection="endOfFlow" messageDomainProperty="DFDL" messageSetProperty="{ISO8583_Lib}" messageTypeProperty="{}:ISO8583_1987" validateTiming="immediate">
-        <translation xmi:type="utility:ConstantString" string="TCPIP Server Input"/>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="270,52" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.tcpipsimulator#TCPIPSimulator_Compute.Main" computeMode="all">
+        <translation xmi:type="utility:ConstantString" string="Based On Processing Code andMTI"/>
       </nodes>
-      <nodes xmi:type="ComIbmTCPIPServerOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="373,43" connectionDetails="{ESB_DBPolicies}:FlexcubeServer" closeConnection="afterData" closeOutputStream="true" modifyOutputStream="release" modifyInputStream="release">
-        <translation xmi:type="utility:ConstantString" string="TCPIP Server Output"/>
+      <nodes xmi:type="ComIbmTCPIPServerInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_9" location="106,75" connectionDetails="{ESB_DBPolicies}:FlexcubeServer" modifyInputStream="reserve" messageDomainProperty="DFDL" messageSetProperty="{ISO8583_Lib}" messageTypeProperty="{}:ISO8583_1987" recordDetection="parsedRecordSequence">
+        <translation xmi:type="utility:ConstantString" string="TCPIP Server Input(ESBT24)"/>
       </nodes>
-      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_1" sourceNode="FCMComposite_1_2" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
-      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="FCMComposite_1_3" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" targetNode="FCMComposite_1_8" sourceNode="FCMComposite_1_9" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_6" targetNode="FCMComposite_1_7" sourceNode="FCMComposite_1_8" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
     </composition>
     <propertyOrganizer/>
     <stickyBoard/>
