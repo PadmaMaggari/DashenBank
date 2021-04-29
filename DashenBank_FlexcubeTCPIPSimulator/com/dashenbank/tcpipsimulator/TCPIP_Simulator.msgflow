@@ -6,13 +6,13 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_FlexcubeTCPIPSimulator/icons/full/obj16/TCPIP_Simulator.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_FlexcubeTCPIPSimulator/icons/full/obj30/TCPIP_Simulator.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmTCPIPServerOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="486,76" connectionDetails="{ESB_DBPolicies}:FlexcubeServer" closeOutputStream="true" modifyInputStream="release">
+      <nodes xmi:type="ComIbmTCPIPServerOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_7" location="486,76" connectionDetails="1289" closeOutputStream="true">
         <translation xmi:type="utility:ConstantString" string="TCPIP Server Output(T24toESB)"/>
       </nodes>
       <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_8" location="270,52" dataSource="DBDSN" computeExpression="esql://routine/com.dashenbank.tcpipsimulator#TCPIPSimulator_Compute.Main" computeMode="all">
         <translation xmi:type="utility:ConstantString" string="Based On Processing Code andMTI"/>
       </nodes>
-      <nodes xmi:type="ComIbmTCPIPServerInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_9" location="106,75" connectionDetails="{ESB_DBPolicies}:FlexcubeServer" modifyInputStream="reserve" messageDomainProperty="DFDL" messageSetProperty="{ISO8583_Lib}" messageTypeProperty="{}:ISO8583_1987" recordDetection="parsedRecordSequence">
+      <nodes xmi:type="ComIbmTCPIPServerInput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_9" location="106,75" connectionDetails="1289" modifyInputStream="reserve" messageDomainProperty="DFDL" messageSetProperty="{ISO8583_Lib}" messageTypeProperty="{}:ISO8583_1987" recordDetection="parsedRecordSequence">
         <translation xmi:type="utility:ConstantString" string="TCPIP Server Input(ESBT24)"/>
       </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_5" targetNode="FCMComposite_1_8" sourceNode="FCMComposite_1_9" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>

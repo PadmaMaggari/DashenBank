@@ -6,16 +6,16 @@
     <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_TCPIPFlexcubeCall/icons/full/obj16/TCPIP_FlexcubeCall.gif"/>
     <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/DashenBank_TCPIPFlexcubeCall/icons/full/obj30/TCPIP_FlexcubeCall.gif"/>
     <composition>
-      <nodes xmi:type="ComIbmTCPIPClientOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="182,20" connectionDetails="{ESB_DBPolicies}:FlexcubeClient" closeOutputStream="true" modifyInputStream="reserveThenRelease">
+      <nodes xmi:type="ComIbmTCPIPClientOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_3" location="182,20" connectionDetails="1289" closeOutputStream="true" modifyInputStream="reserveThenRelease">
         <translation xmi:type="utility:ConstantString" string="TCPIP Client Output"/>
       </nodes>
       <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Output" location="455,20">
         <translation xmi:type="utility:TranslatableString" key="OutTerminal.Output" bundleName="com/dashenbank/tcpipcall/TCPIP_FlexcubeCall" pluginId="DashenBank_TCPIPFlexcubeCall"/>
       </nodes>
-      <nodes xmi:type="ComIbmTCPIPClientReceive.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="325,14" connectionDetails="{ESB_DBPolicies}:FlexcubeClient" modifyInputStream="release" modifyOutputStream="release" messageDomainProperty="DFDL" messageSetProperty="{ISO8583_Lib}" messageTypeProperty="{}:ISO8583_1987" recordDetection="parsedRecordSequence">
+      <nodes xmi:type="ComIbmTCPIPClientReceive.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_4" location="325,14" connectionDetails="1289" modifyInputStream="release" modifyOutputStream="release" messageDomainProperty="DFDL" messageSetProperty="{ISO8583_Lib}" messageTypeProperty="{}:ISO8583_1987" recordDetection="parsedRecordSequence">
         <translation xmi:type="utility:ConstantString" string="TCPIP Client Receive"/>
       </nodes>
-      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.Input" location="130,20">
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.Input" location="103,41">
         <translation xmi:type="utility:TranslatableString" key="InTerminal.Input" bundleName="com/dashenbank/tcpipcall/TCPIP_FlexcubeCall" pluginId="DashenBank_TCPIPFlexcubeCall"/>
       </nodes>
       <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_4" targetNode="FCMComposite_1_3" sourceNode="InTerminal.Input" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>

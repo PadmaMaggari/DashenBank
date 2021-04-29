@@ -77,7 +77,7 @@ CREATE COMPUTE MODULE BalanceEnquiry_TCPFlow_GenerateReqToFlexcube
 		-- PROPAGATE TO TERMINAL 'out1';
 		-- END IF;
 		----------------------
-		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.DFDL = NULL;
 		SET OutputRoot.MQRFH2 = Environment.MQRFH2;
 		SET OutputRoot.DFDL = Environment.dfdlData;
 	END;
@@ -133,6 +133,7 @@ CREATE COMPUTE MODULE BalanceEnquiry_TCPFlow_GenerateResToBase24
 		-- PROPAGATE TO TERMINAL 'out';
 		-- END IF;
 		----------------------
+		SET OutputRoot.DFDL = NULL;           -- comment this line when if log required is uncomment
 		SET OutputRoot.Properties = Environment.Properties;
 		SET OutputRoot.MQMD = InputRoot.MQMD;
 		SET OutputRoot.MQRFH2 = Environment.MQRFH2;

@@ -106,7 +106,7 @@ CREATE COMPUTE MODULE IncomingRouterFlow_RouteToInterfaceBasedonProcessingCode
 			CALL STORE_CACHE(procCodeData);
 			DECLARE DBValues ROW;
 			IF version||class||funct||origin = '0800' OR version||class||funct||origin = '0801' THEN
-				SET DBValues.values[] = SELECT T.TCP_REQ_QNAME, T.TCP_RES_QNAME FROM getDBDetailsCache.Values[] AS T WHERE T.PROC_CODE = NETWORKPROCESSCODE AND T.MSGDOMAIN =ISO ;
+				SET DBValues.values[] = SELECT T.TCP_REQ_QNAME, T.TCP_RES_QNAME FROM getDBDetailsCache.Values[] AS T WHERE T.PROC_CODE = NETWORKPROCESSCODE AND T.MSGDOMAIN = ISO ;
 			ELSE
 				SET DBValues.values[] = SELECT T.TCP_REQ_QNAME, T.TCP_RES_QNAME FROM getDBDetailsCache.Values[] AS T WHERE T.PROC_CODE = procCodeData AND T.MSGDOMAIN = ISO ;
 				CALL generateEsbPcode(procCode,channel);
