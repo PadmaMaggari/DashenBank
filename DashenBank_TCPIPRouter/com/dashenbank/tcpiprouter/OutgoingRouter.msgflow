@@ -34,8 +34,8 @@
       <nodes xmi:type="ComIbmMQOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_9" location="491,134" destinationQueueManagerName="DASHEN" destinationMode="list">
         <translation xmi:type="utility:ConstantString" string="EXCEP_Q"/>
       </nodes>
-      <nodes xmi:type="ComIbmTCPIPServerOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="464,46" connectionDetails="9875" closeOutputStream="true" modifyOutputStream="release" modifyInputStream="release">
-        <translation xmi:type="utility:ConstantString" string="PostilionServerOut"/>
+      <nodes xmi:type="ComIbmTCPIPServerOutput.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_2" location="464,46" connectionDetails="{ESB_DBPolicies}:Base24Server" closeOutputStream="true" modifyOutputStream="release" modifyInputStream="release">
+        <translation xmi:type="utility:ConstantString" string="Base24ServerOut"/>
       </nodes>
       <nodes xmi:type="com_dashenbank_genericsubflow_ExceptionHandlerSubFlow.subflow:FCMComposite_1" xmi:id="FCMComposite_1_4" location="207,156">
         <translation xmi:type="utility:ConstantString" string="ExceptionHandler"/>
